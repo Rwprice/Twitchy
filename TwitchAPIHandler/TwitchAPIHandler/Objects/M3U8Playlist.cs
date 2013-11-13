@@ -10,7 +10,7 @@ namespace TwitchAPIHandler.Objects
 {
     public class M3U8Playlist
     {
-        public Dictionary<string, string> streams;
+        public Dictionary<string, string> streams { get; set; }
 
         public static async Task<M3U8Playlist> GetStreamPlaylist(string Channel, AccessToken accessToken)
         {
@@ -56,7 +56,7 @@ namespace TwitchAPIHandler.Objects
 
                 if (line.Contains("NAME="))
                 {
-                    string quality = line.Substring(line.IndexOf("NAME="));
+                    string quality = line.Substring(line.IndexOf("NAME=") + 5);
                     quality = quality.Remove(quality.IndexOf(",AUTOSELECT="));
 
                     QualityAndStreamPair.Add(quality, lines[i + 2]);
