@@ -17,7 +17,6 @@ namespace TwitchAPIHandler.Objects
             Uri m3u8_path = new Uri(string.Format(PathStrings.M3U8_PATH, Channel, accessToken.Token, accessToken.Signature));
             var request = HttpWebRequest.Create(m3u8_path);
             request.Method = "GET";
-            request.ContentType = "text/plain; charset=utf-8 ";
             var response = await HttpRequest(request);
 
             return new M3U8Playlist
@@ -28,7 +27,7 @@ namespace TwitchAPIHandler.Objects
 
         private static async Task<string> HttpRequest(WebRequest request)
         {
-            string received;
+            string received = "";
 
             using (var response = (HttpWebResponse)(await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null)))
             {
@@ -40,6 +39,7 @@ namespace TwitchAPIHandler.Objects
                     }
                 }
             }
+
 
             return received;
         }
@@ -56,8 +56,8 @@ namespace TwitchAPIHandler.Objects
 
                 if (line.Contains("NAME="))
                 {
-                    string quality = line.Substring(line.IndexOf("NAME=") + 5);
-                    quality = quality.Remove(quality.IndexOf(",AUTOSELECT="));
+                    string quality = line.Substring(line.IndexOf("NAME=") + 6);
+                    quality = quality.Remove(quality.IndexOf(",AUTOSELECT=")-1);
 
                     QualityAndStreamPair.Add(quality, lines[i + 2]);
                 }

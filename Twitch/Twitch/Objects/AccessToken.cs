@@ -24,7 +24,6 @@ namespace TwitchAPIHandler.Objects
             Uri access_token_path = new Uri(string.Format(PathStrings.TOKEN_PATH, Channel));
             var request = HttpWebRequest.Create(access_token_path);
             request.Method = "GET";
-            request.ContentType = "text/plain; charset=utf-8 ";
             var response = await HttpRequest(request);
             JToken o = JObject.Parse(response);
             return new AccessToken
@@ -36,7 +35,7 @@ namespace TwitchAPIHandler.Objects
 
         private static async Task<string> HttpRequest(WebRequest request)
         {
-            string received;
+            string received = "";
 
             using (var response = (HttpWebResponse)(await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null)))
             {
@@ -48,6 +47,7 @@ namespace TwitchAPIHandler.Objects
                     }
                 }
             }
+
 
             return received;
         }
