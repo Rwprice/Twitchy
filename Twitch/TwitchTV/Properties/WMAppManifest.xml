@@ -2,7 +2,7 @@
 
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
   <DefaultLanguage xmlns="" code="en-US"/>
-  <App xmlns="" ProductID="{23092aa3-fc19-4918-9021-64e285a651b0}" Title="TwitchTV" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal"  Author="TwitchTV author" Description="Sample description" Publisher="TwitchTV" PublisherID="{fe35c8c9-6297-4fc5-888e-242703a8ba28}">
+  <App xmlns="" ProductID="{30b779bd-58c5-4929-bc9f-890f4460e09c}" Title="TwitchTV" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal"  Author="TwitchTV author" Description="Sample description" Publisher="TwitchTV" PublisherID="{3f927707-aac9-49f1-acba-8dade4d1b4fc}">
     <IconPath IsRelative="true" IsResource="false">Assets\ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING"/>

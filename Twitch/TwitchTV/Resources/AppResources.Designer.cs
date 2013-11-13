@@ -92,7 +92,7 @@ namespace TwitchTV.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to MY APPLICATION.
+        ///   Looks up a localized string similar to my application.
         /// </summary>
         public static string ApplicationTitle
         {
@@ -103,24 +103,13 @@ namespace TwitchTV.Resources
         }
 
         /// <summary>
-        ///   Looks up a localized string similar to button.
+        ///   Looks up a localized string similar to Sample Runtime Property Value.
         /// </summary>
-        public static string AppBarButtonText
+        public static string SampleProperty
         {
             get
             {
-                return ResourceManager.GetString("AppBarButtonText", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Looks up a localized string similar to menu item.
-        /// </summary>
-        public static string AppBarMenuItemText
-        {
-            get
-            {
-                return ResourceManager.GetString("AppBarMenuItemText", resourceCulture);
+                return ResourceManager.GetString("SampleProperty", resourceCulture);
             }
         }
     }
