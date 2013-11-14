@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="Objects\AccessToken.cs" />
     <Compile Include="Objects\M3U8Playlist.cs" />
+    <Compile Include="Objects\Stream.cs" />
     <Compile Include="Objects\StreamFileList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PathStrings.Designer.cs">

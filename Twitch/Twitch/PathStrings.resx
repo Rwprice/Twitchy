@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="FRONT_PAGE_STREAMS_PATH" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/streams/featured?limit=8&amp;offset=0</value>
+  </data>
   <data name="M3U8_PATH" xml:space="preserve">
     <value>http://usher.twitch.tv/api/channel/hls/{0}.m3u8?token={1}&amp;sig={2}</value>
   </data>

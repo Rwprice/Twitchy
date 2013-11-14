@@ -7,7 +7,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignData SampleData/MainViewModelSampleData.xaml}"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -43,21 +42,45 @@
             </phone:Panorama.Background>
 
             <!--Front Page-->
-            <phone:PanoramaItem Header="Front Page" Orientation="Horizontal">
+            <phone:PanoramaItem Header="Featured Streams" Orientation="Horizontal">
                 <!--Double wide Panorama with large image placeholders-->
                 <Grid>
                     <StackPanel Margin="0,4,16,0" Orientation="Vertical" VerticalAlignment="Top">
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                            <Border Background="#FFFFC700" Height="173" Width="173" Margin="12,0,0,0"/>
-                            <Border Background="#FFFFC700" Height="173" Width="173" Margin="12,0,0,0"/>
-                            <Border Background="#FFFFC700" Height="173" Width="173" Margin="12,0,0,0"/>
-                            <Border Background="#FFFFC700" Height="173" Width="173" Margin="12,0,0,0"/>
+                            <Canvas Name="FP1" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Image Name="FP1Image"/>
+                                <TextBlock Name="FP1Text"/>
+                            </Canvas>
+                            <Canvas Name="FP3" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Image Name="FP3Image"/>
+                                <TextBlock Name="FP3Text"/>
+                            </Canvas>
+                            <Canvas Name="FP5" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Image Name="FP5Image"/>
+                                <TextBlock Name="FP5Text"/>
+                            </Canvas>
+                            <Canvas Name="FP7" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Image Name="FP7Image"/>
+                                <TextBlock Name="FP7Text"/>
+                            </Canvas>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0">
-                            <Border Background="#FFFFC700" Height="173" Width="173" Margin="12,0,0,0"/>
-                            <Border Background="#FFFFC700" Height="173" Width="173" Margin="12,0,0,0"/>
-                            <Border Background="#FFFFC700" Height="173" Width="173" Margin="12,0,0,0"/>
-                            <Border Background="#FFFFC700" Height="173" Width="173" Margin="12,0,0,0"/>
+                            <Canvas Name="FP2" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Image Name="FP2Image" />
+                                <TextBlock Name="FP2Text"/>
+                            </Canvas>
+                            <Canvas Name="FP4" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Image Name="FP4Image"/>
+                                <TextBlock Name="FP4Text"/>
+                            </Canvas>
+                            <Canvas Name="FP6" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Image Name="FP6Image"/>
+                                <TextBlock Name="FP6Text"/>
+                            </Canvas>
+                            <Canvas Name="FP8" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Image Name="FP8Image"/>
+                                <TextBlock Name="FP8Text"/>
+                            </Canvas>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -66,7 +89,7 @@
             <!--Top Streams-->
             <phone:PanoramaItem>
                 <!--Double line list with image placeholder and text wrapping using a floating header that scrolls with the content-->
-                <phone:LongListSelector Margin="0,-38,-22,2" ItemsSource="{Binding Items}">
+                <phone:LongListSelector Margin="0,-38,-22,2" ItemsSource="{Binding TopStreams}">
                     <phone:LongListSelector.ListHeaderTemplate>
                         <DataTemplate>
                             <Grid Margin="12,0,0,38">
@@ -86,7 +109,7 @@
                                 <!--Replace rectangle with image-->
                                 <Border BorderThickness="1" Width="99" Height="99" BorderBrush="#FFFFC700" Background="#FFFFC700"/>
                                 <StackPanel Width="311" Margin="8,-7,0,0">
-                                    <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" />
+                                    <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" Tap="TopStreamTapped"/>
                                     <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
                                 </StackPanel>
                             </StackPanel>
@@ -98,7 +121,7 @@
             <!--Top Games-->
             <phone:PanoramaItem>
                 <!--Double line list with image placeholder and text wrapping using a floating header that scrolls with the content-->
-                <phone:LongListSelector Margin="0,-38,-22,2" ItemsSource="{Binding Items}">
+                <phone:LongListSelector Margin="0,-38,-22,2" ItemsSource="{Binding TopGames}">
                     <phone:LongListSelector.ListHeaderTemplate>
                         <DataTemplate>
                             <Grid Margin="12,0,0,38">
@@ -118,7 +141,7 @@
                                 <!--Replace rectangle with image-->
                                 <Border BorderThickness="1" Width="99" Height="99" BorderBrush="#FFFFC700" Background="#FFFFC700"/>
                                 <StackPanel Width="311" Margin="8,-7,0,0">
-                                    <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" />
+                                    <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" Tap="TopGameTapped"/>
                                     <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
                                 </StackPanel>
                             </StackPanel>
@@ -130,11 +153,11 @@
             <!--Settings-->
             <phone:PanoramaItem Header="Settings">
                 <!--Single line list with text wrapping-->
-                <phone:LongListSelector Margin="0,0,-22,0" ItemsSource="{Binding Items}">
+                <phone:LongListSelector Margin="0,0,-22,0" ItemsSource="{Binding Settings}">
                     <phone:LongListSelector.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Margin="0,-6,0,12">
-                                <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeExtraLarge}"/>
+                                <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Tap="SettingTapped"/>
                             </StackPanel>
                         </DataTemplate>
                     </phone:LongListSelector.ItemTemplate>
