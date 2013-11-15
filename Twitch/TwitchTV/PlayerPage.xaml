@@ -11,7 +11,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-    SupportedOrientations="Landscape" Orientation="Landscape"
+    SupportedOrientations="Landscape"  Orientation="Landscape"
     mc:Ignorable="d"
     shell:SystemTray.IsVisible="False">
 
@@ -23,10 +23,10 @@
         </Grid.RowDefinitions>
 
         <!--ContentPanel - place additional content here-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <player:MediaPlayer Name="Video" Margin="0,10">
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="0,0,0,0">
+            <player:MediaPlayer Name="Video" Margin="0,0">
                 <player:MediaPlayer.Plugins>
-                    <smmedia:StreamingMediaPlugin />
+                    <smmedia:StreamingMediaPlugin/>
                 </player:MediaPlayer.Plugins>
             </player:MediaPlayer>
         </Grid>

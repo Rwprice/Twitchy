@@ -27,13 +27,24 @@ namespace TwitchTV
             token = await AccessToken.GetToken(App.ViewModel.channel);
             playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.channel, token);
 
-            string path_to_video = playlist.streams["High"];
+            string path_to_video = playlist.streams["Low"];
             this.Video.Source = new Uri(path_to_video, UriKind.RelativeOrAbsolute);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             GetVideo();
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            this.Video.Close();
+            base.OnNavigatedFrom(e);
+        }
+
+        protected override void OnOrientationChanged(OrientationChangedEventArgs e)
+        {
+            base.OnOrientationChanged(e);
         }
     }
 }
