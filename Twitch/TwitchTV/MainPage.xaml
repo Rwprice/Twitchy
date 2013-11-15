@@ -38,7 +38,7 @@
          <!--Panorama control-->
         <phone:Panorama Title="TwitchTV">
             <phone:Panorama.Background>
-                <ImageBrush ImageSource="/TwitchTV;component/Assets/PanoramaBackground.png"/>
+                <ImageBrush ImageSource="/Twitchy;component/Assets/PanoramaBackground.png"/>
             </phone:Panorama.Background>
 
             <!--Front Page-->
@@ -108,35 +108,35 @@
                     <StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS0" Tap="TopStreamTapped">
                             <Image Name="TS0Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS0Text"/>
+                            <TextBlock Name="TS0Text" Margin="20,0,0,0"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS1" Tap="TopStreamTapped">
                             <Image Name="TS1Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS1Text"/>
+                            <TextBlock Name="TS1Text" Margin="20,0,0,0"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS2" Tap="TopStreamTapped">
                             <Image Name="TS2Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS2Text"/>
+                            <TextBlock Name="TS2Text" Margin="20,0,0,0"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS3" Tap="TopStreamTapped">
                             <Image Name="TS3Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS3Text"/>
+                            <TextBlock Name="TS3Text" Margin="20,0,0,0"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS4" Tap="TopStreamTapped">
                             <Image Name="TS4Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS4Text"/>
+                            <TextBlock Name="TS4Text" Margin="20,0,0,0"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS5" Tap="TopStreamTapped">
                             <Image Name="TS5Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS5Text"/>
+                            <TextBlock Name="TS5Text" Margin="20,0,0,0"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS6" Tap="TopStreamTapped">
                             <Image Name="TS6Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS6Text"/>
+                            <TextBlock Name="TS6Text" Margin="20,0,0,0"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS7" Tap="TopStreamTapped">
                             <Image Name="TS7Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS7Text"/>
+                            <TextBlock Name="TS7Text" Margin="20,0,0,0"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>

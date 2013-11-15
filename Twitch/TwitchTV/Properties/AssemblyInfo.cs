@@ -6,11 +6,11 @@ using System.Resources;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TwitchTV")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Twitchy")]
+[assembly: AssemblyDescription("Unofficial Twitch TV app for watching streams on Windows Phone 8")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("TwitchTV")]
+[assembly: AssemblyCompany("Earthquake Unicorn Productions")]
+[assembly: AssemblyProduct("Twitchy")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
