@@ -39,7 +39,7 @@ namespace TwitchAPIHandler.Objects
                         name = arrayValue.SelectToken("game").SelectToken("name").ToString(),
                         box = new Box
                         {
-                            template = arrayValue.SelectToken("game").SelectToken("box").SelectToken("template").ToString()
+                            medium = new Uri(arrayValue.SelectToken("game").SelectToken("box").SelectToken("medium").ToString())
                         }
                     },
                 });
@@ -76,6 +76,6 @@ namespace TwitchAPIHandler.Objects
 
     public class Box
     {
-        public string template { get; set; }
+        public Uri medium { get; set; }
     }
 }

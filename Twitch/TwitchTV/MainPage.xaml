@@ -79,7 +79,7 @@
                             </Canvas>
                             <Canvas Name="FP8" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Image Name="FP8Image"/>
-                                <TextBlock Name="FP8Text"/>
+                                <TextBlock Name="FP8Text" />
                             </Canvas>
                         </StackPanel>
                     </StackPanel>
@@ -87,83 +87,94 @@
             </phone:PanoramaItem>
 
             <!--Top Streams-->
-            <phone:PanoramaItem>
-                <!--Double line list with image placeholder and text wrapping using a floating header that scrolls with the content-->
-                <phone:LongListSelector Margin="0,-38,-22,2" ItemsSource="{Binding TopStreams}">
-                    <phone:LongListSelector.ListHeaderTemplate>
-                        <DataTemplate>
-                            <Grid Margin="12,0,0,38">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="Top Streams"
-                                           Style="{StaticResource PanoramaItemHeaderTextStyle}"
-                                           Grid.Row="0"/>
-                            </Grid>
-                        </DataTemplate>
-                    </phone:LongListSelector.ListHeaderTemplate>
-                    <phone:LongListSelector.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="12,2,0,4" Height="105" Width="432">
-                                <!--Replace rectangle with image-->
-                                <Border BorderThickness="1" Width="99" Height="99" BorderBrush="#FFFFC700" Background="#FFFFC700"/>
-                                <StackPanel Width="311" Margin="8,-7,0,0">
-                                    <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" Tap="TopStreamTapped"/>
-                                    <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </phone:LongListSelector.ItemTemplate>
-                </phone:LongListSelector>
+            <phone:PanoramaItem Header="Top Streams" Orientation="Vertical">
+                <ScrollViewer>
+                    <StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS0" Tap="TopStreamTapped">
+                            <Image Name="TS0Image" Height="136" Width="190"/>
+                            <TextBlock Name="TS0Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS1" Tap="TopStreamTapped">
+                            <Image Name="TS1Image" Height="136" Width="190"/>
+                            <TextBlock Name="TS1Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS2" Tap="TopStreamTapped">
+                            <Image Name="TS2Image" Height="136" Width="190"/>
+                            <TextBlock Name="TS2Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS3" Tap="TopStreamTapped">
+                            <Image Name="TS3Image" Height="136" Width="190"/>
+                            <TextBlock Name="TS3Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS4" Tap="TopStreamTapped">
+                            <Image Name="TS4Image" Height="136" Width="190"/>
+                            <TextBlock Name="TS4Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS5" Tap="TopStreamTapped">
+                            <Image Name="TS5Image" Height="136" Width="190"/>
+                            <TextBlock Name="TS5Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS6" Tap="TopStreamTapped">
+                            <Image Name="TS6Image" Height="136" Width="190"/>
+                            <TextBlock Name="TS6Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS7" Tap="TopStreamTapped">
+                            <Image Name="TS7Image" Height="136" Width="190"/>
+                            <TextBlock Name="TS7Text"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </phone:PanoramaItem>
 
             <!--Top Games-->
-            <phone:PanoramaItem>
-                <!--Double line list with image placeholder and text wrapping using a floating header that scrolls with the content-->
-                <phone:LongListSelector Margin="0,-38,-22,2" ItemsSource="{Binding TopGames}">
-                    <phone:LongListSelector.ListHeaderTemplate>
-                        <DataTemplate>
-                            <Grid Margin="12,0,0,38">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="Top Games"
-                                           Style="{StaticResource PanoramaItemHeaderTextStyle}"
-                                           Grid.Row="0"/>
-                            </Grid>
-                        </DataTemplate>
-                    </phone:LongListSelector.ListHeaderTemplate>
-                    <phone:LongListSelector.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Margin="12,2,0,4" Height="105" Width="432">
-                                <!--Replace rectangle with image-->
-                                <Border BorderThickness="1" Width="99" Height="99" BorderBrush="#FFFFC700" Background="#FFFFC700"/>
-                                <StackPanel Width="311" Margin="8,-7,0,0">
-                                    <TextBlock Text="{Binding game.name}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" Tap="TopGameTapped"/>
-                                    <TextBlock Text="{Binding viewers}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </phone:LongListSelector.ItemTemplate>
-                </phone:LongListSelector>
+            <phone:PanoramaItem Header="Top Games" Orientation="Vertical">
+                <ScrollViewer>
+                    <StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG0" Tap="TopGameTapped">
+                            <Image Name="TG0Image" Height="136" Width="190"/>
+                            <TextBlock Name="TG0Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG1" Tap="TopGameTapped">
+                            <Image Name="TG1Image" Height="136" Width="190"/>
+                            <TextBlock Name="TG1Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG2" Tap="TopGameTapped">
+                            <Image Name="TG2Image" Height="136" Width="190"/>
+                            <TextBlock Name="TG2Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG3" Tap="TopGameTapped">
+                            <Image Name="TG3Image" Height="136" Width="190"/>
+                            <TextBlock Name="TG3Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG4" Tap="TopGameTapped">
+                            <Image Name="TG4Image" Height="136" Width="190"/>
+                            <TextBlock Name="TG4Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG5" Tap="TopGameTapped">
+                            <Image Name="TG5Image" Height="136" Width="190"/>
+                            <TextBlock Name="TG5Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG6" Tap="TopGameTapped">
+                            <Image Name="TG6Image" Height="136" Width="190"/>
+                            <TextBlock Name="TG6Text"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG7" Tap="TopGameTapped">
+                            <Image Name="TG7Image" Height="136" Width="190"/>
+                            <TextBlock Name="TG7Text"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </phone:PanoramaItem>
             
             <!--Settings-->
             <phone:PanoramaItem Header="Settings">
-                <!--Single line list with text wrapping-->
-                <phone:LongListSelector Margin="0,0,-22,0" ItemsSource="{Binding Settings}">
-                    <phone:LongListSelector.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,-6,0,12">
-                                <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeExtraLarge}" Tap="SettingTapped"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </phone:LongListSelector.ItemTemplate>
-                </phone:LongListSelector>
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="Some Setting" Name="SomeSetting" FontSize="18" Margin="100,0,0,0" Tap="SettingTapped"/>
+                    </StackPanel>
+                </ScrollViewer>
             </phone:PanoramaItem>
-            
+
         </phone:Panorama>
 
         <!--Uncomment to see an alignment grid to help ensure your controls are
