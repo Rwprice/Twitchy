@@ -61,7 +61,7 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/featured?limit=8&amp;offset=0.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/featured?limit=8&amp;offset=0&amp;hls=true.
         /// </summary>
         internal static string FRONT_PAGE_STREAMS_PATH {
             get {
@@ -88,11 +88,29 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/games/top?limit=8&amp;offset=0.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/games/top?limit=8&amp;offset=0&amp;hls=true.
         /// </summary>
         internal static string TOP_GAMES_PATH {
             get {
                 return ResourceManager.GetString("TOP_GAMES_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams?game={0}&amp;hls=true.
+        /// </summary>
+        internal static string TOP_STREAMS_FOR_GAME_PATH {
+            get {
+                return ResourceManager.GetString("TOP_STREAMS_FOR_GAME_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams?hls=true.
+        /// </summary>
+        internal static string TOP_STREAMS_PATH {
+            get {
+                return ResourceManager.GetString("TOP_STREAMS_PATH", resourceCulture);
             }
         }
     }

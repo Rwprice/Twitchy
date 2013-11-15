@@ -47,39 +47,55 @@
                 <Grid>
                     <StackPanel Margin="0,4,16,0" Orientation="Vertical" VerticalAlignment="Top">
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                            <Canvas Name="FP1" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Image Name="FP1Image"/>
-                                <TextBlock Name="FP1Text"/>
+                            <Canvas Name="FP0" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Border Height="200" Width="320" Background="Black"/>
+                                <Image Name="FP0Image"/>
+                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                                <TextBlock Name="FP0Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP3" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Image Name="FP3Image"/>
-                                <TextBlock Name="FP3Text"/>
+                            <Canvas Name="FP2" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Border Height="200" Width="320" Background="Black"/>
+                                <Image Name="FP2Image"/>
+                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                                <TextBlock Name="FP2Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP5" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Image Name="FP5Image"/>
-                                <TextBlock Name="FP5Text"/>
+                            <Canvas Name="FP4" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Border Height="200" Width="320" Background="Black"/>
+                                <Image Name="FP4Image"/>
+                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                                <TextBlock Name="FP4Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP7" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Image Name="FP7Image"/>
-                                <TextBlock Name="FP7Text"/>
+                            <Canvas Name="FP6" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Border Height="200" Width="320" Background="Black"/>
+                                <Image Name="FP6Image"/>
+                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                                <TextBlock Name="FP6Text" Text="Loading..."/>
                             </Canvas>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0">
-                            <Canvas Name="FP2" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Image Name="FP2Image" />
-                                <TextBlock Name="FP2Text"/>
+                            <Canvas Name="FP1" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Border Height="200" Width="320" Background="Black"/>
+                                <Image Name="FP1Image" />
+                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                                <TextBlock Name="FP1Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP4" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Image Name="FP4Image"/>
-                                <TextBlock Name="FP4Text"/>
+                            <Canvas Name="FP3" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Border Height="200" Width="320" Background="Black"/>
+                                <Image Name="FP3Image"/>
+                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                                <TextBlock Name="FP3Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP6" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Image Name="FP6Image"/>
-                                <TextBlock Name="FP6Text"/>
+                            <Canvas Name="FP5" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Border Height="200" Width="320" Background="Black"/>
+                                <Image Name="FP5Image"/>
+                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                                <TextBlock Name="FP5Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP8" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Image Name="FP8Image"/>
-                                <TextBlock Name="FP8Text" />
+                            <Canvas Name="FP7" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                                <Border Height="200" Width="320" Background="Black"/>
+                                <Image Name="FP7Image"/>
+                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                                <TextBlock Name="FP7Text" Text="Loading..."/>
                             </Canvas>
                         </StackPanel>
                     </StackPanel>
@@ -170,7 +186,7 @@
             <phone:PanoramaItem Header="Settings">
                 <ScrollViewer>
                     <StackPanel>
-                        <TextBlock Text="Some Setting" Name="SomeSetting" FontSize="18" Margin="100,0,0,0" Tap="SettingTapped"/>
+                        <TextBlock Text="Some Setting" Name="SomeSetting" Margin="100,0,0,0" Tap="SettingTapped" FontSize="30"/>
                     </StackPanel>
                 </ScrollViewer>
             </phone:PanoramaItem>

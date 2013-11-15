@@ -86,14 +86,5 @@ namespace TwitchTV.Resources {
                 return ResourceManager.GetString("ResourceLanguage", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Sample Runtime Property Value.
-        /// </summary>
-        public static string SampleProperty {
-            get {
-                return ResourceManager.GetString("SampleProperty", resourceCulture);
-            }
-        }
     }
 }

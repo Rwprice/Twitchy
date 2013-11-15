@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="FRONT_PAGE_STREAMS_PATH" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/streams/featured?limit=8&amp;offset=0</value>
+    <value>https://api.twitch.tv/kraken/streams/featured?limit=8&amp;offset=0&amp;hls=true</value>
   </data>
   <data name="M3U8_PATH" xml:space="preserve">
     <value>http://usher.twitch.tv/api/channel/hls/{0}.m3u8?token={1}&amp;sig={2}</value>
@@ -127,6 +127,12 @@
     <value>http://api.twitch.tv/api/channels/{0}/access_token</value>
   </data>
   <data name="TOP_GAMES_PATH" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/games/top?limit=8&amp;offset=0</value>
+    <value>https://api.twitch.tv/kraken/games/top?limit=8&amp;offset=0&amp;hls=true</value>
+  </data>
+  <data name="TOP_STREAMS_FOR_GAME_PATH" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/streams?game={0}&amp;hls=true</value>
+  </data>
+  <data name="TOP_STREAMS_PATH" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/streams?hls=true</value>
   </data>
 </root>

@@ -128,7 +128,4 @@
   <data name="ApplicationTitle" xml:space="preserve">
     <value>TwitchTV</value>
   </data>
-  <data name="SampleProperty" xml:space="preserve">
-    <value>Sample Runtime Property Value</value>
-  </data>
 </root>

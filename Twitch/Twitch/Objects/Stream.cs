@@ -21,7 +21,16 @@ namespace TwitchAPIHandler.Objects
             var request = HttpWebRequest.Create(front_page_streams_path);
             request.Method = "GET";
             var response = await HttpRequest(request);
-            return JsonToStreamList(response);
+            return JsonToFeaturedStreamsList(response);
+        }
+
+        public static async Task<List<Stream>> GetTopStreams()
+        {
+            Uri top_streams_path = new Uri(PathStrings.TOP_STREAMS_PATH);
+            var request = HttpWebRequest.Create(top_streams_path);
+            request.Method = "GET";
+            var response = await HttpRequest(request);
+            return JsonToTopStreamsList(response);
         }
 
         private static async Task<string> HttpRequest(WebRequest request)
@@ -43,7 +52,7 @@ namespace TwitchAPIHandler.Objects
             return received;
         }
 
-        private static List<Stream> JsonToStreamList(string json)
+        private static List<Stream> JsonToFeaturedStreamsList(string json)
         {
             List<Stream> featuredStreams = new List<Stream>();
             JToken o = JObject.Parse(json);
@@ -57,6 +66,7 @@ namespace TwitchAPIHandler.Objects
                     viewers = int.Parse(stream.SelectToken("viewers").ToString()),
                     preview = new Preview
                     {
+                        small = new Uri(stream.SelectToken("preview").SelectToken("small").ToString()),
                         medium = new Uri(stream.SelectToken("preview").SelectToken("medium").ToString())
                     },
                     channel = new Channel
@@ -70,11 +80,40 @@ namespace TwitchAPIHandler.Objects
 
             return featuredStreams;
         }
+
+        private static List<Stream> JsonToTopStreamsList(string json)
+        {
+            List<Stream> featuredStreams = new List<Stream>();
+            JToken o = JObject.Parse(json);
+            JArray featured = JArray.Parse(o.SelectToken("streams").ToString());
+
+            foreach (var arrayValue in featured)
+            {
+                featuredStreams.Add(new Stream()
+                {
+                    viewers = int.Parse(arrayValue.SelectToken("viewers").ToString()),
+                    preview = new Preview
+                    {
+                        small = new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()),
+                        medium = new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString())
+                    },
+                    channel = new Channel
+                    {
+                        display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString(),
+                        name = arrayValue.SelectToken("channel").SelectToken("name").ToString(),
+                        status = arrayValue.SelectToken("channel").SelectToken("status").ToString()
+                    }
+                });
+            }
+
+            return featuredStreams;
+        }
     }
 
     public class Preview
     {
         public Uri medium { get; set; }
+        public Uri small { get; set; }
     }
 
     public class Channel
