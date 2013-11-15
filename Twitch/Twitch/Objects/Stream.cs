@@ -33,6 +33,15 @@ namespace TwitchAPIHandler.Objects
             return JsonToTopStreamsList(response);
         }
 
+        public static async Task<List<Stream>> GetTopStreamsForGame(string gameName)
+        {
+            Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_FOR_GAME_PATH, gameName));
+            var request = HttpWebRequest.Create(top_streams_path);
+            request.Method = "GET";
+            var response = await HttpRequest(request);
+            return JsonToTopStreamsList(response);
+        }
+
         private static async Task<string> HttpRequest(WebRequest request)
         {
             string received = "";

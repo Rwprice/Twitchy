@@ -106,7 +106,7 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams?hls=true.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams?hls=true&amp;limit=8.
         /// </summary>
         internal static string TOP_STREAMS_PATH {
             get {

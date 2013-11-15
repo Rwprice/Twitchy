@@ -133,6 +133,6 @@
     <value>https://api.twitch.tv/kraken/streams?game={0}&amp;hls=true</value>
   </data>
   <data name="TOP_STREAMS_PATH" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/streams?hls=true</value>
+    <value>https://api.twitch.tv/kraken/streams?hls=true&amp;limit=8</value>
   </data>
 </root>
