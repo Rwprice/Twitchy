@@ -126,4 +126,7 @@
   <data name="TOKEN_PATH" xml:space="preserve">
     <value>http://api.twitch.tv/api/channels/{0}/access_token</value>
   </data>
+  <data name="TOP_GAMES_PATH" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/games/top?limit=8&amp;offset=0</value>
+  </data>
 </root>

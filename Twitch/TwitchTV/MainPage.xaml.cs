@@ -55,6 +55,7 @@ namespace TwitchTV
             int index = int.Parse(((Canvas)sender).Name.Remove(0, 2)) - 1;
             string name = App.ViewModel.FeaturedStreams[index].channel.name;
 
+            //Go to the video player page
             AccessToken token = await AccessToken.GetToken(name);
             M3U8Playlist playlist = await M3U8Playlist.GetStreamPlaylist(name, token);
             StreamFileList fileList = await StreamFileList.UpdateStreamFileList(playlist, "Mobile");

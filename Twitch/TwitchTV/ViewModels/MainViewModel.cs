@@ -14,7 +14,7 @@ namespace TwitchTV.ViewModels
         public MainViewModel()
         {
             this.TopStreams = new ObservableCollection<ItemViewModel>();
-            this.TopGames = new ObservableCollection<ItemViewModel>();
+            this.TopGames = new List<TopGame>();
             this.Settings = new ObservableCollection<ItemViewModel>();
             this.FeaturedStreams = new List<Stream>();
         }
@@ -32,7 +32,7 @@ namespace TwitchTV.ViewModels
         /// <summary>
         /// A collection for ItemViewModel objects.
         /// </summary>
-        public ObservableCollection<ItemViewModel> TopGames { get; private set; }
+        public List<TopGame> TopGames { get; private set; }
 
         /// <summary>
         /// A collection for ItemViewModel objects.
@@ -80,7 +80,7 @@ namespace TwitchTV.ViewModels
         /// <summary>
         /// Creates and adds a few ItemViewModel
         /// </summary>
-        public void LoadData()
+        public async void LoadData()
         {
             // Sample data; replace with real data
             this.Settings.Add(new ItemViewModel() 
@@ -88,11 +88,7 @@ namespace TwitchTV.ViewModels
                 LineOne = "Some Setting"
             });
 
-            this.TopGames.Add(new ItemViewModel()
-            {
-                LineOne = "Some Game",
-                LineTwo = "1337"
-            });
+            this.TopGames = await TopGame.GetTopGames();
 
             this.TopStreams.Add(new ItemViewModel()
             {

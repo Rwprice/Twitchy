@@ -86,5 +86,14 @@ namespace TwitchAPIHandler {
                 return ResourceManager.GetString("TOKEN_PATH", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/games/top?limit=8&amp;offset=0.
+        /// </summary>
+        internal static string TOP_GAMES_PATH {
+            get {
+                return ResourceManager.GetString("TOP_GAMES_PATH", resourceCulture);
+            }
+        }
     }
 }
