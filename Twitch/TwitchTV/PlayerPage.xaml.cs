@@ -15,7 +15,6 @@ namespace TwitchTV
     {
         public AccessToken token { get; set; }
         public M3U8Playlist playlist { get; set; }
-        public StreamFileList fileList { get; set; }
 
         public PlayerPage()
         {
@@ -27,8 +26,9 @@ namespace TwitchTV
             //Go to the video player page
             token = await AccessToken.GetToken(App.ViewModel.channel);
             playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.channel, token);
-            fileList = await StreamFileList.UpdateStreamFileList(playlist, "Mobile");
-            MessageBox.Show(fileList.IndexList[0]);
+
+            string path_to_video = playlist.streams["Low"];
+            this.Video.Source = new Uri(path_to_video, UriKind.RelativeOrAbsolute);
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

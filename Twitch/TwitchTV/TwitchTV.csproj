@@ -143,6 +143,7 @@
     </Content>
     <Resource Include="Assets\loading_128x.GIF" />
     <Resource Include="Assets\loading_99x.GIF" />
+    <Content Include="Assets\football.ts" />
     <Content Include="Assets\Tiles\FlipCycleTileLarge.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -170,6 +171,15 @@
       <Project>{A117E9E7-F939-4B97-B69B-6DD45061DB86}</Project>
       <Name>TwitchAPIHandler</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SM.Media.MediaPlayer.WP8\SM.Media.MediaPlayer.WP8.csproj">
+      <Project>{503BEB79-3826-4966-9767-F957F1D83E0C}</Project>
+      <Name>SM.Media.MediaPlayer.WP8</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="Microsoft.PlayerFramework.WP8.Core, Version=1.8.2.1">
+      <Name>Microsoft Player Framework</Name>
+    </SDKReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
