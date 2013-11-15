@@ -1,18 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SM.Media.MediaPlayer.WP8", "SM.Media.MediaPlayer.WP8\SM.Media.MediaPlayer.WP8.csproj", "{503BEB79-3826-4966-9767-F957F1D83E0C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4731C804-661E-41D1-A0E0-A7FDECCE88B3}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchAPIHandler", "C:\src\Twitch-Windows-Phone-8\Twitch\Twitch\TwitchAPIHandler.csproj", "{A117E9E7-F939-4B97-B69B-6DD45061DB86}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchTV", "C:\src\Twitch-Windows-Phone-8\Twitch\TwitchTV\TwitchTV.csproj", "{30B779BD-58C5-4929-BC9F-890F4460E09C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twitchy", "TwitchTV\Twitchy.csproj", "{30B779BD-58C5-4929-BC9F-890F4460E09C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,16 +15,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Debug|ARM.ActiveCfg = Debug|ARM
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Debug|ARM.Build.0 = Debug|ARM
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Debug|x86.ActiveCfg = Debug|x86
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Debug|x86.Build.0 = Debug|x86
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Release|Any CPU.ActiveCfg = Release|x86
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Release|ARM.ActiveCfg = Release|ARM
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Release|ARM.Build.0 = Release|ARM
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Release|x86.ActiveCfg = Release|x86
-		{503BEB79-3826-4966-9767-F957F1D83E0C}.Release|x86.Build.0 = Release|x86
 		{A117E9E7-F939-4B97-B69B-6DD45061DB86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A117E9E7-F939-4B97-B69B-6DD45061DB86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A117E9E7-F939-4B97-B69B-6DD45061DB86}.Debug|ARM.ActiveCfg = Debug|ARM

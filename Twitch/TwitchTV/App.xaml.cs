@@ -44,7 +44,6 @@ namespace TwitchTV
         /// </summary>
         public App()
         {
-            // Global handler for uncaught exceptions.
             UnhandledException += Application_UnhandledException;
 
             // Standard XAML initialization

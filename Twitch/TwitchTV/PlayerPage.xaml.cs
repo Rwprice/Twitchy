@@ -27,7 +27,7 @@ namespace TwitchTV
             token = await AccessToken.GetToken(App.ViewModel.channel);
             playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.channel, token);
 
-            string path_to_video = playlist.streams["Low"];
+            string path_to_video = playlist.streams["High"];
             this.Video.Source = new Uri(path_to_video, UriKind.RelativeOrAbsolute);
         }
 
