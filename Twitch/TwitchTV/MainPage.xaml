@@ -12,31 +12,37 @@
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="False">
-
+    
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
+        
+        <Grid.Resources>
+            
+            <DataTemplate x:Name="TopStreamsTemplate">
+                <StackPanel Orientation="Horizontal" Margin="12,2,0,4" Height="105" Width="432">
+                    <Image Source="{Binding preview.small}" Width="130" Height="130"/>
+                    <StackPanel Width="311" Margin="8,-7,0,0">
+                        <TextBlock Text="{Binding channel.display_name}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" />
+                        <TextBlock Text="{Binding viewers, StringFormat='Viewers: {0}'}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
 
-        <!-- LOCALIZATION NOTE:
-            To localize the displayed strings copy their values to appropriately named
-            keys in the app's neutral language resource file (AppResources.resx) then
-            replace the hard-coded text value between the attributes' quotation marks
-            with the binding clause whose path points to that string name.
-
-            For example:
-
-                Text="{Binding Path=LocalizedResources.ApplicationTitle, Source={StaticResource LocalizedStrings}}"
-
-            This binding points to the template's string resource named "ApplicationTitle".
-
-            Adding supported languages in the Project Properties tab will create a
-            new resx file per language that can carry the translated values of your
-            UI strings. The binding in these examples will cause the value of the
-            attributes to be drawn from the .resx file that matches the
-            CurrentUICulture of the app at run time.
-         -->
-
+            <DataTemplate x:Name="TopGamesTemplate">
+                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0">
+                    <Image Source="{Binding game.box.medium}" Height="136" Width="190"/>
+                    <StackPanel>
+                        <TextBlock Text="{Binding game.name}" FontSize="26" />
+                        <TextBlock Text="{Binding channels, StringFormat='Channels: {0}'}" Style="{StaticResource PhoneTextSubtleStyle}"  />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+            
+        </Grid.Resources>
+        
          <!--Panorama control-->
-        <phone:Panorama Title="TwitchTV">
+        <phone:Panorama Title="Twitchy">
+            
             <phone:Panorama.Background>
                 <ImageBrush ImageSource="/Twitchy;component/Assets/PanoramaBackground.png"/>
             </phone:Panorama.Background>
@@ -44,7 +50,7 @@
             <!--Front Page-->
             <phone:PanoramaItem Header="Featured Streams" Orientation="Horizontal">
                 <!--Double wide Panorama with large image placeholders-->
-                <Grid>
+                <Grid Name="FeaturedStreams">
                     <StackPanel Margin="0,4,16,0" Orientation="Vertical" VerticalAlignment="Top">
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                             <Canvas Name="FP0" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
@@ -104,82 +110,16 @@
 
             <!--Top Streams-->
             <phone:PanoramaItem Header="Top Streams" Orientation="Vertical">
-                <ScrollViewer>
-                    <StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS0" Tap="TopStreamTapped">
-                            <Image Name="TS0Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS0Text" Margin="20,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS1" Tap="TopStreamTapped">
-                            <Image Name="TS1Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS1Text" Margin="20,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS2" Tap="TopStreamTapped">
-                            <Image Name="TS2Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS2Text" Margin="20,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS3" Tap="TopStreamTapped">
-                            <Image Name="TS3Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS3Text" Margin="20,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS4" Tap="TopStreamTapped">
-                            <Image Name="TS4Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS4Text" Margin="20,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS5" Tap="TopStreamTapped">
-                            <Image Name="TS5Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS5Text" Margin="20,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS6" Tap="TopStreamTapped">
-                            <Image Name="TS6Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS6Text" Margin="20,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS7" Tap="TopStreamTapped">
-                            <Image Name="TS7Image" Height="136" Width="190"/>
-                            <TextBlock Name="TS7Text" Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
+                <ListBox x:Name="TopStreamsList"
+                         ItemTemplate="{StaticResource TopStreamsTemplate}"
+                         SelectionChanged="TopStreamsList_SelectionChanged"/>
             </phone:PanoramaItem>
 
             <!--Top Games-->
             <phone:PanoramaItem Header="Top Games" Orientation="Vertical">
-                <ScrollViewer>
-                    <StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG0" Tap="TopGameTapped">
-                            <Image Name="TG0Image" Height="136" Width="190"/>
-                            <TextBlock Name="TG0Text"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG1" Tap="TopGameTapped">
-                            <Image Name="TG1Image" Height="136" Width="190"/>
-                            <TextBlock Name="TG1Text"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG2" Tap="TopGameTapped">
-                            <Image Name="TG2Image" Height="136" Width="190"/>
-                            <TextBlock Name="TG2Text"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG3" Tap="TopGameTapped">
-                            <Image Name="TG3Image" Height="136" Width="190"/>
-                            <TextBlock Name="TG3Text"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG4" Tap="TopGameTapped">
-                            <Image Name="TG4Image" Height="136" Width="190"/>
-                            <TextBlock Name="TG4Text"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG5" Tap="TopGameTapped">
-                            <Image Name="TG5Image" Height="136" Width="190"/>
-                            <TextBlock Name="TG5Text"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG6" Tap="TopGameTapped">
-                            <Image Name="TG6Image" Height="136" Width="190"/>
-                            <TextBlock Name="TG6Text"/>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TG7" Tap="TopGameTapped">
-                            <Image Name="TG7Image" Height="136" Width="190"/>
-                            <TextBlock Name="TG7Text"/>
-                        </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
+                <ListBox x:Name="TopGamesList"
+                         ItemTemplate="{StaticResource TopGamesTemplate}"
+                         SelectionChanged="TopGamesList_SelectionChanged"/>
             </phone:PanoramaItem>
             
             <!--Settings-->
@@ -192,14 +132,6 @@
             </phone:PanoramaItem>
 
         </phone:Panorama>
-
-        <!--Uncomment to see an alignment grid to help ensure your controls are
-            aligned on common boundaries.  The image has a top margin of -32px to
-            account for the System Tray. Set this to 0 (or remove the margin altogether)
-            if the System Tray is hidden.
-
-            Before shipping remove this XAML and the image itself.-->
-        <!--<Image Source="/Assets/AlignmentGrid.png" VerticalAlignment="Top" Height="800" Width="480" Margin="0" Grid.Row="0" Grid.RowSpan="2" IsHitTestVisible="False" />-->
 
     </Grid>
 </phone:PhoneApplicationPage>

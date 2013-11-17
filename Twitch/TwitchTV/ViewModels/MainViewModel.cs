@@ -21,9 +21,69 @@ namespace TwitchTV.ViewModels
         /// </summary>
         public TopGame curTopGame { get; set; }
 
+        /// <summary>
+        /// Featured Streams
+        /// </summary>
+        private ObservableCollection<Stream> _FeaturedStreams;
+        public ObservableCollection<Stream> FeaturedStreams
+        {
+            get
+            {
+                return _FeaturedStreams;
+            }
+            set
+            {
+                if (value != _FeaturedStreams)
+                {
+                    _FeaturedStreams = value;
+                    NotifyPropertyChanged("FeaturedStreams");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Top Games
+        /// </summary>
+        private ObservableCollection<TopGame> _TopGames;
+        public ObservableCollection<TopGame> TopGames
+        {
+            get
+            {
+                return _TopGames;
+            }
+            set
+            {
+                if (value != _TopGames)
+                {
+                    _TopGames = value;
+                    NotifyPropertyChanged("TopGames");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Top Streams
+        /// </summary>
+        private ObservableCollection<Stream> _TopStreams;
+        public ObservableCollection<Stream> TopStreams
+        {
+            get
+            {
+                return _TopStreams;
+            }
+            set
+            {
+                if (value != _TopStreams)
+                {
+                    _TopStreams = value;
+                    NotifyPropertyChanged("TopStreams");
+                }
+            }
+        }
+
         public MainViewModel()
         {
-
+            curTopGame = new TopGame();
         }
 
         public bool IsDataLoaded
@@ -42,8 +102,12 @@ namespace TwitchTV.ViewModels
             }
         }
 
-        public void LoadData()
+        public async void LoadData()
         {
+            this.FeaturedStreams = await Stream.GetFeaturedStreams();
+            this.TopGames = await TopGame.GetTopGames();
+            this.TopStreams = await Stream.GetTopStreams();
+
             IsDataLoaded = true;
         }
     }

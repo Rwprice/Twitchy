@@ -6,21 +6,59 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using System.Collections.ObjectModel;
+using System.Windows.Media.Imaging;
+using System.ComponentModel;
 
 namespace TwitchAPIHandler.Objects
 {
-    public class TopGame
+    public class TopGame : INotifyPropertyChanged
     {
-        public int channels { get; set; }
-        public Game game { get; set; }
+        private int _channels;
+        public int channels
+        {
+            get
+            {
+                return _channels;
+            }
+            set
+            {
+                if (value != _channels)
+                {
+                    _channels = value;
+                    NotifyPropertyChanged("channels");
+                }
+            }
+        }
 
-        public static async Task<List<TopGame>> GetTopGames()
+        private Game _game;
+        public Game game
+        {
+            get
+            {
+                return _game;
+            }
+            set
+            {
+                if (value != _game)
+                {
+                    _game = value;
+                    NotifyPropertyChanged("game");
+                }
+            }
+        }
+
+        public static async Task<ObservableCollection<TopGame>> GetTopGames()
         {
             Uri top_games_path = new Uri(PathStrings.TOP_GAMES_PATH);
             var request = HttpWebRequest.Create(top_games_path);
             request.Method = "GET";
             var response = await HttpRequest(request);
-            return JsonToTopGames(response);
+            var games = JsonToTopGames(response);
+            var gamesToReturn = new ObservableCollection<TopGame>();
+            foreach (var game in games)
+                gamesToReturn.Add(game);
+            return gamesToReturn;
         }
 
         private static List<TopGame> JsonToTopGames(string json)
@@ -39,7 +77,7 @@ namespace TwitchAPIHandler.Objects
                         name = arrayValue.SelectToken("game").SelectToken("name").ToString(),
                         box = new Box
                         {
-                            medium = new Uri(arrayValue.SelectToken("game").SelectToken("box").SelectToken("medium").ToString())
+                            medium = new BitmapImage(new Uri(arrayValue.SelectToken("game").SelectToken("box").SelectToken("medium").ToString()))
                         }
                     },
                 });
@@ -66,6 +104,16 @@ namespace TwitchAPIHandler.Objects
 
             return received;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(String propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (null != handler)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
     }
 
     public class Game
@@ -76,6 +124,6 @@ namespace TwitchAPIHandler.Objects
 
     public class Box
     {
-        public Uri medium { get; set; }
+        public BitmapImage medium { get; set; }
     }
 }

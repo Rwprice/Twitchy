@@ -1,45 +1,107 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace TwitchAPIHandler.Objects
 {
-    public class Stream
+    public class Stream : INotifyPropertyChanged
     {
-        public int viewers { get; set; }
-        public Preview preview { get; set; }
-        public Channel channel { get; set; }
+        private int _viewers;
+        public int viewers
+        {
+            get
+            {
+                return _viewers;
+            }
+            set
+            {
+                if (value != _viewers)
+                {
+                    _viewers = value;
+                    NotifyPropertyChanged("viewers");
+                }
+            }
+        }
 
-        public static async Task<List<Stream>> GetFeaturedStreams()
+        private Preview _preview;
+        public Preview preview
+        {
+            get
+            {
+                return _preview;
+            }
+            set
+            {
+                if (value != _preview)
+                {
+                    _preview = value;
+                    NotifyPropertyChanged("preview");
+                }
+            }
+        }
+
+        private Channel _channel;
+        public Channel channel
+        {
+            get
+            {
+                return _channel;
+            }
+            set
+            {
+                if (value != _channel)
+                {
+                    _channel = value;
+                    NotifyPropertyChanged("channel");
+                }
+            }
+        }
+
+        public static async Task<ObservableCollection<Stream>> GetFeaturedStreams()
         {
             Uri front_page_streams_path = new Uri(PathStrings.FRONT_PAGE_STREAMS_PATH);
             var request = HttpWebRequest.Create(front_page_streams_path);
             request.Method = "GET";
             var response = await HttpRequest(request);
-            return JsonToFeaturedStreamsList(response);
+            var streams = JsonToFeaturedStreamsList(response);
+            var streamsToReturn = new ObservableCollection<Stream>();
+            foreach (var stream in streams)
+                streamsToReturn.Add(stream);
+            return streamsToReturn;
         }
 
-        public static async Task<List<Stream>> GetTopStreams()
+        public static async Task<ObservableCollection<Stream>> GetTopStreams()
         {
             Uri top_streams_path = new Uri(PathStrings.TOP_STREAMS_PATH);
             var request = HttpWebRequest.Create(top_streams_path);
             request.Method = "GET";
             var response = await HttpRequest(request);
-            return JsonToTopStreamsList(response);
+            var streams = JsonToTopStreamsList(response);
+            var streamsToReturn = new ObservableCollection<Stream>();
+            foreach (var stream in streams)
+                streamsToReturn.Add(stream);
+            return streamsToReturn;
         }
 
-        public static async Task<List<Stream>> GetTopStreamsForGame(string gameName)
+        public static async Task<ObservableCollection<Stream>> GetTopStreamsForGame(string gameName)
         {
             Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_FOR_GAME_PATH, gameName));
             var request = HttpWebRequest.Create(top_streams_path);
             request.Method = "GET";
             var response = await HttpRequest(request);
-            return JsonToTopStreamsList(response);
+            var streams = JsonToTopStreamsList(response);
+            var streamsToReturn = new ObservableCollection<Stream>();
+            foreach (var stream in streams)
+                streamsToReturn.Add(stream);
+            return streamsToReturn;
         }
 
         private static async Task<string> HttpRequest(WebRequest request)
@@ -75,8 +137,8 @@ namespace TwitchAPIHandler.Objects
                     viewers = int.Parse(stream.SelectToken("viewers").ToString()),
                     preview = new Preview
                     {
-                        small = new Uri(stream.SelectToken("preview").SelectToken("small").ToString()),
-                        medium = new Uri(stream.SelectToken("preview").SelectToken("medium").ToString())
+                        small = new BitmapImage(new Uri(stream.SelectToken("preview").SelectToken("small").ToString())),
+                        medium = new BitmapImage(new Uri(stream.SelectToken("preview").SelectToken("medium").ToString()))
                     },
                     channel = new Channel
                     {
@@ -103,8 +165,8 @@ namespace TwitchAPIHandler.Objects
                     viewers = int.Parse(arrayValue.SelectToken("viewers").ToString()),
                     preview = new Preview
                     {
-                        small = new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()),
-                        medium = new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString())
+                        small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString())),
+                        medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()))
                     },
                     channel = new Channel
                     {
@@ -117,12 +179,22 @@ namespace TwitchAPIHandler.Objects
 
             return featuredStreams;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(String propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (null != handler)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
     }
 
     public class Preview
     {
-        public Uri medium { get; set; }
-        public Uri small { get; set; }
+        public BitmapImage medium { get; set; }
+        public BitmapImage small { get; set; }
     }
 
     public class Channel

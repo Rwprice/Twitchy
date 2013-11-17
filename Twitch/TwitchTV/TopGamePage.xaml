@@ -15,44 +15,24 @@
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <!--Top Streams-->
-        <phone:PanoramaItem Name="TGHeader" Orientation="Vertical">
-            <ScrollViewer>
-                <StackPanel>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS0" Tap="SendToVideoPage">
-                        <Image Name="TS0Image" Height="136" Width="190"/>
-                        <TextBlock Name="TS0Text" Margin="20,0,0,0"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS1" Tap="SendToVideoPage">
-                        <Image Name="TS1Image" Height="136" Width="190"/>
-                        <TextBlock Name="TS1Text" Margin="20,0,0,0"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS2" Tap="SendToVideoPage">
-                        <Image Name="TS2Image" Height="136" Width="190"/>
-                        <TextBlock Name="TS2Text" Margin="20,0,0,0"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS3" Tap="SendToVideoPage">
-                        <Image Name="TS3Image" Height="136" Width="190"/>
-                        <TextBlock Name="TS3Text" Margin="20,0,0,0"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS4" Tap="SendToVideoPage">
-                        <Image Name="TS4Image" Height="136" Width="190"/>
-                        <TextBlock Name="TS4Text" Margin="20,0,0,0"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS5" Tap="SendToVideoPage">
-                        <Image Name="TS5Image" Height="136" Width="190"/>
-                        <TextBlock Name="TS5Text" Margin="20,0,0,0"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS6" Tap="SendToVideoPage">
-                        <Image Name="TS6Image" Height="136" Width="190"/>
-                        <TextBlock Name="TS6Text" Margin="20,0,0,0"/>
-                    </StackPanel>
-                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0" Name="TS7" Tap="SendToVideoPage">
-                        <Image Name="TS7Image" Height="136" Width="190"/>
-                        <TextBlock Name="TS7Text" Margin="20,0,0,0"/>
+        
+        <Grid.Resources>
+            <DataTemplate x:Name="TopStreamsTemplate">
+                <StackPanel Orientation="Horizontal" Margin="12,2,0,4" Height="105" Width="432">
+                    <Image Source="{Binding preview.small}" Width="130" Height="130"/>
+                    <StackPanel Width="311" Margin="8,-7,0,0">
+                        <TextBlock Text="{Binding channel.display_name}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" />
+                        <TextBlock Text="{Binding viewers, StringFormat='Viewers: {0}'}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
                     </StackPanel>
                 </StackPanel>
-            </ScrollViewer>
+            </DataTemplate>
+        </Grid.Resources>
+        
+        <!--Top Streams-->
+        <phone:PanoramaItem Name="TGHeader" Orientation="Vertical">
+            <ListBox x:Name="TopStreamsList"
+                         ItemTemplate="{StaticResource TopStreamsTemplate}"
+                         SelectionChanged="TopStreamsList_SelectionChanged"/>
         </phone:PanoramaItem>
     </Grid>
 
