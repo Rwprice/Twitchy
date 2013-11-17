@@ -45,7 +45,7 @@ namespace TwitchTV
 
         private void TopGamePage_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            this.TopStreamsList.ItemsSource = App.ViewModel.TopStreams;
+            this.TopStreamsList.ItemsSource = this.TopStreams;
         }
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
