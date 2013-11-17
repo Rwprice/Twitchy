@@ -80,7 +80,7 @@ namespace TwitchAPIHandler.Objects
 
         public static async Task<ObservableCollection<Stream>> GetTopStreams()
         {
-            Uri top_streams_path = new Uri(PathStrings.TOP_STREAMS_PATH);
+            Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_PATH, 0));
             var request = HttpWebRequest.Create(top_streams_path);
             request.Method = "GET";
             var response = await HttpRequest(request);
@@ -93,7 +93,7 @@ namespace TwitchAPIHandler.Objects
 
         public static async Task<ObservableCollection<Stream>> GetTopStreamsForGame(string gameName)
         {
-            Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_FOR_GAME_PATH, gameName));
+            Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_FOR_GAME_PATH, gameName, 0));
             var request = HttpWebRequest.Create(top_streams_path);
             request.Method = "GET";
             var response = await HttpRequest(request);

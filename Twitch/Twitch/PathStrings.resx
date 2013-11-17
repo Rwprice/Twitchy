@@ -127,12 +127,12 @@
     <value>http://api.twitch.tv/api/channels/{0}/access_token</value>
   </data>
   <data name="TOP_GAMES_PATH" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/games/top?limit=8&amp;offset=0&amp;hls=true</value>
+    <value>https://api.twitch.tv/kraken/games/top?limit=8&amp;offset={0}&amp;hls=true</value>
   </data>
   <data name="TOP_STREAMS_FOR_GAME_PATH" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/streams?game={0}&amp;hls=true</value>
+    <value>https://api.twitch.tv/kraken/streams?game={0}&amp;hls=true&amp;limit=8&amp;offset={1}</value>
   </data>
   <data name="TOP_STREAMS_PATH" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/streams?hls=true&amp;limit=8</value>
+    <value>https://api.twitch.tv/kraken/streams?hls=true&amp;limit=8&amp;offset={0}</value>
   </data>
 </root>

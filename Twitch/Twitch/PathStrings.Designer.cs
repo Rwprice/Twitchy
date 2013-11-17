@@ -88,7 +88,7 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/games/top?limit=8&amp;offset=0&amp;hls=true.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/games/top?limit=8&amp;offset={0}&amp;hls=true.
         /// </summary>
         internal static string TOP_GAMES_PATH {
             get {
@@ -97,7 +97,7 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams?game={0}&amp;hls=true.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams?game={0}&amp;hls=true&amp;limit=8&amp;offset={1}.
         /// </summary>
         internal static string TOP_STREAMS_FOR_GAME_PATH {
             get {
@@ -106,7 +106,7 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams?hls=true&amp;limit=8.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams?hls=true&amp;limit=8&amp;offset={0}.
         /// </summary>
         internal static string TOP_STREAMS_PATH {
             get {

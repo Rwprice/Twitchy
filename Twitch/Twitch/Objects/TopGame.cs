@@ -50,7 +50,7 @@ namespace TwitchAPIHandler.Objects
 
         public static async Task<ObservableCollection<TopGame>> GetTopGames()
         {
-            Uri top_games_path = new Uri(PathStrings.TOP_GAMES_PATH);
+            Uri top_games_path = new Uri(string.Format(PathStrings.TOP_GAMES_PATH, 0));
             var request = HttpWebRequest.Create(top_games_path);
             request.Method = "GET";
             var response = await HttpRequest(request);
