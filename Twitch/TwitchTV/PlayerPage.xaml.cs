@@ -54,8 +54,6 @@ namespace TwitchTV
 
         public void GetVideo()
         {
-            this.Video.Close();
-
             string path_to_video = playlist.streams[quality];
 
             this.Video.ControlPanel.IsEnabled = false;
