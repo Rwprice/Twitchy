@@ -10,11 +10,13 @@ namespace TwitchAPIHandler.Objects
 {
     public class M3U8Playlist
     {
-        public Dictionary<string, string> streams { get; set; }
+        public static Uri indexUri;
+        public Dictionary<string, Uri> streams { get; set; }
 
         public static async Task<M3U8Playlist> GetStreamPlaylist(string Channel, AccessToken accessToken)
         {
             Uri m3u8_path = new Uri(string.Format(PathStrings.M3U8_PATH, Channel, accessToken.Token, accessToken.Signature));
+            indexUri = m3u8_path;
             var request = HttpWebRequest.Create(m3u8_path);
             request.Method = "GET";
             var response = await HttpRequest(request);
@@ -44,9 +46,9 @@ namespace TwitchAPIHandler.Objects
             return received;
         }
 
-        private static Dictionary<string, string> GetStreamsFromM3U8(string fileContent)
+        private static Dictionary<string, Uri> GetStreamsFromM3U8(string fileContent)
         {
-            Dictionary<string, string> QualityAndStreamPair = new Dictionary<string, string>();
+            Dictionary<string, Uri> QualityAndStreamPair = new Dictionary<string, Uri>();
 
             string[] lines = fileContent.Split('\n');
 
@@ -59,11 +61,26 @@ namespace TwitchAPIHandler.Objects
                     string quality = line.Substring(line.IndexOf("NAME=") + 6);
                     quality = quality.Remove(quality.IndexOf(",AUTOSELECT=")-1);
 
-                    QualityAndStreamPair.Add(quality, lines[i + 2]);
+                    QualityAndStreamPair.Add(quality, new Uri(lines[i + 2]));
                 }
             }
 
             return QualityAndStreamPair;
+        }
+
+        public int GetIndexOfQuality(string Quality)
+        {
+            int index = -1;
+
+            for (int i = 0; i < streams.Count; i++)
+            {
+                if (streams.Keys.ElementAt(i) == Quality)
+                {
+                    index = i;
+                }
+            }
+
+            return index;
         }
     }
 }

@@ -11,6 +11,14 @@ using TwitchAPIHandler.Objects;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using SM.Media.Web;
+using System.Windows.Threading;
+using SM.Media;
+using SM.Media.Playlists;
+using System.Net.Http.Headers;
+using SM.Media.Utility;
+using SM.Media.Segments;
+using System.Windows.Media;
 
 namespace TwitchTV
 {
@@ -18,49 +26,134 @@ namespace TwitchTV
     {
         public AccessToken token { get; set; }
         public M3U8Playlist playlist { get; set; }
-
-        public List<string> qualitys { get; set; }
-
         public string quality { get; set; }
+
+        public bool firstRun = true;
+
+        readonly IHttpClients _httpClients;
+        IMediaElementManager _mediaElementManager;
+        PlaylistSegmentManager _playlist;
+        ITsMediaManager _tsMediaManager;
+        TsMediaStreamSource _tsMediaStreamSource;
+        Program program;
+        ISubProgram subProgram;
 
         public PlayerPage()
         {
-            qualitys = new List<string>();
             token = new AccessToken();
             playlist = new M3U8Playlist();
             InitializeComponent();
+            _httpClients = new HttpClients();
         }
 
-        public async void GetQualities()
+        private async void GetQualities()
         {
-            if (string.IsNullOrEmpty(token.Token) || string.IsNullOrEmpty(token.Signature))
+            token = await AccessToken.GetToken(App.ViewModel.channel);
+            playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.channel, token);
+
+            if (string.IsNullOrEmpty(quality))
+                quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
+
+            this.QualitySelection.ItemsSource = playlist.streams.Keys;
+            this.QualitySelection.SelectedItem = quality;
+
+            firstRun = false;
+
+            playVideo();
+        }
+
+        async void playVideo()
+        {
+            if (null != _playlist)
             {
-                //Go to the video player page
-                token = await AccessToken.GetToken(App.ViewModel.channel);
-                playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.channel, token);
+                _playlist.Dispose();
+                _playlist = null;
             }
 
-            foreach (var qual in playlist.streams.Keys)
-                qualitys.Add(qual);
+            if (null != _tsMediaStreamSource)
+            {
+                _tsMediaStreamSource.Dispose();
+                _tsMediaStreamSource = null;
+            }
 
-            if(quality == "" || quality == null)
-                quality = qualitys[qualitys.Count-1];
+            var segmentsFactory = new SegmentsFactory(_httpClients);
 
-            qualitys.Reverse();
+            var programManager = new ProgramManager(_httpClients, segmentsFactory.CreateStreamSegments)
+            {
+                Playlists = new Uri[] { M3U8Playlist.indexUri }
+            };
 
-            this.QualitySelection.ItemsSource = qualitys;
-            this.QualitySelection.SelectedItem = quality;
+            var programs = await programManager.LoadAsync();
+
+            program = programs.Values.FirstOrDefault();
+
+            subProgram = program.SubPrograms.ElementAt(playlist.GetIndexOfQuality(quality));
+
+            var programClient = _httpClients.CreatePlaylistClient(program.Url);
+
+            _playlist = new PlaylistSegmentManager(uri => new CachedWebRequest(uri, programClient), subProgram, segmentsFactory.CreateStreamSegments);
+
+            #region MediaElementManager
+            _mediaElementManager = new MediaElementManager(Dispatcher,
+                () =>
+                {
+                    var me = new MediaElement
+                    {
+                        Margin = new Thickness(0, 68, 0, 0)
+
+                    };
+
+                    me.MediaFailed += mediaElement1_MediaFailed;
+                    me.CurrentStateChanged += mediaElement1_CurrentStateChanged;
+                    me.BufferingProgressChanged += OnBufferingProgressChanged;
+                    ContentPanel.Children.Add(me);
+
+                    this.mediaElement1 = me;
+
+                    UpdateState(MediaElementState.Opening);
+
+                    return me;
+                },
+                me =>
+                {
+                    if (null != me)
+                    {
+                        ContentPanel.Children.Remove(me);
+
+                        me.MediaFailed -= mediaElement1_MediaFailed;
+                        me.CurrentStateChanged -= mediaElement1_CurrentStateChanged;
+                        me.BufferingProgressChanged -= OnBufferingProgressChanged;
+                    }
+
+                    mediaElement1.Stop();
+                    mediaElement1 = null;
+
+                    UpdateState(MediaElementState.Closed);
+                });
+            #endregion
+
+            var segmentReaderManager = new SegmentReaderManager(new[] { _playlist }, _httpClients.CreateSegmentClient);
+
+            _tsMediaStreamSource = new TsMediaStreamSource();
+
+            _tsMediaManager = new TsMediaManager(segmentReaderManager, _mediaElementManager, _tsMediaStreamSource);
+
+            _tsMediaManager.OnStateChange += TsMediaManagerOnOnStateChange;
+
+            _tsMediaManager.Play();
         }
 
-        public void GetVideo()
+        async void CleanupMedia()
         {
-            string path_to_video = playlist.streams[quality];
+            await _mediaElementManager.Close();
+            _mediaElementManager = null;
 
-            this.Video.ControlPanel.IsEnabled = false;
-            this.Video.ControlPanel.Visibility = System.Windows.Visibility.Collapsed;
+            _tsMediaManager.Close();
+            _tsMediaManager = null;
 
-            this.Video.Source = new Uri(path_to_video, UriKind.RelativeOrAbsolute);
-            this.Video.Play();
+            await _playlist.StopAsync();
+            _playlist.Dispose();
+            _playlist = null;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -71,36 +164,76 @@ namespace TwitchTV
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            this.Video.Close();
             base.OnNavigatedFrom(e);
+
+            CleanupMedia();
         }
 
-        protected override void OnOrientationChanged(OrientationChangedEventArgs e)
+        void OnBufferingProgressChanged(object sender, RoutedEventArgs routedEventArgs)
         {
-            base.OnOrientationChanged(e);
+            mediaElement1_CurrentStateChanged(sender, routedEventArgs);
+        }
+
+        void mediaElement1_CurrentStateChanged(object sender, RoutedEventArgs e)
+        {
+            var state = null == mediaElement1 ? MediaElementState.Closed : mediaElement1.CurrentState;
+
+            if (null != _mediaElementManager)
+            {
+                var managerState = _tsMediaManager.State;
+
+                if (MediaElementState.Closed == state)
+                {
+                    if (TsMediaManager.MediaState.OpenMedia == managerState || TsMediaManager.MediaState.Opening == managerState || TsMediaManager.MediaState.Playing == managerState)
+                        state = MediaElementState.Opening;
+                }
+            }
+
+            UpdateState(state);
+        }
+
+        void UpdateState(MediaElementState state)
+        {
+            Debug.WriteLine("MediaElement State: " + state);
+
+            if (MediaElementState.Buffering == state && null != mediaElement1)
+                Debug.WriteLine(string.Format("Buffering {0:F2}%", mediaElement1.BufferingProgress * 100));
+            else
+                Debug.WriteLine(state.ToString());
+        }
+
+        void TsMediaManagerOnOnStateChange(object sender, TsMediaManagerStateEventArgs tsMediaManagerStateEventArgs)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                var message = tsMediaManagerStateEventArgs.Message;
+
+                if (!string.IsNullOrWhiteSpace(message))
+                {
+                    Debug.WriteLine(message);
+                }
+
+                mediaElement1_CurrentStateChanged(null, null);
+            });
+        }
+
+        private void mediaElement1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            Debug.WriteLine(e.ErrorException.Message);
+
+            CleanupMedia();
         }
 
         private void QualitySelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var obj = ((ListPicker)(sender)).SelectedItem;
-            if (obj != null)
+            if (!firstRun)
             {
-                quality = (string)obj;
-                GetVideo();
-            }
-        }
-
-        private void Video_Tap(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            if (this.TaskBar.Opacity == 0)
-            {
-                this.TaskBar.Opacity = 1;
-                this.QualitySelection.Opacity = 1;
-            }
-            else
-            {
-                this.TaskBar.Opacity = 0;
-                this.QualitySelection.Opacity = 0;
+                var obj = (string)((ListPicker)(sender)).SelectedItem;
+                if (!string.IsNullOrEmpty(obj))
+                {
+                    quality = obj;
+                    GetQualities();
+                }
             }
         }
     }

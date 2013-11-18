@@ -4,8 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
-    xmlns:player="clr-namespace:Microsoft.PlayerFramework;assembly=Microsoft.PlayerFramework"
-    xmlns:smmedia="clr-namespace:SM.Media.MediaPlayer;assembly=SM.Media.MediaPlayer.WP8"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
@@ -25,15 +23,11 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="0,0,0,0">
-            <player:MediaPlayer Name="Video" Margin="0,0" Tap="Video_Tap">
-                <player:MediaPlayer.Plugins>
-                    <smmedia:StreamingMediaPlugin/>
-                </player:MediaPlayer.Plugins>
-            </player:MediaPlayer>
-            <Border Name="TaskBar" Opacity="0" Background="Gray" BorderBrush="DarkGray" BorderThickness="5" HorizontalAlignment="Left" Height="68" VerticalAlignment="Top" Width="800"/>
+            <MediaElement Name="mediaElement1" AutoPlay="True"/>
+            <Border Name="TaskBar" Opacity="1" Background="Gray" BorderBrush="DarkGray" BorderThickness="5" HorizontalAlignment="Left" Height="68" VerticalAlignment="Top" Width="800"/>
             <toolkit:ListPicker 
                 x:Name="QualitySelection"
-                Opacity="0"
+                Opacity="1"
                 Margin="693,0,0,176" 
                 BorderBrush="DarkGray"
                 SelectionChanged="QualitySelection_SelectionChanged"/>
