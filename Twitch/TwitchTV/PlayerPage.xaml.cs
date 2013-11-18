@@ -64,17 +64,16 @@ namespace TwitchTV
 
         async void playVideo()
         {
+            CleanupMedia();
+
             if (null != _playlist)
             {
-                await _playlist.StopAsync();
                 _playlist.Dispose();
                 _playlist = null;
             }
 
             if (null != _tsMediaStreamSource)
             {
-                await _tsMediaStreamSource.WaitDrain();
-                await _tsMediaStreamSource.CloseAsync();
                 _tsMediaStreamSource.Dispose();
                 _tsMediaStreamSource = null;
             }
@@ -102,8 +101,7 @@ namespace TwitchTV
                 {
                     var me = new MediaElement
                     {
-                        Margin = new Thickness(0, 68, 0, 0)
-
+                        Margin = new Thickness(0,68,0,0)
                     };
 
                     me.MediaFailed += mediaElement1_MediaFailed;
@@ -111,7 +109,7 @@ namespace TwitchTV
                     me.BufferingProgressChanged += OnBufferingProgressChanged;
                     ContentPanel.Children.Add(me);
 
-                    this.mediaElement1 = me;
+                    mediaElement1 = me;
 
                     UpdateState(MediaElementState.Opening);
 
@@ -121,6 +119,8 @@ namespace TwitchTV
                 {
                     if (null != me)
                     {
+                        Debug.Assert(ReferenceEquals(me, mediaElement1));
+
                         ContentPanel.Children.Remove(me);
 
                         me.MediaFailed -= mediaElement1_MediaFailed;
@@ -128,7 +128,6 @@ namespace TwitchTV
                         me.BufferingProgressChanged -= OnBufferingProgressChanged;
                     }
 
-                    mediaElement1.Stop();
                     mediaElement1 = null;
 
                     UpdateState(MediaElementState.Closed);
@@ -136,6 +135,9 @@ namespace TwitchTV
             #endregion
 
             var segmentReaderManager = new SegmentReaderManager(new[] { _playlist }, _httpClients.CreateSegmentClient);
+
+            if (null != _tsMediaManager)
+                _tsMediaManager.OnStateChange -= TsMediaManagerOnOnStateChange;
 
             _tsMediaStreamSource = new TsMediaStreamSource();
 
@@ -148,26 +150,24 @@ namespace TwitchTV
 
         async void CleanupMedia()
         {
-            Debug.WriteLine("Cleaning Media...");
+            if (null != _tsMediaManager)
+                _tsMediaManager.Close();
 
-            await _tsMediaStreamSource.WaitDrain();
-            await _tsMediaStreamSource.CloseAsync();
-            _tsMediaStreamSource.Dispose();
-            _tsMediaStreamSource = null;
+            if (null != _playlist)
+                await _playlist.StopAsync();
 
-            await _mediaElementManager.Close();
-            _mediaElementManager = null;
-
-            _tsMediaManager.Close();
-            _tsMediaManager = null;
-
-            await _playlist.StopAsync();
-            _playlist.Dispose();
-            _playlist = null;
+            if (null != _mediaElementManager)
+                await _mediaElementManager.Close();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            if (null != _mediaElementManager)
+            {
+                _mediaElementManager.Close()
+                                    .Wait();
+            }
+
             GetQualities();
             base.OnNavigatedTo(e);
         }
@@ -177,6 +177,12 @@ namespace TwitchTV
             base.OnNavigatedFrom(e);
 
             CleanupMedia();
+
+            if (null != _mediaElementManager)
+            {
+                _mediaElementManager.Close()
+                                    .Wait();
+            }
         }
 
         void OnBufferingProgressChanged(object sender, RoutedEventArgs routedEventArgs)
