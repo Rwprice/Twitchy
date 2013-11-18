@@ -66,12 +66,15 @@ namespace TwitchTV
         {
             if (null != _playlist)
             {
+                await _playlist.StopAsync();
                 _playlist.Dispose();
                 _playlist = null;
             }
 
             if (null != _tsMediaStreamSource)
             {
+                await _tsMediaStreamSource.WaitDrain();
+                await _tsMediaStreamSource.CloseAsync();
                 _tsMediaStreamSource.Dispose();
                 _tsMediaStreamSource = null;
             }
@@ -145,6 +148,13 @@ namespace TwitchTV
 
         async void CleanupMedia()
         {
+            Debug.WriteLine("Cleaning Media...");
+
+            await _tsMediaStreamSource.WaitDrain();
+            await _tsMediaStreamSource.CloseAsync();
+            _tsMediaStreamSource.Dispose();
+            _tsMediaStreamSource = null;
+
             await _mediaElementManager.Close();
             _mediaElementManager = null;
 
