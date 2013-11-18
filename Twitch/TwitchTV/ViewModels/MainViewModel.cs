@@ -12,9 +12,9 @@ namespace TwitchTV.ViewModels
     public class MainViewModel : INotifyPropertyChanged
     {
         /// <summary>
-        /// Place holder for the channel name while switching screens
+        /// Place holder for the stream while switching screens
         /// </summary>
-        public string channel { get; set; }
+        public Stream stream { get; set; }
 
         /// <summary>
         /// Place holder for the chosen top game while switching screens

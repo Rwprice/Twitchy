@@ -56,13 +56,13 @@ namespace TwitchTV
         private void SendToVideoPage(object sender, System.Windows.Input.GestureEventArgs e)
         {
             int index = int.Parse(((StackPanel)sender).Name.Remove(0, 2));
-            App.ViewModel.channel = this.TopStreams[index].channel.name;
+            App.ViewModel.stream = this.TopStreams[index];
             NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
         }
 
         private void TopStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            App.ViewModel.channel = ((Stream)((ListBox)sender).SelectedItem).channel.name;
+            App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
             NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
         }
 

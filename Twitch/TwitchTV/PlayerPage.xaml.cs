@@ -44,12 +44,13 @@ namespace TwitchTV
             playlist = new M3U8Playlist();
             InitializeComponent();
             _httpClients = new HttpClients();
+            this.Status.Text = App.ViewModel.stream.channel.status;
         }
 
         private async void GetQualities()
         {
-            token = await AccessToken.GetToken(App.ViewModel.channel);
-            playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.channel, token);
+            token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
+            playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
 
             if (string.IsNullOrEmpty(quality))
                 quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
@@ -101,7 +102,9 @@ namespace TwitchTV
                 {
                     var me = new MediaElement
                     {
-                        Margin = new Thickness(0,68,0,0)
+                        Margin = new Thickness(0),
+                        Height = 480,
+                        Width = 800
                     };
 
                     me.MediaFailed += mediaElement1_MediaFailed;
@@ -110,6 +113,7 @@ namespace TwitchTV
                     ContentPanel.Children.Add(me);
 
                     mediaElement1 = me;
+                    mediaElement1.Tap += mediaElement1_Tap;
 
                     UpdateState(MediaElementState.Opening);
 
@@ -250,6 +254,23 @@ namespace TwitchTV
                     quality = obj;
                     GetQualities();
                 }
+            }
+        }
+
+        private void mediaElement1_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (this.TaskBar.Opacity == 0)
+            {
+                this.TaskBar.Opacity = 1;
+                this.QualitySelection.Opacity = 1;
+                this.Status.Opacity = 1;
+            }
+
+            else
+            {
+                this.TaskBar.Opacity = 0;
+                this.QualitySelection.Opacity = 0;
+                this.Status.Opacity = 0;
             }
         }
     }

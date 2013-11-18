@@ -23,11 +23,13 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="0,0,0,0">
-            <MediaElement Name="mediaElement1" AutoPlay="True"/>
-            <Border Name="TaskBar" Opacity="1" Background="Gray" BorderBrush="DarkGray" BorderThickness="5" HorizontalAlignment="Left" Height="68" VerticalAlignment="Top" Width="800"/>
+            <MediaElement Name="mediaElement1" AutoPlay="True" Canvas.ZIndex="0" Tap="mediaElement1_Tap"/>
+            <Border Name="TaskBar" Opacity="0" Canvas.ZIndex="1" Background="Gray" BorderBrush="DarkGray" BorderThickness="5" HorizontalAlignment="Left" Height="68" VerticalAlignment="Top" Width="800"/>
+            <TextBlock Margin="10,10,107,421" Canvas.ZIndex="2" Name="Status" Opacity="0"/>
             <toolkit:ListPicker 
                 x:Name="QualitySelection"
-                Opacity="1"
+                Canvas.ZIndex="3"
+                Opacity="0"
                 Margin="693,0,0,176" 
                 BorderBrush="DarkGray"
                 SelectionChanged="QualitySelection_SelectionChanged"/>

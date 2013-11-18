@@ -72,7 +72,7 @@ namespace TwitchTV
         private void FrontPageIconTapped(object sender, System.Windows.Input.GestureEventArgs e)
         {
             int index = int.Parse(((Canvas)sender).Name.Remove(0, 2));
-            App.ViewModel.channel = App.ViewModel.FeaturedStreams[index].channel.name;
+            App.ViewModel.stream = App.ViewModel.FeaturedStreams[index];
             NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
         }
 
@@ -83,7 +83,7 @@ namespace TwitchTV
 
         private void TopStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            App.ViewModel.channel = ((Stream)((ListBox)sender).SelectedItem).channel.name;
+            App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
             NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
         }
 
