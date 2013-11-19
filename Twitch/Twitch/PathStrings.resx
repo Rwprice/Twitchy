@@ -135,4 +135,10 @@
   <data name="TOP_STREAMS_PATH" xml:space="preserve">
     <value>https://api.twitch.tv/kraken/streams?hls=true&amp;limit=8&amp;offset={0}</value>
   </data>
+  <data name="SEARCH_STREAM_PATH" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/search/streams?limit=8&offset=0&q={0}&live=true&hls=true</value>
+  </data>
+  <data name="SEARCH_GAME_PATH" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/search/games?limit=8&offset=0&q={0}&live=true&hls=true&type=suggest</value>
+  </data>
 </root>
