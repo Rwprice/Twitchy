@@ -60,6 +60,7 @@ namespace TwitchTV
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            this.TopStreamsList.SelectedItem = null;
             if (isNetwork)
             {
                 if (!App.ViewModel.IsDataLoaded)
@@ -83,8 +84,11 @@ namespace TwitchTV
 
         private void TopStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
-            NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+            if (((Stream)((ListBox)sender).SelectedItem) != null)
+            {
+                App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
+                NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+            }
         }
 
         private void TopGamesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
