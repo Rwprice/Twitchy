@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
   <DefaultLanguage xmlns="" code="en-US" />
-  <App xmlns="" ProductID="{30b779bd-58c5-4929-bc9f-890f4460e09c}" Title="TwitchTV" RuntimeType="Silverlight" Version="0.5.0.0" Genre="apps.normal" Author="TwitchTV author" Description="Watch live video game streams from TwitchTV" Publisher="TwitchTV" PublisherID="{3f927707-aac9-49f1-acba-8dade4d1b4fc}">
+  <App xmlns="" ProductID="{30b779bd-58c5-4929-bc9f-890f4460e09c}" Title="Twitchy" RuntimeType="Silverlight" Version="0.5.0.0" Genre="apps.normal" Author="TwitchTV author" Description="Watch live video game streams from TwitchTV" Publisher="TwitchTV" PublisherID="{3f927707-aac9-49f1-acba-8dade4d1b4fc}">
     <IconPath IsRelative="true" IsResource="false">Assets\ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />
@@ -19,7 +19,7 @@
           <SmallImageURI IsRelative="true" IsResource="false">Assets\Tiles\FlipCycleTileSmall.png</SmallImageURI>
           <Count>0</Count>
           <BackgroundImageURI IsRelative="true" IsResource="false">Assets\Tiles\FlipCycleTileMedium.png</BackgroundImageURI>
-          <Title>TwitchTV</Title>
+          <Title>Twitchy</Title>
           <BackContent>
           </BackContent>
           <BackBackgroundImageURI>
