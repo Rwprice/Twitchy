@@ -61,6 +61,8 @@ namespace TwitchTV
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             this.TopStreamsList.SelectedItem = null;
+            this.TopGamesList.SelectedItem = null;
+
             if (isNetwork)
             {
                 if (!App.ViewModel.IsDataLoaded)
@@ -93,8 +95,11 @@ namespace TwitchTV
 
         private void TopGamesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            App.ViewModel.curTopGame = ((TopGame)((ListBox)sender).SelectedItem);
-            NavigationService.Navigate(new Uri("/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
+            if (((TopGame)((ListBox)sender).SelectedItem) != null)
+            {
+                App.ViewModel.curTopGame = ((TopGame)((ListBox)sender).SelectedItem);
+                NavigationService.Navigate(new Uri("/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
+            }
         }
     }
 }
