@@ -37,6 +37,7 @@ namespace TwitchTV
         TsMediaStreamSource _tsMediaStreamSource;
         Program program;
         ISubProgram subProgram;
+        DispatcherTimer uiTimeout;
 
         public PlayerPage()
         {
@@ -45,6 +46,16 @@ namespace TwitchTV
             InitializeComponent();
             _httpClients = new HttpClients();
             this.Status.Text = App.ViewModel.stream.channel.status;
+
+            uiTimeout = new DispatcherTimer();
+            uiTimeout.Interval = new TimeSpan(0, 0, 4);
+            uiTimeout.Tick += uiTimeout_Tick;
+        }
+
+        private void uiTimeout_Tick(object sender, EventArgs e)
+        {
+            if (this.TaskBar.Opacity == 1)
+                ToggleUI();
         }
 
         private async void GetQualities()
@@ -148,6 +159,8 @@ namespace TwitchTV
             _tsMediaManager = new TsMediaManager(segmentReaderManager, _mediaElementManager, _tsMediaStreamSource);
 
             _tsMediaManager.OnStateChange += TsMediaManagerOnOnStateChange;
+
+            this.uiTimeout.Start();
 
             _tsMediaManager.Play();
         }
@@ -259,11 +272,17 @@ namespace TwitchTV
 
         private void mediaElement1_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
+            ToggleUI();
+        }
+
+        private void ToggleUI()
+        {
             if (this.TaskBar.Opacity == 0)
             {
                 this.TaskBar.Opacity = 1;
                 this.QualitySelection.Opacity = 1;
                 this.Status.Opacity = 1;
+                this.uiTimeout.Start();
             }
 
             else
@@ -271,6 +290,7 @@ namespace TwitchTV
                 this.TaskBar.Opacity = 0;
                 this.QualitySelection.Opacity = 0;
                 this.Status.Opacity = 0;
+                this.uiTimeout.Stop();
             }
         }
     }
