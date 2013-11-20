@@ -2,3 +2,5 @@
 */*/Bin
 *.v11.suo
 *.suo
+Twitch/TwitchTV/PerfLogs/*
+*.sap
