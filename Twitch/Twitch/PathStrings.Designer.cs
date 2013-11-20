@@ -79,6 +79,24 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/search/games?limit=8&amp;offset=0&amp;q={0}&amp;live=true&amp;hls=true&amp;type=suggest.
+        /// </summary>
+        internal static string SEARCH_GAME_PATH {
+            get {
+                return ResourceManager.GetString("SEARCH_GAME_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/search/streams?limit=8&amp;offset=0&amp;q={0}&amp;live=true&amp;hls=true.
+        /// </summary>
+        internal static string SEARCH_STREAM_PATH {
+            get {
+                return ResourceManager.GetString("SEARCH_STREAM_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to http://api.twitch.tv/api/channels/{0}/access_token.
         /// </summary>
         internal static string TOKEN_PATH {

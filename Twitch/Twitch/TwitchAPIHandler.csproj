@@ -103,6 +103,7 @@
     <EmbeddedResource Include="PathStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>PathStrings.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
