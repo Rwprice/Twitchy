@@ -30,7 +30,7 @@
                 x:Name="QualitySelection"
                 Canvas.ZIndex="3"
                 Opacity="1"
-                Margin="693,0,0,176" 
+                Margin="685,0,8,176" 
                 BorderBrush="DarkGray"
                 SelectionChanged="QualitySelection_SelectionChanged"/>
         </Grid>

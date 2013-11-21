@@ -1,0 +1,73 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="TwitchTV.SearchPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait"  Orientation="Portrait"
+    shell:SystemTray.IsVisible="False">
+
+    <!--LayoutRoot contains the root grid where all other page content is placed-->
+    <Grid x:Name="LayoutRoot">
+        
+        <Grid.Resources>
+            <DataTemplate x:Name="StreamsTemplate">
+                <StackPanel Orientation="Horizontal" Margin="12,2,0,4" Height="105" Width="432">
+                    <Image Source="{Binding preview.small}" Width="130" Height="130"/>
+                    <StackPanel Width="311" Margin="8,-7,0,0">
+                        <TextBlock Text="{Binding channel.display_name}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" />
+                        <TextBlock Text="{Binding viewers, StringFormat='Viewers: {0}'}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate x:Name="GamesTemplate">
+                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0">
+                    <Image Source="{Binding game.box.medium}" Height="136" Width="190"/>
+                    <StackPanel>
+                        <TextBlock Text="{Binding game.name}" FontSize="26" />
+                        <TextBlock Text="{Binding channels, StringFormat='Channels: {0}'}" Style="{StaticResource PhoneTextSubtleStyle}"  />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+        </Grid.Resources>
+        
+        <phone:Panorama Title="Search">
+
+            <!--Panorama item one-->
+            <phone:PanoramaItem Header="Streams">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Name="StreamsSearchBox" Text="Search..." GotFocus="StreamsSearchBox_GotFocus" Width="326"/>
+                        <Button Name="StreamSearchButton" Click="StreamSearchButton_Click" Width="94"/>
+                    </StackPanel>
+                    <ListBox x:Name="StreamsList"
+                             ItemTemplate="{StaticResource StreamsTemplate}"
+                             SelectionChanged="StreamsList_SelectionChanged" 
+                             MaxHeight="410"/>
+                </StackPanel>
+            </phone:PanoramaItem>
+
+            <!--Panorama item two-->
+            <phone:PanoramaItem Header="Games">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox Name="GamesSearchBox" Text="Search..." GotFocus="GamesSearchBox_GotFocus" Width="326"/> 
+                        <Button Name="GameSearchButton" Click="GameSearchButton_Click" Width="94"/>
+                    </StackPanel>
+                <ListBox x:Name="GamesList"
+                             ItemTemplate="{StaticResource GamesTemplate}"
+                             SelectionChanged="GamesList_SelectionChanged"
+                             MaxHeight="410"/>
+                </StackPanel>
+            </phone:PanoramaItem>
+        </phone:Panorama>
+    </Grid>
+
+</phone:PhoneApplicationPage>

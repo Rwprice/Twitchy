@@ -101,5 +101,10 @@ namespace TwitchTV
                 NavigationService.Navigate(new Uri("/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
+
+        private void SearchButton_Click(object sender, EventArgs e)
+        {
+            NavigationService.Navigate(new Uri("/SearchPage.xaml", UriKind.RelativeOrAbsolute));
+        }
     }
 }

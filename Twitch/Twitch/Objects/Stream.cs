@@ -104,6 +104,19 @@ namespace TwitchAPIHandler.Objects
             return streamsToReturn;
         }
 
+        public static async Task<ObservableCollection<Stream>> SearchStreams(string query)
+        {
+            Uri search_streams_path = new Uri(string.Format(PathStrings.SEARCH_STREAM_PATH, query));
+            var request = HttpWebRequest.Create(search_streams_path);
+            request.Method = "GET";
+            var response = await HttpRequest(request);
+            var streams = JsonToSearchResults(response);
+            var streamsToReturn = new ObservableCollection<Stream>();
+            foreach (var stream in streams)
+                streamsToReturn.Add(stream);
+            return streamsToReturn;
+        }
+
         private static async Task<string> HttpRequest(WebRequest request)
         {
             string received = "";
@@ -159,6 +172,34 @@ namespace TwitchAPIHandler.Objects
             JArray featured = JArray.Parse(o.SelectToken("streams").ToString());
 
             foreach (var arrayValue in featured)
+            {
+                featuredStreams.Add(new Stream()
+                {
+                    viewers = int.Parse(arrayValue.SelectToken("viewers").ToString()),
+                    preview = new Preview
+                    {
+                        small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString())),
+                        medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()))
+                    },
+                    channel = new Channel
+                    {
+                        display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString(),
+                        name = arrayValue.SelectToken("channel").SelectToken("name").ToString(),
+                        status = arrayValue.SelectToken("channel").SelectToken("status").ToString()
+                    }
+                });
+            }
+
+            return featuredStreams;
+        }
+
+        private static List<Stream> JsonToSearchResults(string json)
+        {
+            List<Stream> featuredStreams = new List<Stream>();
+            JToken o = JObject.Parse(json);
+            JArray streams = JArray.Parse(o.SelectToken("streams").ToString());
+
+            foreach (var arrayValue in streams)
             {
                 featuredStreams.Add(new Stream()
                 {

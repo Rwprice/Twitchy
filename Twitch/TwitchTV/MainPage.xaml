@@ -46,7 +46,7 @@
             <phone:Panorama.Background>
                 <ImageBrush ImageSource="/Twitchy;component/Assets/PanoramaBackground.png"/>
             </phone:Panorama.Background>
-
+            
             <!--Front Page-->
             <phone:PanoramaItem Header="Featured Streams" Orientation="Horizontal">
                 <!--Double wide Panorama with large image placeholders-->
@@ -121,7 +121,7 @@
                          ItemTemplate="{StaticResource TopGamesTemplate}"
                          SelectionChanged="TopGamesList_SelectionChanged"/>
             </phone:PanoramaItem>
-            
+
             <!--Settings-->
             <phone:PanoramaItem Header="Settings">
                 <ScrollViewer>
@@ -134,4 +134,14 @@
         </phone:Panorama>
 
     </Grid>
+
+    <!--Panorama-based applications should not show an ApplicationBar-->
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Minimized" Opacity="1.0" >
+
+            <shell:ApplicationBarIconButton IconUri="/Images/search.png" Text="Search" Click="SearchButton_Click"/>
+
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+
 </phone:PhoneApplicationPage>

@@ -61,6 +61,44 @@ namespace TwitchAPIHandler.Objects
             return gamesToReturn;
         }
 
+        public static async Task<ObservableCollection<TopGame>> SearchGames(string query)
+        {
+            Uri top_games_path = new Uri(string.Format(PathStrings.SEARCH_GAME_PATH, query));
+            var request = HttpWebRequest.Create(top_games_path);
+            request.Method = "GET";
+            var response = await HttpRequest(request);
+            var games = JsonToSearchResults(response);
+            var gamesToReturn = new ObservableCollection<TopGame>();
+            foreach (var game in games)
+                gamesToReturn.Add(game);
+            return gamesToReturn;
+        }
+
+        private static List<TopGame> JsonToSearchResults(string json)
+        {
+            List<TopGame> searchResults = new List<TopGame>();
+            JToken o = JObject.Parse(json);
+            JArray games = JArray.Parse(o.SelectToken("games").ToString());
+
+            foreach (var arrayValue in games)
+            {
+                searchResults.Add(new TopGame()
+                {
+                    channels = int.Parse(arrayValue.SelectToken("popularity").ToString()),
+                    game = new Game
+                    {
+                        name = arrayValue.SelectToken("name").ToString(),
+                        box = new Box
+                        {
+                            medium = new BitmapImage(new Uri(arrayValue.SelectToken("box").SelectToken("medium").ToString()))
+                        }
+                    },
+                });
+            }
+
+            return searchResults;
+        }
+
         private static List<TopGame> JsonToTopGames(string json)
         {
             List<TopGame> topGames = new List<TopGame>();
