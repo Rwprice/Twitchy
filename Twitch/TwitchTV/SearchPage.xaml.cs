@@ -104,5 +104,23 @@ namespace TwitchTV
         {
             this.StreamsSearchBox.Text = "";
         }
+
+        private void StreamsSearchBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                StreamSearchButton_Click(null, null);
+                this.Focus();
+            }
+        }
+
+        private void GamesSearchBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                GameSearchButton_Click(null, null);
+                this.Focus();
+            }
+        }
     }
 }

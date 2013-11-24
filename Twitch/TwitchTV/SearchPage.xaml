@@ -44,8 +44,10 @@
             <phone:PanoramaItem Header="Streams">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Name="StreamsSearchBox" Text="Search..." GotFocus="StreamsSearchBox_GotFocus" Width="326"/>
-                        <Button Name="StreamSearchButton" Click="StreamSearchButton_Click" Width="94"/>
+                        <TextBox Name="StreamsSearchBox" Text="Search..." KeyUp="StreamsSearchBox_KeyUp" GotFocus="StreamsSearchBox_GotFocus" Width="302"/>
+                        <Button Name="StreamSearchButton" Click="StreamSearchButton_Click"  Width="119">
+                            <TextBlock Text="Search"/>
+                        </Button>
                     </StackPanel>
                     <ListBox x:Name="StreamsList"
                              ItemTemplate="{StaticResource StreamsTemplate}"
@@ -58,8 +60,10 @@
             <phone:PanoramaItem Header="Games">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox Name="GamesSearchBox" Text="Search..." GotFocus="GamesSearchBox_GotFocus" Width="326"/> 
-                        <Button Name="GameSearchButton" Click="GameSearchButton_Click" Width="94"/>
+                        <TextBox Name="GamesSearchBox" Text="Search..." KeyUp="GamesSearchBox_KeyUp" GotFocus="GamesSearchBox_GotFocus" Width="302"/>
+                        <Button Name="GameSearchButton" Click="GameSearchButton_Click" Width="119">
+                            <TextBlock Text="Search"/>
+                        </Button>
                     </StackPanel>
                 <ListBox x:Name="GamesList"
                              ItemTemplate="{StaticResource GamesTemplate}"
