@@ -11,6 +11,7 @@ using TwitchAPIHandler.Objects;
 using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace TwitchTV
 {
@@ -50,7 +51,16 @@ namespace TwitchTV
 
         protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
-            this.TopStreams = await Stream.GetTopStreamsForGame(App.ViewModel.curTopGame.game.name);
+            try
+            {
+                this.TopStreams = await Stream.GetTopStreamsForGame(App.ViewModel.curTopGame.game.name);
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Can't load the top streams for this game", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         private void SendToVideoPage(object sender, System.Windows.Input.GestureEventArgs e)

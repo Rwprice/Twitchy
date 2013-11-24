@@ -61,7 +61,24 @@ namespace TwitchTV.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to TwitchTV.
+        ///   Looks up a localized string similar to Twitchy is an unofficial app designed for browsing and watching your favorite streams from TwitchTV on Windows Phone 8.
+        ///
+        ///This app is free and will always remain free without limits. 
+        ///
+        ///Be careful when using this app on your mobile data connection as it requires vast amounts of data for streams. 
+        ///
+        ///As of right now, chat and user account functionality is not implemented but will be available in upcoming releases.
+        ///
+        ///Twitchy is a product of Earthquake Unicorn Productions..
+        /// </summary>
+        public static string ABOUT_TEXT {
+            get {
+                return ResourceManager.GetString("ABOUT_TEXT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Twitchy.
         /// </summary>
         public static string ApplicationTitle {
             get {

@@ -22,6 +22,11 @@ namespace TwitchTV.ViewModels
         public TopGame curTopGame { get; set; }
 
         /// <summary>
+        /// Timestamp of the last update of the main menu streams
+        /// </summary>
+        public DateTime lastUpdate { get; set; } 
+
+        /// <summary>
         /// Search Streams
         /// </summary>
         private ObservableCollection<Stream> _SearchStreams;
@@ -144,11 +149,14 @@ namespace TwitchTV.ViewModels
 
         public async void LoadData()
         {
-            this.FeaturedStreams = await Stream.GetFeaturedStreams();
-            this.TopGames = await TopGame.GetTopGames();
-            this.TopStreams = await Stream.GetTopStreams();
+            if (lastUpdate == null || lastUpdate.AddMinutes(2) <= DateTime.Now)
+            {
+                this.FeaturedStreams = await Stream.GetFeaturedStreams();
+                this.TopGames = await TopGame.GetTopGames();
+                this.TopStreams = await Stream.GetTopStreams();
 
-            IsDataLoaded = true;
+                lastUpdate = DateTime.Now;
+            }
         }
     }
 }

@@ -60,15 +60,21 @@ namespace TwitchTV
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            this.TopStreamsList.SelectedItem = null;
-            this.TopGamesList.SelectedItem = null;
-
-            if (isNetwork)
+            try
             {
-                if (!App.ViewModel.IsDataLoaded)
+                this.TopStreamsList.SelectedItem = null;
+                this.TopGamesList.SelectedItem = null;
+
+                if (isNetwork)
                 {
                     App.ViewModel.LoadData();
                 }
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Can't load front page data. Try again later", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
             }
         }
 
@@ -81,7 +87,7 @@ namespace TwitchTV
 
         private void SettingTapped(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            Debug.WriteLine(((TextBlock)sender).Text);
+             NavigationService.Navigate(new Uri("/" + (((TextBlock)sender).Text) + "Page.xaml", UriKind.RelativeOrAbsolute));
         }
 
         private void TopStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)

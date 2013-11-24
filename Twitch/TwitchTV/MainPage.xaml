@@ -44,7 +44,7 @@
         <phone:Panorama Title="Twitchy">
             
             <phone:Panorama.Background>
-                <ImageBrush ImageSource="/Twitchy;component/Assets/PanoramaBackground.png"/>
+                <ImageBrush ImageSource="/Assets/backgroundart.jpg"/>
             </phone:Panorama.Background>
             
             <!--Front Page-->
@@ -126,7 +126,7 @@
             <phone:PanoramaItem Header="Settings">
                 <ScrollViewer>
                     <StackPanel>
-                        <TextBlock Text="Some Setting" Name="SomeSetting" Margin="100,0,0,0" Tap="SettingTapped" FontSize="30"/>
+                        <TextBlock Text="About" Name="SomeSetting" Margin="100,0,0,0" Tap="SettingTapped" FontSize="30"/>
                     </StackPanel>
                 </ScrollViewer>
             </phone:PanoramaItem>
@@ -139,7 +139,7 @@
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Minimized" Opacity="1.0" >
 
-            <shell:ApplicationBarIconButton IconUri="/Images/search.png" Text="Search" Click="SearchButton_Click"/>
+            <shell:ApplicationBarIconButton IconUri="/Assets/search_icon.png" Text="Search" Click="SearchButton_Click"/>
 
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Windows;
@@ -42,19 +43,37 @@ namespace TwitchTV
 
         private async void StreamSearchButton_Click(object sender, RoutedEventArgs e)
         {
-            if (this.StreamsSearchBox.Text != "Search...")
+            try
             {
-                App.ViewModel.SearchStreams = null;
-                App.ViewModel.SearchStreams = await Stream.SearchStreams(this.StreamsSearchBox.Text);
+                if (this.StreamsSearchBox.Text != "Search...")
+                {
+                    App.ViewModel.SearchStreams = null;
+                    App.ViewModel.SearchStreams = await Stream.SearchStreams(this.StreamsSearchBox.Text);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Something went wrong while searching", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
             }
         }
 
         private async void GameSearchButton_Click(object sender, RoutedEventArgs e)
         {
-            if (this.GamesSearchBox.Text != "Search...")
+            try
             {
-                App.ViewModel.SearchGames = null;
-                App.ViewModel.SearchGames = await TopGame.SearchGames(this.GamesSearchBox.Text);
+                if (this.GamesSearchBox.Text != "Search...")
+                {
+                    App.ViewModel.SearchGames = null;
+                    App.ViewModel.SearchGames = await TopGame.SearchGames(this.GamesSearchBox.Text);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Something went wrong while searching", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
             }
         }
 

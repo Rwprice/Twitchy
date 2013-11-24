@@ -60,121 +60,149 @@ namespace TwitchTV
 
         private async void GetQualities()
         {
-            token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
-            playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
+            try
+            {
+                token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
+                playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
 
-            if (string.IsNullOrEmpty(quality))
-                quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
+                if (string.IsNullOrEmpty(quality))
+                    quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
 
-            this.QualitySelection.ItemsSource = playlist.streams.Keys;
-            this.QualitySelection.SelectedItem = quality;
+                this.QualitySelection.ItemsSource = playlist.streams.Keys;
+                this.QualitySelection.SelectedItem = quality;
 
-            firstRun = false;
+                firstRun = false;
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Can't load the qualities list of this stream", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
+            }
 
             playVideo();
         }
 
         async void playVideo()
         {
-            CleanupMedia();
-
-            if (null != _playlist)
+            try
             {
-                _playlist.Dispose();
-                _playlist = null;
+                CleanupMedia();
+
+                if (null != _playlist)
+                {
+                    _playlist.Dispose();
+                    _playlist = null;
+                }
+
+                if (null != _tsMediaStreamSource)
+                {
+                    _tsMediaStreamSource.Dispose();
+                    _tsMediaStreamSource = null;
+                }
+
+                var segmentsFactory = new SegmentsFactory(_httpClients);
+
+                var programManager = new ProgramManager(_httpClients, segmentsFactory.CreateStreamSegments)
+                {
+                    Playlists = new Uri[] { M3U8Playlist.indexUri }
+                };
+
+                var programs = await programManager.LoadAsync();
+
+                program = programs.Values.FirstOrDefault();
+
+                subProgram = program.SubPrograms.ElementAt(playlist.GetIndexOfQuality(quality));
+
+                var programClient = _httpClients.CreatePlaylistClient(program.Url);
+
+                _playlist = new PlaylistSegmentManager(uri => new CachedWebRequest(uri, programClient), subProgram, segmentsFactory.CreateStreamSegments);
+
+                #region MediaElementManager
+                _mediaElementManager = new MediaElementManager(Dispatcher,
+                    () =>
+                    {
+                        var me = new MediaElement
+                        {
+                            Margin = new Thickness(0),
+                            Height = 480,
+                            Width = 800
+                        };
+
+                        me.MediaFailed += mediaElement1_MediaFailed;
+                        me.CurrentStateChanged += mediaElement1_CurrentStateChanged;
+                        me.BufferingProgressChanged += OnBufferingProgressChanged;
+                        ContentPanel.Children.Add(me);
+
+                        mediaElement1 = me;
+                        mediaElement1.Tap += mediaElement1_Tap;
+
+                        UpdateState(MediaElementState.Opening);
+
+                        return me;
+                    },
+                    me =>
+                    {
+                        if (null != me)
+                        {
+                            Debug.Assert(ReferenceEquals(me, mediaElement1));
+
+                            ContentPanel.Children.Remove(me);
+
+                            me.MediaFailed -= mediaElement1_MediaFailed;
+                            me.CurrentStateChanged -= mediaElement1_CurrentStateChanged;
+                            me.BufferingProgressChanged -= OnBufferingProgressChanged;
+                        }
+
+                        mediaElement1 = null;
+
+                        UpdateState(MediaElementState.Closed);
+                    });
+                #endregion
+
+                var segmentReaderManager = new SegmentReaderManager(new[] { _playlist }, _httpClients.CreateSegmentClient);
+
+                if (null != _tsMediaManager)
+                    _tsMediaManager.OnStateChange -= TsMediaManagerOnOnStateChange;
+
+                _tsMediaStreamSource = new TsMediaStreamSource();
+
+                _tsMediaManager = new TsMediaManager(segmentReaderManager, _mediaElementManager, _tsMediaStreamSource);
+
+                _tsMediaManager.OnStateChange += TsMediaManagerOnOnStateChange;
+
+                this.uiTimeout.Start();
+
+                _tsMediaManager.Play();
             }
 
-            if (null != _tsMediaStreamSource)
+            catch (Exception ex)
             {
-                _tsMediaStreamSource.Dispose();
-                _tsMediaStreamSource = null;
+                CleanupMedia();
+                MessageBox.Show("Can't play this particular stream. Try another or try again later", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
             }
-
-            var segmentsFactory = new SegmentsFactory(_httpClients);
-
-            var programManager = new ProgramManager(_httpClients, segmentsFactory.CreateStreamSegments)
-            {
-                Playlists = new Uri[] { M3U8Playlist.indexUri }
-            };
-
-            var programs = await programManager.LoadAsync();
-
-            program = programs.Values.FirstOrDefault();
-
-            subProgram = program.SubPrograms.ElementAt(playlist.GetIndexOfQuality(quality));
-
-            var programClient = _httpClients.CreatePlaylistClient(program.Url);
-
-            _playlist = new PlaylistSegmentManager(uri => new CachedWebRequest(uri, programClient), subProgram, segmentsFactory.CreateStreamSegments);
-
-            #region MediaElementManager
-            _mediaElementManager = new MediaElementManager(Dispatcher,
-                () =>
-                {
-                    var me = new MediaElement
-                    {
-                        Margin = new Thickness(0),
-                        Height = 480,
-                        Width = 800
-                    };
-
-                    me.MediaFailed += mediaElement1_MediaFailed;
-                    me.CurrentStateChanged += mediaElement1_CurrentStateChanged;
-                    me.BufferingProgressChanged += OnBufferingProgressChanged;
-                    ContentPanel.Children.Add(me);
-
-                    mediaElement1 = me;
-                    mediaElement1.Tap += mediaElement1_Tap;
-
-                    UpdateState(MediaElementState.Opening);
-
-                    return me;
-                },
-                me =>
-                {
-                    if (null != me)
-                    {
-                        Debug.Assert(ReferenceEquals(me, mediaElement1));
-
-                        ContentPanel.Children.Remove(me);
-
-                        me.MediaFailed -= mediaElement1_MediaFailed;
-                        me.CurrentStateChanged -= mediaElement1_CurrentStateChanged;
-                        me.BufferingProgressChanged -= OnBufferingProgressChanged;
-                    }
-
-                    mediaElement1 = null;
-
-                    UpdateState(MediaElementState.Closed);
-                });
-            #endregion
-
-            var segmentReaderManager = new SegmentReaderManager(new[] { _playlist }, _httpClients.CreateSegmentClient);
-
-            if (null != _tsMediaManager)
-                _tsMediaManager.OnStateChange -= TsMediaManagerOnOnStateChange;
-
-            _tsMediaStreamSource = new TsMediaStreamSource();
-
-            _tsMediaManager = new TsMediaManager(segmentReaderManager, _mediaElementManager, _tsMediaStreamSource);
-
-            _tsMediaManager.OnStateChange += TsMediaManagerOnOnStateChange;
-
-            this.uiTimeout.Start();
-
-            _tsMediaManager.Play();
         }
 
         async void CleanupMedia()
         {
-            if (null != _tsMediaManager)
-                _tsMediaManager.Close();
+            try
+            {
+                if (null != _tsMediaManager)
+                    _tsMediaManager.Close();
 
-            if (null != _playlist)
-                await _playlist.StopAsync();
+                if (null != _playlist)
+                    await _playlist.StopAsync();
 
-            if (null != _mediaElementManager)
-                await _mediaElementManager.Close();
+                if (null != _mediaElementManager)
+                    await _mediaElementManager.Close();
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("There was an issue while closing the stream", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
+            }
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -228,11 +256,6 @@ namespace TwitchTV
         void UpdateState(MediaElementState state)
         {
             Debug.WriteLine("MediaElement State: " + state);
-
-            if (MediaElementState.Buffering == state && null != mediaElement1)
-                Debug.WriteLine(string.Format("Buffering {0:F2}%", mediaElement1.BufferingProgress * 100));
-            else
-                Debug.WriteLine(state.ToString());
         }
 
         void TsMediaManagerOnOnStateChange(object sender, TsMediaManagerStateEventArgs tsMediaManagerStateEventArgs)
@@ -252,8 +275,8 @@ namespace TwitchTV
 
         private void mediaElement1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
+            MessageBox.Show("The media failed to load", "Well, this is embarrassing...", MessageBoxButton.OK);
             Debug.WriteLine(e.ErrorException.Message);
-
             CleanupMedia();
         }
 
@@ -282,6 +305,8 @@ namespace TwitchTV
                 this.TaskBar.Opacity = 1;
                 this.QualitySelection.Opacity = 1;
                 this.Status.Opacity = 1;
+                this.QualitySelection.IsEnabled = true;
+                this.BufferingText.Opacity = .5;
                 this.uiTimeout.Start();
             }
 
@@ -290,8 +315,15 @@ namespace TwitchTV
                 this.TaskBar.Opacity = 0;
                 this.QualitySelection.Opacity = 0;
                 this.Status.Opacity = 0;
+                this.QualitySelection.IsEnabled = false;
+                this.BufferingText.Opacity = 0;
                 this.uiTimeout.Stop();
             }
+        }
+
+        private void QualitySelection_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.uiTimeout.Start();
         }
     }
 }

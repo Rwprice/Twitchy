@@ -32,7 +32,9 @@
                 Opacity="1"
                 Margin="685,0,8,176" 
                 BorderBrush="DarkGray"
-                SelectionChanged="QualitySelection_SelectionChanged"/>
+                SelectionChanged="QualitySelection_SelectionChanged"
+                GotFocus="QualitySelection_GotFocus"/>
+            <TextBlock Canvas.ZIndex="4" Margin="10,73,566,371" Opacity=".5" Name="BufferingText"/>
         </Grid>
     </Grid>
 

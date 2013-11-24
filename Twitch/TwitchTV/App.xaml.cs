@@ -125,6 +125,8 @@ namespace TwitchTV
                 // An unhandled exception has occurred; break into the debugger
                 Debugger.Break();
             }
+
+            MessageBox.Show("The application has run into an error and must close", "Well, this is embarrasing...", MessageBoxButton.OK);
         }
 
         #region Phone application initialization
