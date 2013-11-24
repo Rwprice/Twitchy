@@ -84,7 +84,6 @@ namespace TwitchAPIHandler.Objects
             {
                 searchResults.Add(new TopGame()
                 {
-                    channels = int.Parse(arrayValue.SelectToken("popularity").ToString()),
                     game = new Game
                     {
                         name = arrayValue.SelectToken("name").ToString(),

@@ -32,7 +32,6 @@
                     <Image Source="{Binding game.box.medium}" Height="136" Width="190"/>
                     <StackPanel>
                         <TextBlock Text="{Binding game.name}" FontSize="26" />
-                        <TextBlock Text="{Binding channels, StringFormat='Channels: {0}'}" Style="{StaticResource PhoneTextSubtleStyle}"  />
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>

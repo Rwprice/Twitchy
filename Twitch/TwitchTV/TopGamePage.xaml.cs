@@ -53,7 +53,12 @@ namespace TwitchTV
         {
             try
             {
+                this.TopStreamsList.SelectedItem = null;
+
                 this.TopStreams = await Stream.GetTopStreamsForGame(App.ViewModel.curTopGame.game.name);
+
+                if (this.TopStreams.Count == 0)
+                    MessageBox.Show("No streams can be loaded for this game");
             }
 
             catch (Exception ex)
@@ -72,8 +77,11 @@ namespace TwitchTV
 
         private void TopStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
-            NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+            if (((Stream)((ListBox)sender).SelectedItem) != null)
+            {
+                App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
+                NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

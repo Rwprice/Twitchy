@@ -45,7 +45,9 @@ namespace TwitchTV
             playlist = new M3U8Playlist();
             InitializeComponent();
             _httpClients = new HttpClients();
-            this.Status.Text = App.ViewModel.stream.channel.status;
+            
+            if(App.ViewModel.stream != null)
+                this.Status.Text = App.ViewModel.stream.channel.status;
 
             uiTimeout = new DispatcherTimer();
             uiTimeout.Interval = new TimeSpan(0, 0, 4);

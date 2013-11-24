@@ -25,11 +25,21 @@ namespace TwitchTV
             if (e.PropertyName == "SearchStreams")
             {
                 this.StreamsList.ItemsSource = App.ViewModel.SearchStreams;
+
+                if (App.ViewModel.SearchStreams.Count == 0)
+                {
+                    MessageBox.Show("This search returned no results");
+                }
             }
 
             if (e.PropertyName == "SearchGames")
             {
                 this.GamesList.ItemsSource = App.ViewModel.SearchGames;
+
+                if (App.ViewModel.SearchGames.Count == 0)
+                {
+                    MessageBox.Show("This search returned no results");
+                }
             }
         }
 
@@ -37,6 +47,7 @@ namespace TwitchTV
         {
             this.StreamsList.SelectedItem = null;
             this.GamesList.SelectedItem = null;
+
             this.StreamsSearchBox.Text = "Search...";
             this.GamesSearchBox.Text = "Search...";
         }
@@ -47,7 +58,8 @@ namespace TwitchTV
             {
                 if (this.StreamsSearchBox.Text != "Search...")
                 {
-                    App.ViewModel.SearchStreams = null;
+                    if(App.ViewModel.SearchStreams != null)
+                        App.ViewModel.SearchStreams.Clear();
                     App.ViewModel.SearchStreams = await Stream.SearchStreams(this.StreamsSearchBox.Text);
                 }
             }
@@ -65,7 +77,6 @@ namespace TwitchTV
             {
                 if (this.GamesSearchBox.Text != "Search...")
                 {
-                    App.ViewModel.SearchGames = null;
                     App.ViewModel.SearchGames = await TopGame.SearchGames(this.GamesSearchBox.Text);
                 }
             }
