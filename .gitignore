@@ -4,3 +4,6 @@
 *.suo
 Twitch/TwitchTV/PerfLogs/*
 *.sap
+720p/*
+WVGA/*
+WXGA/*

@@ -151,9 +151,15 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\backgroundart.jpg" />
-    <Content Include="Assets\logo.png" />
-    <Content Include="Assets\search_icon.png" />
+    <Content Include="Assets\backgroundart.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\search_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Toolkit.Content\ApplicationBar.Add.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Check.png" />

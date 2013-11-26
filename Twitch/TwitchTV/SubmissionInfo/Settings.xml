@@ -1,7 +1,6 @@
 <MarketplaceDetails>
-  <SmallAppTile>
-  </SmallAppTile>
-  <ScreenShots>;;;;;;;;</ScreenShots>
-  <ScreenShotsWXGA>;;;;;;;;</ScreenShotsWXGA>
-  <ScreenShots720P>;;;;;;;;</ScreenShots720P>
+  <SmallAppTile>logo.png</SmallAppTile>
+  <ScreenShots>wp_ss_20131124_0001 - Copy.png;wp_ss_20131124_0002 - Copy.png;wp_ss_20131124_0003 - Copy.png;wp_ss_20131124_0004 - Copy.png;wp_ss_20131124_0005 - Copy.png;wp_ss_20131124_0006 - Copy.png;wp_ss_20131124_0007 - Copy.png;;</ScreenShots>
+  <ScreenShotsWXGA>wp_ss_20131124_0001.png;wp_ss_20131124_0002.png;wp_ss_20131124_0003.png;wp_ss_20131124_0004.png;wp_ss_20131124_0005.png;wp_ss_20131124_0006.png;wp_ss_20131124_0007.png;;</ScreenShotsWXGA>
+  <ScreenShots720P>wp_ss_20131124_0001 720.png;wp_ss_20131124_0002 720.png;wp_ss_20131124_0003 720.png;wp_ss_20131124_0004 720.png;wp_ss_20131124_0005 720.png;wp_ss_20131124_0006 720.png;wp_ss_20131124_0007 720.png;;</ScreenShots720P>
 </MarketplaceDetails>
