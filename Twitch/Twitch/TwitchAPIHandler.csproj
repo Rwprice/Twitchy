@@ -84,6 +84,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Objects\AccessToken.cs" />
+    <Compile Include="Objects\OauthToken.cs" />
     <Compile Include="Objects\TopGame.cs" />
     <Compile Include="Objects\M3U8Playlist.cs" />
     <Compile Include="Objects\Stream.cs" />

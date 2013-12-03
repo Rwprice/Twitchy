@@ -70,6 +70,24 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&amp;client_id=b4v9ttxqtldlobe5jswfqdhrmzp52hi&amp;redirect_uri=http://localhost&amp;scope=user_read chat_login.
+        /// </summary>
+        internal static string GET_AUTHORIZATION_TOKEN {
+            get {
+                return ResourceManager.GetString("GET_AUTHORIZATION_TOKEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/followed?oauth_token={0}.
+        /// </summary>
+        internal static string GET_FOLLOWED_STREAMS {
+            get {
+                return ResourceManager.GetString("GET_FOLLOWED_STREAMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to http://usher.twitch.tv/api/channel/hls/{0}.m3u8?token={1}&amp;sig={2}.
         /// </summary>
         internal static string M3U8_PATH {

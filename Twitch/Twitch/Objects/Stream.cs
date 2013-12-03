@@ -117,6 +117,19 @@ namespace TwitchAPIHandler.Objects
             return streamsToReturn;
         }
 
+        public static async Task<ObservableCollection<Stream>> GetFollowedStreams(string oauthToken)
+        {
+            Uri followed_streams_path = new Uri(string.Format(PathStrings.GET_FOLLOWED_STREAMS, oauthToken));
+            var request = HttpWebRequest.Create(followed_streams_path);
+            request.Method = "GET";
+            var response = await HttpRequest(request);
+            var streams = JsonToFollowedStreamsList(response);
+            var streamsToReturn = new ObservableCollection<Stream>();
+            foreach (var stream in streams)
+                streamsToReturn.Add(stream);
+            return streamsToReturn;
+        }
+
         private static async Task<string> HttpRequest(WebRequest request)
         {
             string received = "";
@@ -208,6 +221,33 @@ namespace TwitchAPIHandler.Objects
                     {
                         small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString())),
                         medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()))
+                    },
+                    channel = new Channel
+                    {
+                        display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString(),
+                        name = arrayValue.SelectToken("channel").SelectToken("name").ToString(),
+                        status = arrayValue.SelectToken("channel").SelectToken("status").ToString()
+                    }
+                });
+            }
+
+            return featuredStreams;
+        }
+
+        private static List<Stream> JsonToFollowedStreamsList(string json)
+        {
+            List<Stream> featuredStreams = new List<Stream>();
+            JToken o = JObject.Parse(json);
+            JArray streams = JArray.Parse(o.SelectToken("streams").ToString());
+
+            foreach (var arrayValue in streams)
+            {
+                featuredStreams.Add(new Stream()
+                {
+                    viewers = int.Parse(arrayValue.SelectToken("viewers").ToString()),
+                    preview = new Preview
+                    {
+                        medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").ToString()))
                     },
                     channel = new Channel
                     {
