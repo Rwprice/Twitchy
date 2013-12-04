@@ -28,6 +28,7 @@ namespace TwitchTV
         public M3U8Playlist playlist { get; set; }
         public string quality { get; set; }
 
+        public bool isFollowed = false;
         public bool firstRun = true;
 
         readonly IHttpClients _httpClients;
@@ -64,6 +65,13 @@ namespace TwitchTV
         {
             try
             {
+                isFollowed = await User.IsStreamFollowed(App.ViewModel.stream.channel.name, App.ViewModel.user);
+
+                if (isFollowed)
+                    this.FavoriteLabel.Text = "Unfollow";
+                else
+                    this.FavoriteLabel.Text = "Follow";
+
                 token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
                 playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
 
@@ -308,7 +316,8 @@ namespace TwitchTV
                 this.QualitySelection.Opacity = 1;
                 this.Status.Opacity = 1;
                 this.QualitySelection.IsEnabled = true;
-                this.BufferingText.Opacity = .5;
+                this.FavoriteButton.Opacity = .5;
+                this.FavoriteLabel.Opacity = .5;
                 this.uiTimeout.Start();
             }
 
@@ -318,7 +327,8 @@ namespace TwitchTV
                 this.QualitySelection.Opacity = 0;
                 this.Status.Opacity = 0;
                 this.QualitySelection.IsEnabled = false;
-                this.BufferingText.Opacity = 0;
+                this.FavoriteButton.Opacity = 0;
+                this.FavoriteLabel.Opacity = 0;
                 this.uiTimeout.Stop();
             }
         }
@@ -326,6 +336,22 @@ namespace TwitchTV
         private void QualitySelection_GotFocus(object sender, RoutedEventArgs e)
         {
             this.uiTimeout.Start();
+        }
+
+        private void FavoriteButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (isFollowed)
+            {
+                User.UnfollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                isFollowed = false;
+                this.FavoriteLabel.Text = "Follow";
+            }
+            else
+            {
+                User.FollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                isFollowed = true;
+                this.FavoriteLabel.Text = "Unfollow";
+            }
         }
     }
 }

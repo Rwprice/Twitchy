@@ -146,9 +146,8 @@
     <!--Panorama-based applications should not show an ApplicationBar-->
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Minimized" Opacity="1.0" >
-
             <shell:ApplicationBarIconButton IconUri="/Assets/search_icon.png" Text="Search" Click="SearchButton_Click"/>
-
+            <shell:ApplicationBarIconButton IconUri="/Assets/refresh_icon.png" Text="Refresh" Click="RefreshButton_Click"/>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>
 

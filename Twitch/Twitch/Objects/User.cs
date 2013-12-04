@@ -105,5 +105,33 @@ namespace TwitchAPIHandler.Objects
             StorageFile textFile = await localFolder.GetFileAsync("user");
             await textFile.DeleteAsync();
         }
+
+        public static async Task<bool> IsStreamFollowed(string stream, User user)
+        {
+            Uri access_token_path = new Uri(string.Format(PathStrings.IS_STREAM_FOLLOWED_PATH, user.Name, stream));
+            var request = HttpWebRequest.Create(access_token_path);
+            request.Method = "GET";
+            var response = await HttpRequest(request);
+
+            if (response != null)
+                return true;
+            return false;
+        }
+
+        public static async void FollowStream(string stream, User user)
+        {
+            Uri access_token_path = new Uri(string.Format(PathStrings.FOLLOW_USER, user.Name, stream, user.Oauth));
+            var request = HttpWebRequest.Create(access_token_path);
+            request.Method = "PUT";
+            var response = await HttpRequest(request);
+        }
+
+        public static async void UnfollowStream(string stream, User user)
+        {
+            Uri access_token_path = new Uri(string.Format(PathStrings.FOLLOW_USER, user.Name, stream, user.Oauth));
+            var request = HttpWebRequest.Create(access_token_path);
+            request.Method = "DELETE";
+            var response = await HttpRequest(request);
+        }
     }
 }

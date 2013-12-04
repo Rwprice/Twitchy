@@ -106,6 +106,15 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/users/{0}/follows/channels/{1}.
+        /// </summary>
+        internal static string IS_STREAM_FOLLOWED_PATH {
+            get {
+                return ResourceManager.GetString("IS_STREAM_FOLLOWED_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to http://usher.twitch.tv/api/channel/hls/{0}.m3u8?token={1}&amp;sig={2}.
         /// </summary>
         internal static string M3U8_PATH {

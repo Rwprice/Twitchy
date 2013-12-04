@@ -151,5 +151,11 @@ namespace TwitchTV
         {
             NavigationService.Navigate(new Uri("/SearchPage.xaml", UriKind.RelativeOrAbsolute));
         }
+
+        private void RefreshButton_Click(object sender, EventArgs e)
+        {
+            App.ViewModel.lastUpdate = DateTime.MinValue;
+            App.ViewModel.LoadData();
+        }
     }
 }
