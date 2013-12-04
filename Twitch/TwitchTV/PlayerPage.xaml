@@ -25,16 +25,19 @@
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="0,0,0,0">
             <MediaElement Name="mediaElement1" AutoPlay="True" Canvas.ZIndex="0" Tap="mediaElement1_Tap"/>
             <Border Name="TaskBar" Opacity="1" Canvas.ZIndex="1" Background="Gray" BorderBrush="DarkGray" BorderThickness="5" HorizontalAlignment="Stretch"  Height="68" VerticalAlignment="Top"/>
-            <TextBlock Margin="6,20,104,412" Canvas.ZIndex="2" Name="Status" Opacity="1" TextTrimming="WordEllipsis"/>
+            <TextBlock Margin="0,15,0,0" Height="50" Canvas.ZIndex="2" Name="Status" Opacity="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" TextTrimming="WordEllipsis"/>
             <toolkit:ListPicker 
                 x:Name="QualitySelection"
                 Canvas.ZIndex="3"
                 Opacity="1"
-                Margin="685,0,8,176" 
+                Margin="0,0,15,0" 
+                VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Width="150"
                 BorderBrush="DarkGray"
                 SelectionChanged="QualitySelection_SelectionChanged"
                 GotFocus="QualitySelection_GotFocus"/>
-            <Button Canvas.ZIndex="4" Margin="10,73,647,340" Opacity=".5" Name="FavoriteButton" Tap="FavoriteButton_Tap">
+            <Button Canvas.ZIndex="4" Margin="0,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity=".5" Name="FavoriteButton" Tap="FavoriteButton_Tap">
                 <TextBlock Name="FavoriteLabel" Opacity=".5"/>
             </Button>
         </Grid>

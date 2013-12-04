@@ -135,8 +135,8 @@ namespace TwitchTV
                         var me = new MediaElement
                         {
                             Margin = new Thickness(0),
-                            Height = 480,
-                            Width = 800
+                            VerticalAlignment = System.Windows.VerticalAlignment.Stretch,
+                            HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch  
                         };
 
                         me.MediaFailed += mediaElement1_MediaFailed;
