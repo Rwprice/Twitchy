@@ -147,4 +147,10 @@
   <data name="GET_FOLLOWED_STREAMS" xml:space="preserve">
     <value>https://api.twitch.tv/kraken/streams/followed?oauth_token={0}</value>
   </data>
+  <data name="GET_USER_PATH" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/user?oauth_token={0}</value>
+  </data>
+  <data name="FOLLOW_USER" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/users/{0}/follows/channels/{1}?oauth_token={2}</value>
+  </data>
 </root>

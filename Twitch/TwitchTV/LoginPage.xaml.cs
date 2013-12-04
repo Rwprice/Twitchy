@@ -31,19 +31,11 @@ namespace TwitchTV
                 string token = e.Uri.AbsoluteUri.Substring(e.Uri.AbsoluteUri.IndexOf('=') + 1);
                 token = token.Remove(token.IndexOf('&'));
 
-                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-                StorageFile textFile = await localFolder.CreateFileAsync("token", CreationCollisionOption.ReplaceExisting);
+                var user = await User.GetUserFromOauth(token);
 
-                using (IRandomAccessStream textStream = await textFile.OpenAsync(FileAccessMode.ReadWrite))
-                {
-                    using (DataWriter textWriter = new DataWriter(textStream))
-                    {
-                        textWriter.WriteString(token);
-                        await textWriter.StoreAsync();
-                    }
-                }
+                User.SaveUser(user);
 
-                App.ViewModel.token = token;
+                App.ViewModel.user = user;
 
                 await this.WebBrowser.ClearCookiesAsync();
                 await this.WebBrowser.ClearInternetCacheAsync();

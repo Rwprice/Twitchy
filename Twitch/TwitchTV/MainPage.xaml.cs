@@ -68,31 +68,14 @@ namespace TwitchTV
                 this.TopGamesList.SelectedItem = null;
                 this.FollowedStreamsList.SelectedItem = null;
 
-                if (App.ViewModel.token == null)
+                if (App.ViewModel.user == null)
                 {
-                    try
+                    var user = await User.TryLoadUser();
+                    if (user != null)
                     {
-                        string contents;
-
-                        StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-                        StorageFile textFile = await localFolder.GetFileAsync("token");
-
-                        using (IRandomAccessStream textStream = await textFile.OpenReadAsync())
-                        {
-                            using (DataReader textReader = new DataReader(textStream))
-                            {
-                                uint textLength = (uint)textStream.Size;
-                                await textReader.LoadAsync(textLength);
-                                contents = textReader.ReadString(textLength);
-                            }
-                        }
-
-                        App.ViewModel.token = contents;
-
+                        App.ViewModel.user = user;
                         this.Account.Text = "Logout";
                     }
-
-                    catch { }
                 }
 
                 else
@@ -118,17 +101,15 @@ namespace TwitchTV
             NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
         }
 
-        private async void SettingTapped(object sender, System.Windows.Input.GestureEventArgs e)
+        private void SettingTapped(object sender, System.Windows.Input.GestureEventArgs e)
         {
             if((((TextBlock)sender).Text) != "Logout")
                 NavigationService.Navigate(new Uri("/" + (((TextBlock)sender).Text) + "Page.xaml", UriKind.RelativeOrAbsolute));
             else if ((((TextBlock)sender).Text) == "Logout")
             {
-                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-                StorageFile textFile = await localFolder.GetFileAsync("token");
-                await textFile.DeleteAsync();
+                User.LogoutUser();
 
-                App.ViewModel.token = null;
+                App.ViewModel.user = null;
 
                 MessageBox.Show("User has been logged out!");
 

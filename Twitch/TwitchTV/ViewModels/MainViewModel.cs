@@ -29,7 +29,7 @@ namespace TwitchTV.ViewModels
         /// <summary>
         /// Timestamp of the last update of the main menu streams
         /// </summary>
-        public string token { get; set; }
+        public User user { get; set; }
 
         private bool alreadyLoadedFromToken = false;
 
@@ -181,9 +181,9 @@ namespace TwitchTV.ViewModels
                 this.FeaturedStreams = await Stream.GetFeaturedStreams();
                 this.TopGames = await TopGame.GetTopGames();
                 this.TopStreams = await Stream.GetTopStreams();
-                if (App.ViewModel.token != null)
+                if (user != null)
                 {
-                    this.FollowedStreams = await Stream.GetFollowedStreams(token);
+                    this.FollowedStreams = await Stream.GetFollowedStreams(user.Oauth);
                     alreadyLoadedFromToken = true;
                 }
 

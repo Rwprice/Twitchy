@@ -61,6 +61,15 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/users/{0}/follows/channels/{1}?oauth_token={2}.
+        /// </summary>
+        internal static string FOLLOW_USER {
+            get {
+                return ResourceManager.GetString("FOLLOW_USER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/featured?limit=8&amp;offset=0&amp;hls=true.
         /// </summary>
         internal static string FRONT_PAGE_STREAMS_PATH {
@@ -84,6 +93,15 @@ namespace TwitchAPIHandler {
         internal static string GET_FOLLOWED_STREAMS {
             get {
                 return ResourceManager.GetString("GET_FOLLOWED_STREAMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/user?oauth_token={0}.
+        /// </summary>
+        internal static string GET_USER_PATH {
+            get {
+                return ResourceManager.GetString("GET_USER_PATH", resourceCulture);
             }
         }
         
