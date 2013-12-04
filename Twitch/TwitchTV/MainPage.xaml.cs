@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Net;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using TwitchAPIHandler.Objects;
-using System.Diagnostics;
-using System.Windows.Media.Imaging;
 using Microsoft.Phone.Net.NetworkInformation;
+using TwitchAPIHandler.Objects;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace TwitchTV
 {
@@ -39,6 +36,11 @@ namespace TwitchTV
                 this.TopStreamsList.ItemsSource = App.ViewModel.TopStreams;
             }
 
+            if (e.PropertyName == "FollowedStreams")
+            {
+                this.FollowedStreamsList.ItemsSource = App.ViewModel.FollowedStreams;
+            }
+
             if (e.PropertyName == "TopGames")
             {
                 this.TopGamesList.ItemsSource = App.ViewModel.TopGames;
@@ -58,12 +60,43 @@ namespace TwitchTV
             }
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {
             try
             {
                 this.TopStreamsList.SelectedItem = null;
                 this.TopGamesList.SelectedItem = null;
+                this.FollowedStreamsList.SelectedItem = null;
+
+                if (App.ViewModel.token == null)
+                {
+                    try
+                    {
+                        string contents;
+
+                        StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                        StorageFile textFile = await localFolder.GetFileAsync("token");
+
+                        using (IRandomAccessStream textStream = await textFile.OpenReadAsync())
+                        {
+                            using (DataReader textReader = new DataReader(textStream))
+                            {
+                                uint textLength = (uint)textStream.Size;
+                                await textReader.LoadAsync(textLength);
+                                contents = textReader.ReadString(textLength);
+                            }
+                        }
+
+                        App.ViewModel.token = contents;
+
+                        this.Account.Text = "Logout";
+                    }
+
+                    catch { }
+                }
+
+                else
+                    this.Account.Text = "Logout";
 
                 if (isNetwork)
                 {
@@ -85,9 +118,25 @@ namespace TwitchTV
             NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
         }
 
-        private void SettingTapped(object sender, System.Windows.Input.GestureEventArgs e)
+        private async void SettingTapped(object sender, System.Windows.Input.GestureEventArgs e)
         {
-             NavigationService.Navigate(new Uri("/" + (((TextBlock)sender).Text) + "Page.xaml", UriKind.RelativeOrAbsolute));
+            if((((TextBlock)sender).Text) != "Logout")
+                NavigationService.Navigate(new Uri("/" + (((TextBlock)sender).Text) + "Page.xaml", UriKind.RelativeOrAbsolute));
+            else if ((((TextBlock)sender).Text) == "Logout")
+            {
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                StorageFile textFile = await localFolder.GetFileAsync("token");
+                await textFile.DeleteAsync();
+
+                App.ViewModel.token = null;
+
+                MessageBox.Show("User has been logged out!");
+
+                if(this.FollowedStreamsList.Items.Count > 0)
+                    this.FollowedStreamsList.Items.Clear();
+
+                this.Account.Text = "Login";
+            }
         }
 
         private void TopStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -105,6 +154,15 @@ namespace TwitchTV
             {
                 App.ViewModel.curTopGame = ((TopGame)((ListBox)sender).SelectedItem);
                 NavigationService.Navigate(new Uri("/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
+            }
+        }
+
+        private void FollowedStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (((Stream)((ListBox)sender).SelectedItem) != null)
+            {
+                App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
+                NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
 

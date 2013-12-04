@@ -122,11 +122,18 @@
                          SelectionChanged="TopGamesList_SelectionChanged"/>
             </phone:PanoramaItem>
 
+            <!--Followed Streams-->
+            <phone:PanoramaItem Header="Following" Orientation="Vertical">
+                <ListBox x:Name="FollowedStreamsList"
+                         ItemTemplate="{StaticResource TopStreamsTemplate}"
+                         SelectionChanged="FollowedStreamsList_SelectionChanged"/>
+            </phone:PanoramaItem>
+
             <!--Settings-->
             <phone:PanoramaItem Header="Settings">
                 <ScrollViewer>
                     <StackPanel>
-                        <TextBlock Text="Login" Name="Login" Margin="100,0,0,0" Tap="SettingTapped" FontSize="30"/>
+                        <TextBlock Text="Login" Name="Account" Margin="100,0,0,0" Tap="SettingTapped" FontSize="30"/>
                         <TextBlock Text="About" Name="About" Margin="100,0,0,0" Tap="SettingTapped" FontSize="30"/>
                     </StackPanel>
                 </ScrollViewer>

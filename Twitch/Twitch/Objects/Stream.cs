@@ -247,7 +247,8 @@ namespace TwitchAPIHandler.Objects
                     viewers = int.Parse(arrayValue.SelectToken("viewers").ToString()),
                     preview = new Preview
                     {
-                        medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").ToString()))
+                        small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString())),
+                        medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()))
                     },
                     channel = new Channel
                     {

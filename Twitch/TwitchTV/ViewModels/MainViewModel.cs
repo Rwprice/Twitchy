@@ -24,7 +24,14 @@ namespace TwitchTV.ViewModels
         /// <summary>
         /// Timestamp of the last update of the main menu streams
         /// </summary>
-        public DateTime lastUpdate { get; set; } 
+        public DateTime lastUpdate { get; set; }
+
+        /// <summary>
+        /// Timestamp of the last update of the main menu streams
+        /// </summary>
+        public string token { get; set; }
+
+        private bool alreadyLoadedFromToken = false;
 
         /// <summary>
         /// Search Streams
@@ -126,9 +133,29 @@ namespace TwitchTV.ViewModels
             }
         }
 
+        // <summary>
+        /// Top Streams
+        /// </summary>
+        private ObservableCollection<Stream> _FollowedStreams;
+        public ObservableCollection<Stream> FollowedStreams
+        {
+            get
+            {
+                return _FollowedStreams;
+            }
+            set
+            {
+                if (value != _FollowedStreams)
+                {
+                    _FollowedStreams = value;
+                    NotifyPropertyChanged("FollowedStreams");
+                }
+            }
+        }
+
         public MainViewModel()
         {
-            curTopGame = new TopGame();
+
         }
 
         public bool IsDataLoaded
@@ -149,11 +176,16 @@ namespace TwitchTV.ViewModels
 
         public async void LoadData()
         {
-            if (lastUpdate == null || lastUpdate.AddMinutes(2) <= DateTime.Now)
+            if (lastUpdate == null || !alreadyLoadedFromToken || lastUpdate.AddMinutes(2) <= DateTime.Now)
             {
                 this.FeaturedStreams = await Stream.GetFeaturedStreams();
                 this.TopGames = await TopGame.GetTopGames();
                 this.TopStreams = await Stream.GetTopStreams();
+                if (App.ViewModel.token != null)
+                {
+                    this.FollowedStreams = await Stream.GetFollowedStreams(token);
+                    alreadyLoadedFromToken = true;
+                }
 
                 lastUpdate = DateTime.Now;
             }
