@@ -56,7 +56,7 @@ namespace TwitchAPIHandler.Objects
             {
                 string line = lines[i];
 
-                if (line.Contains("NAME="))
+                if (line.Contains("NAME=") && !line.Contains("RESTRICTED"))
                 {
                     string quality = line.Substring(line.IndexOf("NAME=") + 6);
                     quality = quality.Remove(quality.IndexOf(",AUTOSELECT=")-1);
