@@ -10,7 +10,7 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-    SupportedOrientations="Landscape"  Orientation="Landscape"
+    SupportedOrientations="PortraitOrLandscape"  Orientation="Landscape"
     mc:Ignorable="d"
     shell:SystemTray.IsVisible="False">
 
@@ -25,7 +25,7 @@
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="0,0,0,0">
             <MediaElement Name="mediaElement1" AutoPlay="True" Canvas.ZIndex="0" Tap="mediaElement1_Tap"/>
             <Border Name="TaskBar" Opacity="1" Canvas.ZIndex="1" Background="Gray" BorderBrush="DarkGray" BorderThickness="5" HorizontalAlignment="Stretch"  Height="68" VerticalAlignment="Top"/>
-            <TextBlock Margin="0,15,0,0" Height="50" Canvas.ZIndex="2" Name="Status" Opacity="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" TextTrimming="WordEllipsis"/>
+            <TextBlock Margin="10,20,165,0" Height="40" Canvas.ZIndex="2" Name="Status" Opacity="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" TextTrimming="WordEllipsis"/>
             <toolkit:ListPicker 
                 x:Name="QualitySelection"
                 Canvas.ZIndex="3"
@@ -37,7 +37,7 @@
                 BorderBrush="DarkGray"
                 SelectionChanged="QualitySelection_SelectionChanged"
                 GotFocus="QualitySelection_GotFocus"/>
-            <Button Canvas.ZIndex="4" Margin="0,70,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity=".5" Name="FavoriteButton" Tap="FavoriteButton_Tap">
+            <Button BorderThickness="0" Canvas.ZIndex="4" Margin="10,75,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.5" Name="FavoriteButton" Tap="FavoriteButton_Tap">
                 <TextBlock Name="FavoriteLabel" Opacity=".5"/>
             </Button>
         </Grid>

@@ -111,14 +111,18 @@ namespace TwitchAPIHandler.Objects
             Uri access_token_path = new Uri(string.Format(PathStrings.IS_STREAM_FOLLOWED_PATH, user.Name, stream));
             var request = HttpWebRequest.Create(access_token_path);
             request.Method = "GET";
-            var response = await HttpRequest(request);
+            string response;
 
-            if (response != null)
+            try
+            {
+                response = await HttpRequest(request);
                 return true;
-            return false;
+            }
+            catch { return false; }
+            
         }
 
-        public static async void FollowStream(string stream, User user)
+        public static async Task FollowStream(string stream, User user)
         {
             Uri access_token_path = new Uri(string.Format(PathStrings.FOLLOW_USER, user.Name, stream, user.Oauth));
             var request = HttpWebRequest.Create(access_token_path);
@@ -126,7 +130,7 @@ namespace TwitchAPIHandler.Objects
             var response = await HttpRequest(request);
         }
 
-        public static async void UnfollowStream(string stream, User user)
+        public static async Task UnfollowStream(string stream, User user)
         {
             Uri access_token_path = new Uri(string.Format(PathStrings.FOLLOW_USER, user.Name, stream, user.Oauth));
             var request = HttpWebRequest.Create(access_token_path);

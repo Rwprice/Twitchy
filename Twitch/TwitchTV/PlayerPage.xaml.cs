@@ -132,12 +132,28 @@ namespace TwitchTV
                 _mediaElementManager = new MediaElementManager(Dispatcher,
                     () =>
                     {
-                        var me = new MediaElement
+                        var me = new MediaElement();
+
+                        if (this.Orientation == PageOrientation.Landscape || this.Orientation == PageOrientation.LandscapeLeft || this.Orientation == PageOrientation.LandscapeRight)
                         {
-                            Margin = new Thickness(0),
-                            VerticalAlignment = System.Windows.VerticalAlignment.Stretch,
-                            HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch  
-                        };
+                            me = new MediaElement
+                            {
+                                Margin = new Thickness(0),
+                                VerticalAlignment = System.Windows.VerticalAlignment.Stretch,
+                                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch
+                            };
+                        }
+
+                        else
+                        {
+                            me = new MediaElement
+                            {
+                                Margin = new Thickness(0,70,0,0),
+                                VerticalAlignment = System.Windows.VerticalAlignment.Top,
+                                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch
+                            };
+                        }
+                        
 
                         me.MediaFailed += mediaElement1_MediaFailed;
                         me.CurrentStateChanged += mediaElement1_CurrentStateChanged;
@@ -310,26 +326,55 @@ namespace TwitchTV
 
         private void ToggleUI()
         {
-            if (this.TaskBar.Opacity == 0)
+            if (this.Orientation == PageOrientation.Landscape || this.Orientation == PageOrientation.LandscapeLeft || this.Orientation == PageOrientation.LandscapeRight)
+            {
+                if (this.TaskBar.Opacity == 0)
+                {
+                    this.TaskBar.Opacity = 1;
+                    this.QualitySelection.Opacity = 1;
+                    this.Status.Opacity = 1;
+                    this.QualitySelection.IsEnabled = true;
+                    this.FavoriteButton.Opacity = .5;
+                    this.FavoriteLabel.Opacity = .5;
+                    this.FavoriteButton.IsEnabled = true;
+                    this.uiTimeout.Start();
+                }
+
+                else
+                {
+                    this.TaskBar.Opacity = 0;
+                    this.QualitySelection.Opacity = 0;
+                    this.Status.Opacity = 0;
+                    this.QualitySelection.IsEnabled = false;
+                    this.FavoriteButton.Opacity = 0;
+                    this.FavoriteLabel.Opacity = 0;
+                    this.FavoriteButton.IsEnabled = false;
+                    this.uiTimeout.Stop();
+                }
+            }
+
+            else
             {
                 this.TaskBar.Opacity = 1;
                 this.QualitySelection.Opacity = 1;
                 this.Status.Opacity = 1;
                 this.QualitySelection.IsEnabled = true;
-                this.FavoriteButton.Opacity = .5;
-                this.FavoriteLabel.Opacity = .5;
-                this.uiTimeout.Start();
-            }
 
-            else
-            {
-                this.TaskBar.Opacity = 0;
-                this.QualitySelection.Opacity = 0;
-                this.Status.Opacity = 0;
-                this.QualitySelection.IsEnabled = false;
-                this.FavoriteButton.Opacity = 0;
-                this.FavoriteLabel.Opacity = 0;
-                this.uiTimeout.Stop();
+                if (this.FavoriteButton.Opacity == 0)
+                {
+                    this.FavoriteButton.Opacity = .5;
+                    this.FavoriteLabel.Opacity = .5;
+                    this.FavoriteButton.IsEnabled = true;
+                    this.uiTimeout.Start();
+                }
+
+                else
+                {
+                    this.FavoriteButton.Opacity = 0;
+                    this.FavoriteLabel.Opacity = 0;
+                    this.FavoriteButton.IsEnabled = false;
+                    this.uiTimeout.Stop();
+                }
             }
         }
 
@@ -338,20 +383,46 @@ namespace TwitchTV
             this.uiTimeout.Start();
         }
 
-        private void FavoriteButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private async void FavoriteButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             if (isFollowed)
             {
-                User.UnfollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                this.FavoriteButton.IsEnabled = false;
+                await User.UnfollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
                 isFollowed = false;
                 this.FavoriteLabel.Text = "Follow";
+                if (this.FavoriteButton.Opacity == .5)
+                    this.FavoriteButton.IsEnabled = true;
             }
             else
             {
-                User.FollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                this.FavoriteButton.IsEnabled = false;
+                await User.FollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
                 isFollowed = true;
                 this.FavoriteLabel.Text = "Unfollow";
+                if(this.FavoriteButton.Opacity == .5)
+                    this.FavoriteButton.IsEnabled = true;
             }
+        }
+
+        protected override void OnOrientationChanged(OrientationChangedEventArgs e)
+        {
+            if (e.Orientation == PageOrientation.Landscape || e.Orientation == PageOrientation.LandscapeLeft || e.Orientation == PageOrientation.LandscapeRight)
+            {
+                this.mediaElement1.Margin = new Thickness(0);
+                this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
+                this.mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+            }
+
+            else
+            {
+                this.mediaElement1.Margin = new Thickness(0, 70, 0, 0);
+                this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                this.mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+            }
+
+            ToggleUI();
+            base.OnOrientationChanged(e);
         }
     }
 }
