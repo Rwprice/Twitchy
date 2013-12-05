@@ -10,12 +10,12 @@
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
-    SupportedOrientations="PortraitOrLandscape"  Orientation="Landscape"
+    SupportedOrientations="PortraitOrLandscape"  Orientation="Portrait"
     mc:Ignorable="d"
     shell:SystemTray.IsVisible="False">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="Transparent">        
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -39,6 +39,17 @@
                 GotFocus="QualitySelection_GotFocus"/>
             <Button BorderThickness="0" Canvas.ZIndex="4" Margin="10,75,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.5" Name="FavoriteButton" Tap="FavoriteButton_Tap">
                 <TextBlock Name="FavoriteLabel" Opacity=".5"/>
+            </Button>
+            <ListBox Name="ChatBox" Background="White" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="385" Margin="0,0,0,70">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="Wrap"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBox KeyUp="SendMessageBox_KeyUp" GotFocus="SendMessageBox_GotFocus" Margin="0,0,70,0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="70" Name="SendMessageBox" BorderThickness="0" Text="Type to chat..."/>
+            <Button Name="SendButton" Tap="SendButton_Tap" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="70" Width="90">
+                <TextBlock FontSize="18" Text="Send"/>
             </Button>
         </Grid>
     </Grid>

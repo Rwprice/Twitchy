@@ -19,6 +19,8 @@ using System.Net.Http.Headers;
 using SM.Media.Utility;
 using SM.Media.Segments;
 using System.Windows.Media;
+using SocketEx;
+using System.Threading;
 
 namespace TwitchTV
 {
@@ -40,12 +42,17 @@ namespace TwitchTV
         ISubProgram subProgram;
         DispatcherTimer uiTimeout;
 
+        List<string> ChatLog { get; set; }
+        ChatClient client;
+        CancellationTokenSource cancelToken;
+
         public PlayerPage()
         {
             token = new AccessToken();
             playlist = new M3U8Playlist();
             InitializeComponent();
             _httpClients = new HttpClients();
+            ChatLog = new List<string>();
             
             if(App.ViewModel.stream != null)
                 this.Status.Text = App.ViewModel.stream.channel.status;
@@ -53,6 +60,7 @@ namespace TwitchTV
             uiTimeout = new DispatcherTimer();
             uiTimeout.Interval = new TimeSpan(0, 0, 4);
             uiTimeout.Tick += uiTimeout_Tick;
+            cancelToken = new CancellationTokenSource();
         }
 
         private void uiTimeout_Tick(object sender, EventArgs e)
@@ -239,6 +247,8 @@ namespace TwitchTV
                                     .Wait();
             }
 
+            JoinChatAndListen();
+
             GetQualities();
             base.OnNavigatedTo(e);
         }
@@ -254,6 +264,9 @@ namespace TwitchTV
                 _mediaElementManager.Close()
                                     .Wait();
             }
+
+            cancelToken.Cancel(false);
+            client = null;
         }
 
         void OnBufferingProgressChanged(object sender, RoutedEventArgs routedEventArgs)
@@ -328,6 +341,13 @@ namespace TwitchTV
         {
             if (this.Orientation == PageOrientation.Landscape || this.Orientation == PageOrientation.LandscapeLeft || this.Orientation == PageOrientation.LandscapeRight)
             {
+                this.ChatBox.Opacity = 0;
+                this.ChatBox.IsEnabled = false;
+                this.SendMessageBox.Opacity = 0;
+                this.SendMessageBox.IsEnabled = false;
+                this.SendButton.Opacity = 0;
+                this.SendButton.IsEnabled = false;
+
                 if (this.TaskBar.Opacity == 0)
                 {
                     this.TaskBar.Opacity = 1;
@@ -355,6 +375,15 @@ namespace TwitchTV
 
             else
             {
+                this.ChatBox.Opacity = 1;
+                this.ChatBox.IsEnabled = true;
+
+                this.SendMessageBox.Opacity = 1;
+                this.SendMessageBox.IsEnabled = true;
+
+                this.SendButton.Opacity = 1;
+                this.SendButton.IsEnabled = true;
+
                 this.TaskBar.Opacity = 1;
                 this.QualitySelection.Opacity = 1;
                 this.Status.Opacity = 1;
@@ -423,6 +452,83 @@ namespace TwitchTV
 
             ToggleUI();
             base.OnOrientationChanged(e);
+        }
+
+        private void SendMessageBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+            {
+                if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
+                {
+                    client.sendData("PRIVMSG", this.SendMessageBox.Text);
+                    this.SendMessageBox.Text = "";
+                    this.Focus();
+                }
+            }
+        }
+
+        private void SendMessageBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.SendMessageBox.Text = "";
+        }
+
+        private void SendButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
+            {
+                client.sendData("PRIVMSG", this.SendMessageBox.Text);
+                this.SendMessageBox.Text = "";
+                this.Focus();
+            }
+        }
+
+        public void JoinChatAndListen()
+        {
+            IRCConfig config = new IRCConfig
+            {
+                channel = App.ViewModel.stream.channel.name,
+                nick = App.ViewModel.user.Name,
+                pass = "oauth:" + App.ViewModel.user.Oauth,
+                server = "irc.twitch.tv",
+                port = 6667
+            };
+
+            client = new ChatClient(config);
+            client.sendData("JOIN", "#" + config.channel);
+
+            Task.Factory.StartNew(() => IRCWork(cancelToken.Token));
+        }
+
+        public void IRCWork(CancellationToken token)
+        {
+            string[] ex;
+            string data;
+            bool shouldRun = true;
+
+            while (shouldRun)
+            {
+                data = client.sr.ReadLine();
+
+                if (token.IsCancellationRequested && client == null)
+                    return;
+
+                if (data.Contains("PRIVMSG #" + client.config.channel + " :"))
+                {
+                    string name = data.Substring(1, data.IndexOf('!') - 1);
+                    string msg = data.Substring(data.IndexOf("PRIVMSG #" + client.config.channel + " :") + ("PRIVMSG #" + client.config.channel + " :").Length);
+
+                    ChatLog.Add(name + ": " + msg);
+                    Debug.WriteLine(name + ": " + msg);
+                }
+
+                char[] charSeparator = new char[] { ' ' };
+                ex = data.Split(charSeparator, 5);
+
+                if (ex[0] == "PING")
+                {
+                    client.sendData("PONG", ex[1]);
+                }
+            }
         }
     }
 }
