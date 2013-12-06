@@ -133,7 +133,7 @@ namespace TwitchTV.ViewModels
             }
         }
 
-        // <summary>
+        /// <summary>
         /// Top Streams
         /// </summary>
         private ObservableCollection<Stream> _FollowedStreams;

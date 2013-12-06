@@ -1,26 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
-using TwitchAPIHandler.Objects;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using SM.Media.Web;
-using System.Windows.Threading;
+﻿using Microsoft.Phone.Controls;
 using SM.Media;
 using SM.Media.Playlists;
-using System.Net.Http.Headers;
-using SM.Media.Utility;
 using SM.Media.Segments;
-using System.Windows.Media;
-using SocketEx;
+using SM.Media.Web;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Navigation;
+using System.Windows.Threading;
+using TwitchAPIHandler.Objects;
 
 namespace TwitchTV
 {
@@ -42,9 +36,8 @@ namespace TwitchTV
         ISubProgram subProgram;
         DispatcherTimer uiTimeout;
 
-        List<string> ChatLog { get; set; }
         ChatClient client;
-        CancellationTokenSource cancelToken;
+        BackgroundWorker backgroundWorker = new BackgroundWorker();
 
         public PlayerPage()
         {
@@ -52,7 +45,6 @@ namespace TwitchTV
             playlist = new M3U8Playlist();
             InitializeComponent();
             _httpClients = new HttpClients();
-            ChatLog = new List<string>();
             
             if(App.ViewModel.stream != null)
                 this.Status.Text = App.ViewModel.stream.channel.status;
@@ -60,8 +52,12 @@ namespace TwitchTV
             uiTimeout = new DispatcherTimer();
             uiTimeout.Interval = new TimeSpan(0, 0, 4);
             uiTimeout.Tick += uiTimeout_Tick;
-            cancelToken = new CancellationTokenSource();
+
+            backgroundWorker.DoWork += backgroundWorker_DoWork;
+            backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
+            backgroundWorker.WorkerReportsProgress = true;
         }
+
 
         private void uiTimeout_Tick(object sender, EventArgs e)
         {
@@ -265,7 +261,6 @@ namespace TwitchTV
                                     .Wait();
             }
 
-            cancelToken.Cancel(false);
             client = null;
         }
 
@@ -460,7 +455,9 @@ namespace TwitchTV
             {
                 if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
                 {
-                    client.sendData("PRIVMSG", this.SendMessageBox.Text);
+                    this.ChatBox.Items.Add(client.sendData("PRIVMSG", this.SendMessageBox.Text));
+                    this.ChatBox.ScrollIntoView(this.ChatBox.Items[this.ChatBox.Items.Count - 1]);
+
                     this.SendMessageBox.Text = "";
                     this.Focus();
                 }
@@ -476,7 +473,9 @@ namespace TwitchTV
         {
             if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
             {
-                client.sendData("PRIVMSG", this.SendMessageBox.Text);
+                this.ChatBox.Items.Add(client.sendData("PRIVMSG", this.SendMessageBox.Text));
+                this.ChatBox.ScrollIntoView(this.ChatBox.Items[this.ChatBox.Items.Count - 1]);
+
                 this.SendMessageBox.Text = "";
                 this.Focus();
             }
@@ -496,20 +495,20 @@ namespace TwitchTV
             client = new ChatClient(config);
             client.sendData("JOIN", "#" + config.channel);
 
-            Task.Factory.StartNew(() => IRCWork(cancelToken.Token));
+            backgroundWorker.RunWorkerAsync();
         }
 
-        public void IRCWork(CancellationToken token)
+        public void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             string[] ex;
             string data;
-            bool shouldRun = true;
+            char[] charSeparator = new char[] { ' ' };
 
-            while (shouldRun)
+            while (true)
             {
                 data = client.sr.ReadLine();
 
-                if (token.IsCancellationRequested && client == null)
+                if (client == null)
                     return;
 
                 if (data.Contains("PRIVMSG #" + client.config.channel + " :"))
@@ -517,17 +516,27 @@ namespace TwitchTV
                     string name = data.Substring(1, data.IndexOf('!') - 1);
                     string msg = data.Substring(data.IndexOf("PRIVMSG #" + client.config.channel + " :") + ("PRIVMSG #" + client.config.channel + " :").Length);
 
-                    ChatLog.Add(name + ": " + msg);
-                    Debug.WriteLine(name + ": " + msg);
+                    string chatLine = name + ": " + msg;
+                    backgroundWorker.ReportProgress(0, chatLine);
                 }
 
-                char[] charSeparator = new char[] { ' ' };
-                ex = data.Split(charSeparator, 5);
 
+                ex = data.Split(charSeparator, 5);
                 if (ex[0] == "PING")
                 {
                     client.sendData("PONG", ex[1]);
                 }
+            }
+        }
+
+        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            this.ChatBox.Items.Add(e.UserState.ToString());
+            this.ChatBox.ScrollIntoView(this.ChatBox.Items[this.ChatBox.Items.Count - 1]);
+
+            if (this.ChatBox.Items.Count > 20)
+            {
+                this.ChatBox.Items.RemoveAt(0);
             }
         }
     }

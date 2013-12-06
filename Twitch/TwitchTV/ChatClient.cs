@@ -1,6 +1,7 @@
 ﻿using SocketEx;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -43,27 +44,28 @@ namespace TwitchTV
             }
         }
 
-        public void sendData(string cmd, string param)
+        public string sendData(string cmd, string param)
         {
             if (param == null)
             {
                 sw.WriteLine(cmd);
                 sw.Flush();
-                Console.WriteLine(cmd);
+                return cmd;
             }
             else if (cmd == "PRIVMSG")
             {
                 sw.WriteLine(cmd + " #" + config.channel + " :" + param);
                 sw.Flush();
-                Console.WriteLine(config.nick + ": " + param);
+                return config.nick + ": " + param;
             }
             else
             {
                 sw.WriteLine(cmd + " " + param);
                 sw.Flush();
-                Console.WriteLine(cmd + " " + param);
+                return cmd + " " + param;
             }
         }
+
     }
 
     public struct IRCConfig
