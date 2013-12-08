@@ -50,7 +50,7 @@ namespace TwitchTV
             {
                 Image image;
                 TextBlock text;
-                for (int i = 0; i < 8; i++)
+                for (int i = 0; i < App.ViewModel.FeaturedStreams.Count; i++)
                 {
                     image = (Image)this.FeaturedStreams.FindName("FP" + i + "Image");
                     image.Source = App.ViewModel.FeaturedStreams[i].preview.medium;
@@ -113,8 +113,8 @@ namespace TwitchTV
 
                 MessageBox.Show("User has been logged out!");
 
-                if(this.FollowedStreamsList.Items.Count > 0)
-                    this.FollowedStreamsList.Items.Clear();
+                if (this.FollowedStreamsList.Items.Count > 0)
+                    App.ViewModel.FollowedStreams.Clear();
 
                 this.Account.Text = "Login";
             }

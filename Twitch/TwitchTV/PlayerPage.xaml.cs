@@ -5,6 +5,7 @@ using SM.Media.Segments;
 using SM.Media.Web;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace TwitchTV
 
         public bool isFollowed = false;
         public bool firstRun = true;
+        public bool isScrolling = false;
 
         readonly IHttpClients _httpClients;
         IMediaElementManager _mediaElementManager;
@@ -37,6 +39,10 @@ namespace TwitchTV
         DispatcherTimer uiTimeout;
 
         ChatClient client;
+        ObservableCollection<ChatLine> ChatList = new ObservableCollection<ChatLine>();
+        public static Dictionary<string, string> userColors = new Dictionary<string, string>();
+        public static Random random = new Random();
+        ScrollViewer scrollViewer;
         BackgroundWorker backgroundWorker = new BackgroundWorker();
 
         public PlayerPage()
@@ -57,7 +63,6 @@ namespace TwitchTV
             backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
             backgroundWorker.WorkerReportsProgress = true;
         }
-
 
         private void uiTimeout_Tick(object sender, EventArgs e)
         {
@@ -289,7 +294,7 @@ namespace TwitchTV
 
         void UpdateState(MediaElementState state)
         {
-            Debug.WriteLine("MediaElement State: " + state);
+            
         }
 
         void TsMediaManagerOnOnStateChange(object sender, TsMediaManagerStateEventArgs tsMediaManagerStateEventArgs)
@@ -300,7 +305,7 @@ namespace TwitchTV
 
                 if (!string.IsNullOrWhiteSpace(message))
                 {
-                    Debug.WriteLine(message);
+                    
                 }
 
                 mediaElement1_CurrentStateChanged(null, null);
@@ -310,7 +315,6 @@ namespace TwitchTV
         private void mediaElement1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
             MessageBox.Show("The media failed to load", "Well, this is embarrassing...", MessageBoxButton.OK);
-            Debug.WriteLine(e.ErrorException.Message);
             CleanupMedia();
         }
 
@@ -411,6 +415,7 @@ namespace TwitchTV
         {
             if (isFollowed)
             {
+                this.Focus();
                 this.FavoriteButton.IsEnabled = false;
                 await User.UnfollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
                 isFollowed = false;
@@ -420,6 +425,7 @@ namespace TwitchTV
             }
             else
             {
+                this.Focus();
                 this.FavoriteButton.IsEnabled = false;
                 await User.FollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
                 isFollowed = true;
@@ -455,8 +461,14 @@ namespace TwitchTV
             {
                 if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
                 {
-                    this.ChatBox.Items.Add(client.sendData("PRIVMSG", this.SendMessageBox.Text));
-                    this.ChatBox.ScrollIntoView(this.ChatBox.Items[this.ChatBox.Items.Count - 1]);
+                    ChatList.Add(client.sendData("PRIVMSG", this.SendMessageBox.Text));
+                    if (ChatList.Count > 20)
+                    {
+                        ChatList.RemoveAt(0);
+                    }
+
+                    this.ChatBox.ItemsSource = ChatList;
+                    ScrollIfAtBottom();
 
                     this.SendMessageBox.Text = "";
                     this.Focus();
@@ -473,8 +485,14 @@ namespace TwitchTV
         {
             if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
             {
-                this.ChatBox.Items.Add(client.sendData("PRIVMSG", this.SendMessageBox.Text));
-                this.ChatBox.ScrollIntoView(this.ChatBox.Items[this.ChatBox.Items.Count - 1]);
+                ChatList.Add(client.sendData("PRIVMSG", this.SendMessageBox.Text));
+                if (ChatList.Count > 20)
+                {
+                    ChatList.RemoveAt(0);
+                }
+
+                this.ChatBox.ItemsSource = ChatList;
+                ScrollIfAtBottom();
 
                 this.SendMessageBox.Text = "";
                 this.Focus();
@@ -492,7 +510,7 @@ namespace TwitchTV
                 port = 6667
             };
 
-            client = new ChatClient(config);
+            client = new ChatClient(config);            
             client.sendData("JOIN", "#" + config.channel);
 
             backgroundWorker.RunWorkerAsync();
@@ -508,7 +526,7 @@ namespace TwitchTV
             {
                 data = client.sr.ReadLine();
 
-                if (client == null)
+                if (client == null || data == null)
                     return;
 
                 if (data.Contains("PRIVMSG #" + client.config.channel + " :"))
@@ -516,10 +534,17 @@ namespace TwitchTV
                     string name = data.Substring(1, data.IndexOf('!') - 1);
                     string msg = data.Substring(data.IndexOf("PRIVMSG #" + client.config.channel + " :") + ("PRIVMSG #" + client.config.channel + " :").Length);
 
-                    string chatLine = name + ": " + msg;
+                    string color = GetUserColor(name);
+
+                    ChatLine chatLine = new ChatLine
+                    {
+                        UserName = name,
+                        Message = msg,
+                        Color = color
+                    };
+
                     backgroundWorker.ReportProgress(0, chatLine);
                 }
-
 
                 ex = data.Split(charSeparator, 5);
                 if (ex[0] == "PING")
@@ -531,13 +556,65 @@ namespace TwitchTV
 
         private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            this.ChatBox.Items.Add(e.UserState.ToString());
-            this.ChatBox.ScrollIntoView(this.ChatBox.Items[this.ChatBox.Items.Count - 1]);
+            ChatLine chatLine = (ChatLine)(e.UserState);
+            ChatList.Add(chatLine);
 
-            if (this.ChatBox.Items.Count > 20)
+            if (ChatList.Count > 20)
             {
-                this.ChatBox.Items.RemoveAt(0);
+                ChatList.RemoveAt(0);
             }
+
+            this.ChatBox.ItemsSource = ChatList;
+            ScrollIfAtBottom();
+        }
+
+        public static string GetUserColor(string name)
+        {
+            if (userColors.Keys.Contains(name))
+                return userColors[name];
+
+            else
+            {
+                var color = String.Format("#{0:X6}", random.Next(0x1000000));
+                userColors.Add(name, color);
+                return color;
+            }
+        }
+
+        public void ScrollIfAtBottom()
+        {
+            if (scrollViewer == null)
+            {
+                scrollViewer = FindScrollViewer(this.ChatBox);
+                scrollViewer.ManipulationStarted += scrollViewer_ManipulationStarted;
+                scrollViewer.AddHandler(ScrollViewer.ManipulationCompletedEvent, new EventHandler<System.Windows.Input.ManipulationCompletedEventArgs>(scrollViewer_ManipulationCompleted), true);
+            }
+
+            if(!isScrolling)
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.ExtentHeight);
+        }
+
+        void scrollViewer_ManipulationCompleted(object sender, System.Windows.Input.ManipulationCompletedEventArgs e)
+        {
+            isScrolling = false;
+        }
+
+        void scrollViewer_ManipulationStarted(object sender, System.Windows.Input.ManipulationStartedEventArgs e)
+        {
+            isScrolling = true;
+        }
+
+        static ScrollViewer FindScrollViewer(DependencyObject parent)
+        {
+            var childCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (var i = 0; i < childCount; i++)
+            {
+                var elt = VisualTreeHelper.GetChild(parent, i);
+                if (elt is ScrollViewer) return (ScrollViewer)elt;
+                var result = FindScrollViewer(elt);
+                if (result != null) return result;
+            }
+            return null;
         }
     }
 }

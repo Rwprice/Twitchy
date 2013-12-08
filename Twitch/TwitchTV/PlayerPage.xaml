@@ -43,7 +43,10 @@
             <ListBox Name="ChatBox" Background="White" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="385" Margin="0,0,0,70">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding}" Foreground="Black" TextWrapping="Wrap"/>
+                        <StackPanel>
+                            <TextBlock Text="{Binding UserName}" Foreground="{Binding Color}" FontSize="26" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                            <TextBlock Text="{Binding Message}" Foreground="Black" FontSize="22" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                        </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

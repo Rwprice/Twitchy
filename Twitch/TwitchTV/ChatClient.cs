@@ -26,7 +26,7 @@ namespace TwitchTV
             }
             catch
             {
-                Console.WriteLine("Connection Error");
+                Debug.WriteLine("Connection Error");
             }
 
             try
@@ -40,32 +40,36 @@ namespace TwitchTV
             }
             catch
             {
-                Console.WriteLine("Communication error");
+                Debug.WriteLine("Communication error");
             }
         }
 
-        public string sendData(string cmd, string param)
+        public ChatLine sendData(string cmd, string param)
         {
             if (param == null)
             {
                 sw.WriteLine(cmd);
                 sw.Flush();
-                return cmd;
+                return null;
             }
             else if (cmd == "PRIVMSG")
             {
                 sw.WriteLine(cmd + " #" + config.channel + " :" + param);
                 sw.Flush();
-                return config.nick + ": " + param;
+                return new ChatLine
+                {
+                    UserName = config.nick,
+                    Message = param,
+                    Color = PlayerPage.GetUserColor(config.nick)
+                };
             }
             else
             {
                 sw.WriteLine(cmd + " " + param);
                 sw.Flush();
-                return cmd + " " + param;
+                return null;
             }
         }
-
     }
 
     public struct IRCConfig
@@ -75,5 +79,12 @@ namespace TwitchTV
         public string nick;
         public string pass;
         public string channel;
+    }
+
+    public class ChatLine
+    {
+        public string UserName { get; set; }
+        public string Message { get; set; }
+        public string Color { get; set; }
     }
 }
