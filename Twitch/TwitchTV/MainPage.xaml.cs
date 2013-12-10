@@ -26,6 +26,8 @@ namespace TwitchTV
 
             InitializeComponent();
 
+            App.ViewModel.LoadSettings();
+
             App.ViewModel.PropertyChanged += ViewModel_PropertyChanged;
         }
 

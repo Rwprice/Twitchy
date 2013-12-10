@@ -28,6 +28,9 @@ namespace TwitchTV
         public bool isFollowed = false;
         public bool firstRun = true;
         public bool isScrolling = false;
+        public bool chatJoined = false;
+        public bool isLoggedIn = false;
+        public bool navigatedFrom = false;
 
         readonly IHttpClients _httpClients;
         IMediaElementManager _mediaElementManager;
@@ -36,7 +39,9 @@ namespace TwitchTV
         TsMediaStreamSource _tsMediaStreamSource;
         Program program;
         ISubProgram subProgram;
+
         DispatcherTimer uiTimeout;
+        DispatcherTimer chatGoToBottom;
 
         ChatClient client;
         ObservableCollection<ChatLine> ChatList = new ObservableCollection<ChatLine>();
@@ -47,21 +52,45 @@ namespace TwitchTV
 
         public PlayerPage()
         {
+            isLoggedIn = App.ViewModel.user != null;
+
             token = new AccessToken();
             playlist = new M3U8Playlist();
             InitializeComponent();
             _httpClients = new HttpClients();
+
+            if (App.ViewModel.LockLandscape)
+            {
+                this.TaskBar.Opacity = 0;
+                this.Status.Opacity = 0;
+                this.QualitySelection.Opacity = 0;
+                this.FavoriteButton.Opacity = 0;
+                this.FavoriteLabel.Opacity = 0;
+                this.SupportedOrientations = SupportedPageOrientation.Landscape;
+            }
             
             if(App.ViewModel.stream != null)
                 this.Status.Text = App.ViewModel.stream.channel.status;
+
+            if (!isLoggedIn)
+                this.ConnectToChatText.Text = "Log in to join chat";
 
             uiTimeout = new DispatcherTimer();
             uiTimeout.Interval = new TimeSpan(0, 0, 4);
             uiTimeout.Tick += uiTimeout_Tick;
 
+            chatGoToBottom = new DispatcherTimer();
+            chatGoToBottom.Interval = new TimeSpan(0, 0, 3);
+            chatGoToBottom.Tick += chatGoToBottom_Tick;
+
             backgroundWorker.DoWork += backgroundWorker_DoWork;
             backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
             backgroundWorker.WorkerReportsProgress = true;
+        }
+
+        void chatGoToBottom_Tick(object sender, EventArgs e)
+        {
+            isScrolling = false;
         }
 
         private void uiTimeout_Tick(object sender, EventArgs e)
@@ -74,12 +103,15 @@ namespace TwitchTV
         {
             try
             {
-                isFollowed = await User.IsStreamFollowed(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                if (isLoggedIn)
+                {
+                    isFollowed = await User.IsStreamFollowed(App.ViewModel.stream.channel.name, App.ViewModel.user);
 
-                if (isFollowed)
-                    this.FavoriteLabel.Text = "Unfollow";
-                else
-                    this.FavoriteLabel.Text = "Follow";
+                    if (isFollowed)
+                        this.FavoriteLabel.Text = "Unfollow";
+                    else
+                        this.FavoriteLabel.Text = "Follow";
+                }
 
                 token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
                 playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
@@ -99,7 +131,8 @@ namespace TwitchTV
                 Debug.WriteLine(ex.Message);
             }
 
-            playVideo();
+            if (!navigatedFrom)
+                playVideo();
         }
 
         async void playVideo()
@@ -197,18 +230,22 @@ namespace TwitchTV
 
                 var segmentReaderManager = new SegmentReaderManager(new[] { _playlist }, _httpClients.CreateSegmentClient);
 
-                if (null != _tsMediaManager)
-                    _tsMediaManager.OnStateChange -= TsMediaManagerOnOnStateChange;
+                if (!navigatedFrom)
+                {
+                    if (null != _tsMediaManager)
+                        _tsMediaManager.OnStateChange -= TsMediaManagerOnOnStateChange;
 
-                _tsMediaStreamSource = new TsMediaStreamSource();
+                    _tsMediaStreamSource = new TsMediaStreamSource();
 
-                _tsMediaManager = new TsMediaManager(segmentReaderManager, _mediaElementManager, _tsMediaStreamSource);
+                    _tsMediaManager = new TsMediaManager(segmentReaderManager, _mediaElementManager, _tsMediaStreamSource);
 
-                _tsMediaManager.OnStateChange += TsMediaManagerOnOnStateChange;
+                    _tsMediaManager.OnStateChange += TsMediaManagerOnOnStateChange;
 
-                this.uiTimeout.Start();
+                    this.uiTimeout.Start();
+                }
 
-                _tsMediaManager.Play();
+                if(!navigatedFrom)
+                    _tsMediaManager.Play();
             }
 
             catch (Exception ex)
@@ -226,11 +263,17 @@ namespace TwitchTV
                 if (null != _tsMediaManager)
                     _tsMediaManager.Close();
 
+                _tsMediaManager = null;
+
                 if (null != _playlist)
                     await _playlist.StopAsync();
 
+                _playlist = null;
+
                 if (null != _mediaElementManager)
                     await _mediaElementManager.Close();
+
+                _mediaElementManager = null;
             }
 
             catch (Exception ex)
@@ -248,7 +291,10 @@ namespace TwitchTV
                                     .Wait();
             }
 
-            JoinChatAndListen();
+            if (App.ViewModel.AutoJoinChat && isLoggedIn)
+            {
+                JoinChatAndListen();
+            }
 
             GetQualities();
             base.OnNavigatedTo(e);
@@ -256,7 +302,7 @@ namespace TwitchTV
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            base.OnNavigatedFrom(e);
+            navigatedFrom = true;
 
             CleanupMedia();
 
@@ -267,6 +313,8 @@ namespace TwitchTV
             }
 
             client = null;
+
+            base.OnNavigatedFrom(e);
         }
 
         void OnBufferingProgressChanged(object sender, RoutedEventArgs routedEventArgs)
@@ -346,6 +394,8 @@ namespace TwitchTV
                 this.SendMessageBox.IsEnabled = false;
                 this.SendButton.Opacity = 0;
                 this.SendButton.IsEnabled = false;
+                this.ConnectToChat.IsEnabled = false;
+                this.ConnectToChat.Opacity = 0;
 
                 if (this.TaskBar.Opacity == 0)
                 {
@@ -353,9 +403,12 @@ namespace TwitchTV
                     this.QualitySelection.Opacity = 1;
                     this.Status.Opacity = 1;
                     this.QualitySelection.IsEnabled = true;
-                    this.FavoriteButton.Opacity = .5;
-                    this.FavoriteLabel.Opacity = .5;
-                    this.FavoriteButton.IsEnabled = true;
+                    if (isLoggedIn)
+                    {
+                        this.FavoriteButton.Opacity = .5;
+                        this.FavoriteLabel.Opacity = .5;
+                        this.FavoriteButton.IsEnabled = true;
+                    }
                     this.uiTimeout.Start();
                 }
 
@@ -365,9 +418,12 @@ namespace TwitchTV
                     this.QualitySelection.Opacity = 0;
                     this.Status.Opacity = 0;
                     this.QualitySelection.IsEnabled = false;
-                    this.FavoriteButton.Opacity = 0;
-                    this.FavoriteLabel.Opacity = 0;
-                    this.FavoriteButton.IsEnabled = false;
+                    if (isLoggedIn)
+                    {
+                        this.FavoriteButton.Opacity = 0;
+                        this.FavoriteLabel.Opacity = 0;
+                        this.FavoriteButton.IsEnabled = false;
+                    }
                     this.uiTimeout.Stop();
                 }
             }
@@ -388,7 +444,13 @@ namespace TwitchTV
                 this.Status.Opacity = 1;
                 this.QualitySelection.IsEnabled = true;
 
-                if (this.FavoriteButton.Opacity == 0)
+                if (!chatJoined)
+                {
+                    this.ConnectToChat.IsEnabled = true;
+                    this.ConnectToChat.Opacity = 1;
+                }
+
+                if (isLoggedIn && this.FavoriteButton.Opacity == 0)
                 {
                     this.FavoriteButton.Opacity = .5;
                     this.FavoriteLabel.Opacity = .5;
@@ -396,7 +458,7 @@ namespace TwitchTV
                     this.uiTimeout.Start();
                 }
 
-                else
+                else if (isLoggedIn && this.FavoriteButton.Opacity != 0)
                 {
                     this.FavoriteButton.Opacity = 0;
                     this.FavoriteLabel.Opacity = 0;
@@ -413,31 +475,34 @@ namespace TwitchTV
 
         private async void FavoriteButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            if (isFollowed)
+            if (isLoggedIn)
             {
-                this.Focus();
-                this.FavoriteButton.IsEnabled = false;
-                await User.UnfollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
-                isFollowed = false;
-                this.FavoriteLabel.Text = "Follow";
-                if (this.FavoriteButton.Opacity == .5)
-                    this.FavoriteButton.IsEnabled = true;
-            }
-            else
-            {
-                this.Focus();
-                this.FavoriteButton.IsEnabled = false;
-                await User.FollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
-                isFollowed = true;
-                this.FavoriteLabel.Text = "Unfollow";
-                if(this.FavoriteButton.Opacity == .5)
-                    this.FavoriteButton.IsEnabled = true;
+                if (isFollowed)
+                {
+                    this.Focus();
+                    this.FavoriteButton.IsEnabled = false;
+                    await User.UnfollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                    isFollowed = false;
+                    this.FavoriteLabel.Text = "Follow";
+                    if (this.FavoriteButton.Opacity == .5)
+                        this.FavoriteButton.IsEnabled = true;
+                }
+                else
+                {
+                    this.Focus();
+                    this.FavoriteButton.IsEnabled = false;
+                    await User.FollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                    isFollowed = true;
+                    this.FavoriteLabel.Text = "Unfollow";
+                    if (this.FavoriteButton.Opacity == .5)
+                        this.FavoriteButton.IsEnabled = true;
+                }
             }
         }
 
         protected override void OnOrientationChanged(OrientationChangedEventArgs e)
         {
-            if (e.Orientation == PageOrientation.Landscape || e.Orientation == PageOrientation.LandscapeLeft || e.Orientation == PageOrientation.LandscapeRight)
+            if ((e.Orientation == PageOrientation.Landscape || e.Orientation == PageOrientation.LandscapeLeft || e.Orientation == PageOrientation.LandscapeRight) || App.ViewModel.LockLandscape)
             {
                 this.mediaElement1.Margin = new Thickness(0);
                 this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
@@ -452,12 +517,43 @@ namespace TwitchTV
             }
 
             ToggleUI();
+
             base.OnOrientationChanged(e);
         }
 
         private void SendMessageBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.Enter)
+            if (chatJoined)
+            {
+                if (e.Key == System.Windows.Input.Key.Enter)
+                {
+                    if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
+                    {
+                        ChatList.Add(client.sendData("PRIVMSG", this.SendMessageBox.Text));
+                        if (ChatList.Count > 20)
+                        {
+                            ChatList.RemoveAt(0);
+                        }
+
+                        ScrollIfAtBottom();
+
+                        this.SendMessageBox.Text = "";
+                    }
+                }
+            }
+        }
+
+        private void SendMessageBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (chatJoined)
+                this.SendMessageBox.Text = "";
+            else
+                this.Focus();
+        }
+
+        private void SendButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (chatJoined)
             {
                 if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
                 {
@@ -467,40 +563,24 @@ namespace TwitchTV
                         ChatList.RemoveAt(0);
                     }
 
-                    this.ChatBox.ItemsSource = ChatList;
                     ScrollIfAtBottom();
 
                     this.SendMessageBox.Text = "";
-                    this.Focus();
                 }
-            }
-        }
-
-        private void SendMessageBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            this.SendMessageBox.Text = "";
-        }
-
-        private void SendButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            if (this.SendMessageBox.Text != "" && this.SendMessageBox.Text != null)
-            {
-                ChatList.Add(client.sendData("PRIVMSG", this.SendMessageBox.Text));
-                if (ChatList.Count > 20)
-                {
-                    ChatList.RemoveAt(0);
-                }
-
-                this.ChatBox.ItemsSource = ChatList;
-                ScrollIfAtBottom();
-
-                this.SendMessageBox.Text = "";
-                this.Focus();
             }
         }
 
         public void JoinChatAndListen()
         {
+            this.Focus();
+            this.ConnectToChat.IsEnabled = false;
+            this.ConnectToChat.Opacity = 0;
+
+            chatJoined = true;
+
+            ChatList.Add(new ChatLine { Message = "Connecting to chat...", UserName = "", Color = "#ffffff" });
+            this.ChatBox.ItemsSource = this.ChatList;
+
             IRCConfig config = new IRCConfig
             {
                 channel = App.ViewModel.stream.channel.name,
@@ -529,6 +609,9 @@ namespace TwitchTV
                 if (client == null || data == null)
                     return;
 
+                if(data.Contains("HISTORYEND"))
+                    backgroundWorker.ReportProgress(0, new ChatLine { Message = "Connected!", UserName = "", Color = "#ffffff" });
+
                 if (data.Contains("PRIVMSG #" + client.config.channel + " :"))
                 {
                     string name = data.Substring(1, data.IndexOf('!') - 1);
@@ -545,6 +628,12 @@ namespace TwitchTV
 
                     backgroundWorker.ReportProgress(0, chatLine);
                 }
+
+                if (data.Contains("This room is in subscribers only mode. To talk"))
+                {
+                    backgroundWorker.ReportProgress(0, new ChatLine { Message = "This room is in sub only mode. Your message was not sent.", UserName = "NOTICE", Color = "#65000b" });
+                }
+
 
                 ex = data.Split(charSeparator, 5);
                 if (ex[0] == "PING")
@@ -564,7 +653,6 @@ namespace TwitchTV
                 ChatList.RemoveAt(0);
             }
 
-            this.ChatBox.ItemsSource = ChatList;
             ScrollIfAtBottom();
         }
 
@@ -587,21 +675,18 @@ namespace TwitchTV
             {
                 scrollViewer = FindScrollViewer(this.ChatBox);
                 scrollViewer.ManipulationStarted += scrollViewer_ManipulationStarted;
-                scrollViewer.AddHandler(ScrollViewer.ManipulationCompletedEvent, new EventHandler<System.Windows.Input.ManipulationCompletedEventArgs>(scrollViewer_ManipulationCompleted), true);
             }
 
-            if(!isScrolling)
+            if (!isScrolling)
+            {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.ExtentHeight);
-        }
-
-        void scrollViewer_ManipulationCompleted(object sender, System.Windows.Input.ManipulationCompletedEventArgs e)
-        {
-            isScrolling = false;
+            }
         }
 
         void scrollViewer_ManipulationStarted(object sender, System.Windows.Input.ManipulationStartedEventArgs e)
         {
             isScrolling = true;
+            chatGoToBottom.Start();
         }
 
         static ScrollViewer FindScrollViewer(DependencyObject parent)
@@ -615,6 +700,14 @@ namespace TwitchTV
                 if (result != null) return result;
             }
             return null;
+        }
+
+        private void ConnectToChat_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (isLoggedIn)
+            {
+                JoinChatAndListen();
+            }
         }
     }
 }

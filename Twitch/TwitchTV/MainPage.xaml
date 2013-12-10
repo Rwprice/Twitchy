@@ -133,8 +133,9 @@
             <phone:PanoramaItem Header="Settings">
                 <ScrollViewer>
                     <StackPanel>
-                        <TextBlock Text="Login" Name="Account" Margin="100,0,0,0" Tap="SettingTapped" FontSize="30"/>
-                        <TextBlock Text="About" Name="About" Margin="100,0,0,0" Tap="SettingTapped" FontSize="30"/>
+                        <TextBlock Text="Login" Name="Account" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
+                        <TextBlock Text="Settings" Name="Settings" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
+                        <TextBlock Text="About" Name="About" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
                     </StackPanel>
                 </ScrollViewer>
             </phone:PanoramaItem>

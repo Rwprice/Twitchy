@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using TwitchAPIHandler.Objects;
 using TwitchTV.Resources;
+using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace TwitchTV.ViewModels
 {
@@ -32,6 +35,9 @@ namespace TwitchTV.ViewModels
         public User user { get; set; }
 
         private bool alreadyLoadedFromToken = false;
+
+        public bool AutoJoinChat = false;
+        public bool LockLandscape = false;
 
         /// <summary>
         /// Search Streams
@@ -189,6 +195,49 @@ namespace TwitchTV.ViewModels
 
                 lastUpdate = DateTime.Now;
             }
+        }
+
+        public async void SaveSettings()
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            StorageFile textFile = await localFolder.CreateFileAsync("settings", CreationCollisionOption.ReplaceExisting);
+
+            using (IRandomAccessStream textStream = await textFile.OpenAsync(FileAccessMode.ReadWrite))
+            {
+                using (DataWriter textWriter = new DataWriter(textStream))
+                {
+                    textWriter.WriteString(AutoJoinChat.ToString() + "\n" + LockLandscape.ToString());
+                    await textWriter.StoreAsync();
+                }
+            }
+        }
+
+        public async void LoadSettings()
+        {
+            try
+            {
+                string contents;
+
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                StorageFile textFile = await localFolder.GetFileAsync("settings");
+
+                using (IRandomAccessStream textStream = await textFile.OpenReadAsync())
+                {
+                    using (DataReader textReader = new DataReader(textStream))
+                    {
+                        uint textLength = (uint)textStream.Size;
+                        await textReader.LoadAsync(textLength);
+                        contents = textReader.ReadString(textLength);
+                    }
+                }
+
+                string[] lines = contents.Split('\n');
+
+                bool.TryParse(lines[0], out AutoJoinChat);
+                bool.TryParse(lines[1], out LockLandscape);
+            }
+
+            catch { }
         }
     }
 }

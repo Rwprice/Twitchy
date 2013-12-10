@@ -67,9 +67,9 @@ namespace TwitchTV.Resources {
         ///
         ///Be careful when using this app on your mobile data connection as it requires vast amounts of data for streams. 
         ///
-        ///As of right now, chat and user account functionality is not implemented but will be available in upcoming releases.
+        ///With the Version 2.0 update, user account access such as chat and following have been added! Login to fully utilize the potential of Twitchy!
         ///
-        ///Twitchy is a product of Earthquake Unicorn Productions..
+        ///Keep a look out for an update for stability improvements and add [rest of string was truncated]&quot;;.
         /// </summary>
         public static string ABOUT_TEXT {
             get {
