@@ -53,12 +53,20 @@ namespace TwitchAPIHandler.Objects
             Uri top_games_path = new Uri(string.Format(PathStrings.TOP_GAMES_PATH, 0));
             var request = HttpWebRequest.Create(top_games_path);
             request.Method = "GET";
-            var response = await HttpRequest(request);
-            var games = JsonToTopGames(response);
-            var gamesToReturn = new ObservableCollection<TopGame>();
-            foreach (var game in games)
-                gamesToReturn.Add(game);
-            return gamesToReturn;
+            try
+            {
+                var response = await HttpRequest(request);
+                var games = JsonToTopGames(response);
+                var gamesToReturn = new ObservableCollection<TopGame>();
+                foreach (var game in games)
+                    gamesToReturn.Add(game);
+                return gamesToReturn;
+            }
+
+            catch
+            {
+                return new ObservableCollection<TopGame>();
+            }
         }
 
         public static async Task<ObservableCollection<TopGame>> SearchGames(string query)
@@ -66,12 +74,20 @@ namespace TwitchAPIHandler.Objects
             Uri top_games_path = new Uri(string.Format(PathStrings.SEARCH_GAME_PATH, query));
             var request = HttpWebRequest.Create(top_games_path);
             request.Method = "GET";
-            var response = await HttpRequest(request);
-            var games = JsonToSearchResults(response);
-            var gamesToReturn = new ObservableCollection<TopGame>();
-            foreach (var game in games)
-                gamesToReturn.Add(game);
-            return gamesToReturn;
+            try
+            {
+                var response = await HttpRequest(request);
+                var games = JsonToSearchResults(response);
+                var gamesToReturn = new ObservableCollection<TopGame>();
+                foreach (var game in games)
+                    gamesToReturn.Add(game);
+                return gamesToReturn;
+            }
+
+            catch
+            {
+                return new ObservableCollection<TopGame>();
+            }
         }
 
         private static List<TopGame> JsonToSearchResults(string json)

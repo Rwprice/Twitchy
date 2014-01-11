@@ -504,16 +504,22 @@ namespace TwitchTV
         {
             if ((e.Orientation == PageOrientation.Landscape || e.Orientation == PageOrientation.LandscapeLeft || e.Orientation == PageOrientation.LandscapeRight) || App.ViewModel.LockLandscape)
             {
-                this.mediaElement1.Margin = new Thickness(0);
-                this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
-                this.mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                if (this.mediaElement1 != null)
+                {
+                    this.mediaElement1.Margin = new Thickness(0);
+                    this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
+                    this.mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                }
             }
 
             else
             {
-                this.mediaElement1.Margin = new Thickness(0, 70, 0, 0);
-                this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                this.mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                if (this.mediaElement1 != null)
+                {
+                    this.mediaElement1.Margin = new Thickness(0, 70, 0, 0);
+                    this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                    this.mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                }
             }
 
             ToggleUI();
@@ -577,23 +583,30 @@ namespace TwitchTV
             this.ConnectToChat.Opacity = 0;
 
             chatJoined = true;
-
-            ChatList.Add(new ChatLine { Message = "Connecting to chat...", UserName = "", Color = "#ffffff" });
-            this.ChatBox.ItemsSource = this.ChatList;
-
-            IRCConfig config = new IRCConfig
+            try
             {
-                channel = App.ViewModel.stream.channel.name,
-                nick = App.ViewModel.user.Name,
-                pass = "oauth:" + App.ViewModel.user.Oauth,
-                server = "irc.twitch.tv",
-                port = 6667
-            };
+                ChatList.Add(new ChatLine { Message = "Connecting to chat...", UserName = "", Color = "#ffffff" });
+                this.ChatBox.ItemsSource = this.ChatList;
 
-            client = new ChatClient(config);            
-            client.sendData("JOIN", "#" + config.channel);
+                IRCConfig config = new IRCConfig
+                {
+                    channel = App.ViewModel.stream.channel.name,
+                    nick = App.ViewModel.user.Name,
+                    pass = "oauth:" + App.ViewModel.user.Oauth,
+                    server = "irc.twitch.tv",
+                    port = 6667
+                };
 
-            backgroundWorker.RunWorkerAsync();
+                client = new ChatClient(config);
+                client.sendData("JOIN", "#" + config.channel);
+
+                backgroundWorker.RunWorkerAsync();
+            }
+
+            catch
+            {
+                MessageBox.Show("Connecting to chat has run into issues", "Well, this is embarrassing...", MessageBoxButton.OK);
+            }
         }
 
         public void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -604,7 +617,15 @@ namespace TwitchTV
 
             while (true)
             {
-                data = client.sr.ReadLine();
+                try
+                {
+                    data = client.sr.ReadLine();
+                }
+
+                catch
+                {
+                    data = null;
+                }
 
                 if (client == null || data == null)
                     return;

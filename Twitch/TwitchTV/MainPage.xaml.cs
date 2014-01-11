@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Net.NetworkInformation;
+using Microsoft.Phone.Shell;
 using TwitchAPIHandler.Objects;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -98,9 +100,13 @@ namespace TwitchTV
 
         private void FrontPageIconTapped(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            int index = int.Parse(((Canvas)sender).Name.Remove(0, 2));
-            App.ViewModel.stream = App.ViewModel.FeaturedStreams[index];
-            NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+            try
+            {
+                int index = int.Parse(((Canvas)sender).Name.Remove(0, 2));
+                App.ViewModel.stream = App.ViewModel.FeaturedStreams[index];
+                NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+            }
+            catch { }
         }
 
         private void SettingTapped(object sender, System.Windows.Input.GestureEventArgs e)

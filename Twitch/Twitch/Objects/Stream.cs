@@ -70,12 +70,20 @@ namespace TwitchAPIHandler.Objects
             Uri front_page_streams_path = new Uri(PathStrings.FRONT_PAGE_STREAMS_PATH);
             var request = HttpWebRequest.Create(front_page_streams_path);
             request.Method = "GET";
-            var response = await HttpRequest(request);
-            var streams = JsonToFeaturedStreamsList(response);
-            var streamsToReturn = new ObservableCollection<Stream>();
-            foreach (var stream in streams)
-                streamsToReturn.Add(stream);
-            return streamsToReturn;
+            try
+            {
+                var response = await HttpRequest(request);
+                var streams = JsonToFeaturedStreamsList(response);
+                var streamsToReturn = new ObservableCollection<Stream>();
+                foreach (var stream in streams)
+                    streamsToReturn.Add(stream);
+                return streamsToReturn;
+            }
+
+            catch
+            {
+                return new ObservableCollection<Stream>();
+            }
         }
 
         public static async Task<ObservableCollection<Stream>> GetTopStreams()
@@ -83,12 +91,20 @@ namespace TwitchAPIHandler.Objects
             Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_PATH, 0));
             var request = HttpWebRequest.Create(top_streams_path);
             request.Method = "GET";
-            var response = await HttpRequest(request);
-            var streams = JsonToTopStreamsList(response);
-            var streamsToReturn = new ObservableCollection<Stream>();
-            foreach (var stream in streams)
-                streamsToReturn.Add(stream);
-            return streamsToReturn;
+            try
+            {
+                var response = await HttpRequest(request);
+                var streams = JsonToTopStreamsList(response);
+                var streamsToReturn = new ObservableCollection<Stream>();
+                foreach (var stream in streams)
+                    streamsToReturn.Add(stream);
+                return streamsToReturn;
+            }
+
+            catch
+            {
+                return new ObservableCollection<Stream>();
+            }
         }
 
         public static async Task<ObservableCollection<Stream>> GetTopStreamsForGame(string gameName)
@@ -96,12 +112,20 @@ namespace TwitchAPIHandler.Objects
             Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_FOR_GAME_PATH, gameName, 0));
             var request = HttpWebRequest.Create(top_streams_path);
             request.Method = "GET";
-            var response = await HttpRequest(request);
-            var streams = JsonToTopStreamsList(response);
-            var streamsToReturn = new ObservableCollection<Stream>();
-            foreach (var stream in streams)
-                streamsToReturn.Add(stream);
-            return streamsToReturn;
+            try
+            {
+                var response = await HttpRequest(request);
+                var streams = JsonToTopStreamsList(response);
+                var streamsToReturn = new ObservableCollection<Stream>();
+                foreach (var stream in streams)
+                    streamsToReturn.Add(stream);
+                return streamsToReturn;
+            }
+
+            catch
+            {
+                return new ObservableCollection<Stream>();
+            }
         }
 
         public static async Task<ObservableCollection<Stream>> SearchStreams(string query)
@@ -109,12 +133,20 @@ namespace TwitchAPIHandler.Objects
             Uri search_streams_path = new Uri(string.Format(PathStrings.SEARCH_STREAM_PATH, query));
             var request = HttpWebRequest.Create(search_streams_path);
             request.Method = "GET";
-            var response = await HttpRequest(request);
-            var streams = JsonToSearchResults(response);
-            var streamsToReturn = new ObservableCollection<Stream>();
-            foreach (var stream in streams)
-                streamsToReturn.Add(stream);
-            return streamsToReturn;
+            try
+            {
+                var response = await HttpRequest(request);
+                var streams = JsonToSearchResults(response);
+                var streamsToReturn = new ObservableCollection<Stream>();
+                foreach (var stream in streams)
+                    streamsToReturn.Add(stream);
+                return streamsToReturn;
+            }
+
+            catch
+            {
+                return new ObservableCollection<Stream>();
+            }
         }
 
         public static async Task<ObservableCollection<Stream>> GetFollowedStreams(string oauthToken)
@@ -122,18 +154,25 @@ namespace TwitchAPIHandler.Objects
             Uri followed_streams_path = new Uri(string.Format(PathStrings.GET_FOLLOWED_STREAMS, oauthToken));
             var request = HttpWebRequest.Create(followed_streams_path);
             request.Method = "GET";
-            var response = await HttpRequest(request);
-            var streams = JsonToFollowedStreamsList(response);
-            var streamsToReturn = new ObservableCollection<Stream>();
-            foreach (var stream in streams)
-                streamsToReturn.Add(stream);
-            return streamsToReturn;
+            try
+            {
+                var response = await HttpRequest(request);
+                var streams = JsonToFollowedStreamsList(response);
+                var streamsToReturn = new ObservableCollection<Stream>();
+                foreach (var stream in streams)
+                    streamsToReturn.Add(stream);
+                return streamsToReturn;
+            }
+
+            catch
+            {
+                return new ObservableCollection<Stream>();
+            }
         }
 
         private static async Task<string> HttpRequest(WebRequest request)
         {
             string received = "";
-
             using (var response = (HttpWebResponse)(await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null)))
             {
                 using (var responseStream = response.GetResponseStream())

@@ -122,20 +122,36 @@ namespace TwitchAPIHandler.Objects
             
         }
 
-        public static async Task FollowStream(string stream, User user)
+        public static async Task<bool> FollowStream(string stream, User user)
         {
             Uri access_token_path = new Uri(string.Format(PathStrings.FOLLOW_USER, user.Name, stream, user.Oauth));
             var request = HttpWebRequest.Create(access_token_path);
             request.Method = "PUT";
-            var response = await HttpRequest(request);
+            try
+            {
+                var response = await HttpRequest(request);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public static async Task UnfollowStream(string stream, User user)
+        public static async Task<bool> UnfollowStream(string stream, User user)
         {
             Uri access_token_path = new Uri(string.Format(PathStrings.FOLLOW_USER, user.Name, stream, user.Oauth));
             var request = HttpWebRequest.Create(access_token_path);
             request.Method = "DELETE";
-            var response = await HttpRequest(request);
+            try
+            {
+                var response = await HttpRequest(request);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
