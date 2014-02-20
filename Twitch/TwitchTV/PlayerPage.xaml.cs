@@ -302,7 +302,8 @@ namespace TwitchTV
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            navigatedFrom = true;
+            if(!e.Uri.ToString().Contains("external"))
+                navigatedFrom = true;
 
             CleanupMedia();
 
