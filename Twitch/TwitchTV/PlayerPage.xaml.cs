@@ -31,6 +31,7 @@ namespace TwitchTV
         public bool chatJoined = false;
         public bool isLoggedIn = false;
         public bool navigatedFrom = false;
+        public bool rejoinChat = false;
 
         readonly IHttpClients _httpClients;
         IMediaElementManager _mediaElementManager;
@@ -291,7 +292,7 @@ namespace TwitchTV
                                     .Wait();
             }
 
-            if (App.ViewModel.AutoJoinChat && isLoggedIn)
+            if ((App.ViewModel.AutoJoinChat || rejoinChat) && isLoggedIn)
             {
                 JoinChatAndListen();
             }
@@ -302,8 +303,13 @@ namespace TwitchTV
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            if(!e.Uri.ToString().Contains("external"))
+            if (!e.Uri.ToString().Contains("external"))
                 navigatedFrom = true;
+            else
+            {
+                if (chatJoined)
+                    rejoinChat = true;
+            }
 
             CleanupMedia();
 
