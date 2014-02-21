@@ -20,7 +20,7 @@ namespace TwitchTV
         public MainPage()
         {
             isNetwork = NetworkInterface.GetIsNetworkAvailable();
-
+            
             if (!isNetwork)
             {
                 MessageBox.Show("You are not connected to a network. Twitchy is unavailable");
@@ -28,9 +28,16 @@ namespace TwitchTV
 
             InitializeComponent();
 
+            this.FrontPageAd.ErrorOccurred += FrontPageAd_ErrorOccurred;
+
             App.ViewModel.LoadSettings();
 
             App.ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+        }
+
+        void FrontPageAd_ErrorOccurred(object sender, Microsoft.Advertising.AdErrorEventArgs e)
+        {
+            Debug.WriteLine(e.Error.Message);
         }
 
         void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

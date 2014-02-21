@@ -1,29 +1,37 @@
 ﻿<phone:PhoneApplicationPage
-    x:Class="TwitchTV.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:UI="clr-namespace:Microsoft.Advertising.Mobile.UI;assembly=Microsoft.Advertising.Mobile.UI"
+    x:Class="TwitchTV.MainPage"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
     shell:SystemTray.IsVisible="False">
-    
+
+    <!--Panorama-based applications should not show an ApplicationBar-->
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Minimized" Opacity="1.0" >
+            <shell:ApplicationBarIconButton IconUri="/Assets/search_icon.png" Text="Search" Click="SearchButton_Click"/>
+            <shell:ApplicationBarIconButton IconUri="/Assets/refresh_icon.png" Text="Refresh" Click="RefreshButton_Click"/>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
+
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        
         <Grid.Resources>
-            
+
             <DataTemplate x:Name="TopStreamsTemplate">
                 <StackPanel Orientation="Horizontal" Margin="12,2,0,4" Height="105" Width="432">
                     <Image Source="{Binding preview.small}" Width="130" Height="130"/>
                     <StackPanel Width="311" Margin="8,-7,0,0">
                         <TextBlock Text="{Binding channel.display_name}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" />
-                        <TextBlock Text="{Binding viewers, StringFormat='Viewers: {0}'}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
+                        <TextBlock Text="{Binding viewers, StringFormat=Viewers: \{0\}}" TextWrapping="Wrap" Margin="10,-2,10,0" Style="{StaticResource PhoneTextSubtleStyle}" />
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>
@@ -33,75 +41,74 @@
                     <Image Source="{Binding game.box.medium}" Height="136" Width="190"/>
                     <StackPanel>
                         <TextBlock Text="{Binding game.name}" FontSize="26" />
-                        <TextBlock Text="{Binding channels, StringFormat='Channels: {0}'}" Style="{StaticResource PhoneTextSubtleStyle}"  />
+                        <TextBlock Text="{Binding channels, StringFormat=Channels: \{0\}}" Style="{StaticResource PhoneTextSubtleStyle}"  />
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>
-            
+
         </Grid.Resources>
-        
-         <!--Panorama control-->
+
         <phone:Panorama Title="Twitchy">
             
             <phone:Panorama.Background>
                 <ImageBrush ImageSource="/Assets/backgroundart.jpg"/>
             </phone:Panorama.Background>
-            
+
             <!--Front Page-->
             <phone:PanoramaItem Header="Featured Streams" Orientation="Horizontal">
                 <!--Double wide Panorama with large image placeholders-->
-                <Grid Name="FeaturedStreams">
+                <Grid x:Name="FeaturedStreams">
                     <StackPanel Margin="0,4,16,0" Orientation="Vertical" VerticalAlignment="Top">
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                            <Canvas Name="FP0" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                            <Canvas x:Name="FP0" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Border Height="200" Width="320" Background="Black"/>
-                                <Image Name="FP0Image"/>
+                                <Image x:Name="FP0Image"/>
                                 <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock Name="FP0Text" Text="Loading..."/>
+                                <TextBlock x:Name="FP0Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP2" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                            <Canvas x:Name="FP2" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Border Height="200" Width="320" Background="Black"/>
-                                <Image Name="FP2Image"/>
+                                <Image x:Name="FP2Image"/>
                                 <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock Name="FP2Text" Text="Loading..."/>
+                                <TextBlock x:Name="FP2Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP4" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                            <Canvas x:Name="FP4" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Border Height="200" Width="320" Background="Black"/>
-                                <Image Name="FP4Image"/>
+                                <Image x:Name="FP4Image"/>
                                 <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock Name="FP4Text" Text="Loading..."/>
+                                <TextBlock x:Name="FP4Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP6" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                            <Canvas x:Name="FP6" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Border Height="200" Width="320" Background="Black"/>
-                                <Image Name="FP6Image"/>
+                                <Image x:Name="FP6Image"/>
                                 <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock Name="FP6Text" Text="Loading..."/>
+                                <TextBlock x:Name="FP6Text" Text="Loading..."/>
                             </Canvas>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0">
-                            <Canvas Name="FP1" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                            <Canvas x:Name="FP1" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Border Height="200" Width="320" Background="Black"/>
-                                <Image Name="FP1Image" />
+                                <Image x:Name="FP1Image" />
                                 <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock Name="FP1Text" Text="Loading..."/>
+                                <TextBlock x:Name="FP1Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP3" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                            <Canvas x:Name="FP3" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Border Height="200" Width="320" Background="Black"/>
-                                <Image Name="FP3Image"/>
+                                <Image x:Name="FP3Image"/>
                                 <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock Name="FP3Text" Text="Loading..."/>
+                                <TextBlock x:Name="FP3Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP5" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                            <Canvas x:Name="FP5" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Border Height="200" Width="320" Background="Black"/>
-                                <Image Name="FP5Image"/>
+                                <Image x:Name="FP5Image"/>
                                 <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock Name="FP5Text" Text="Loading..."/>
+                                <TextBlock x:Name="FP5Text" Text="Loading..."/>
                             </Canvas>
-                            <Canvas Name="FP7" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
+                            <Canvas x:Name="FP7" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
                                 <Border Height="200" Width="320" Background="Black"/>
-                                <Image Name="FP7Image"/>
+                                <Image x:Name="FP7Image"/>
                                 <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock Name="FP7Text" Text="Loading..."/>
+                                <TextBlock x:Name="FP7Text" Text="Loading..."/>
                             </Canvas>
                         </StackPanel>
                     </StackPanel>
@@ -111,45 +118,36 @@
             <!--Top Streams-->
             <phone:PanoramaItem Header="Top Streams" Orientation="Vertical">
                 <ListBox x:Name="TopStreamsList"
-                         ItemTemplate="{StaticResource TopStreamsTemplate}"
-                         SelectionChanged="TopStreamsList_SelectionChanged"/>
+					ItemTemplate="{StaticResource TopStreamsTemplate}"
+					SelectionChanged="TopStreamsList_SelectionChanged"/>
             </phone:PanoramaItem>
 
             <!--Top Games-->
             <phone:PanoramaItem Header="Top Games" Orientation="Vertical">
                 <ListBox x:Name="TopGamesList"
-                         ItemTemplate="{StaticResource TopGamesTemplate}"
-                         SelectionChanged="TopGamesList_SelectionChanged"/>
+					ItemTemplate="{StaticResource TopGamesTemplate}"
+					SelectionChanged="TopGamesList_SelectionChanged"/>
             </phone:PanoramaItem>
 
             <!--Followed Streams-->
             <phone:PanoramaItem Header="Following" Orientation="Vertical">
                 <ListBox x:Name="FollowedStreamsList"
-                         ItemTemplate="{StaticResource TopStreamsTemplate}"
-                         SelectionChanged="FollowedStreamsList_SelectionChanged"/>
+					ItemTemplate="{StaticResource TopStreamsTemplate}"
+					SelectionChanged="FollowedStreamsList_SelectionChanged"/>
             </phone:PanoramaItem>
 
             <!--Settings-->
             <phone:PanoramaItem Header="Settings">
                 <ScrollViewer>
                     <StackPanel>
-                        <TextBlock Text="Login" Name="Account" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
-                        <TextBlock Text="Settings" Name="Settings" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
-                        <TextBlock Text="About" Name="About" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
+                        <TextBlock Text="Login" x:Name="Account" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
+                        <TextBlock Text="Settings" x:Name="Settings" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
+                        <TextBlock Text="About" x:Name="About" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
                     </StackPanel>
                 </ScrollViewer>
             </phone:PanoramaItem>
-
         </phone:Panorama>
-
+        <UI:AdControl Name="FrontPageAd" ApplicationId="db8688fa-d097-4a47-831c-0dbff16cf24b" AdUnitId="163143" Height="50" Width="300" VerticalAlignment="Top" HorizontalAlignment="Right" IsAutoRefreshEnabled="True" Keywords="game, games, twitch, twitchtv"/>
     </Grid>
-
-    <!--Panorama-based applications should not show an ApplicationBar-->
-    <phone:PhoneApplicationPage.ApplicationBar>
-        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Mode="Minimized" Opacity="1.0" >
-            <shell:ApplicationBarIconButton IconUri="/Assets/search_icon.png" Text="Search" Click="SearchButton_Click"/>
-            <shell:ApplicationBarIconButton IconUri="/Assets/refresh_icon.png" Text="Refresh" Click="RefreshButton_Click"/>
-        </shell:ApplicationBar>
-    </phone:PhoneApplicationPage.ApplicationBar>
 
 </phone:PhoneApplicationPage>
