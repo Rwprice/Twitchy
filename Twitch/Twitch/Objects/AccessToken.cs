@@ -51,5 +51,10 @@ namespace TwitchAPIHandler.Objects
 
             return received;
         }
+
+        public static string GetAuthorizationTokenURI()
+        {
+            return PathStrings.GET_AUTHORIZATION_TOKEN;
+        }
     }
 }

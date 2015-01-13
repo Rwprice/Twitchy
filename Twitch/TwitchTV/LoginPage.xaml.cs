@@ -46,7 +46,7 @@ namespace TwitchTV
 
         void WebBrowser_Loaded(object sender, RoutedEventArgs e)
         {
-            this.WebBrowser.Navigate(new Uri("https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&client_id=b4v9ttxqtldlobe5jswfqdhrmzp52hi&redirect_uri=http://localhost&scope=user_read chat_login"));
+            this.WebBrowser.Navigate(new Uri(AccessToken.GetAuthorizationTokenURI()));
         }
     }
 }
