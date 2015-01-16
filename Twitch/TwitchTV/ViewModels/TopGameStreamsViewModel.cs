@@ -1,0 +1,139 @@
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Windows;
+using System.Windows.Media.Imaging;
+using System.Xml;
+using TwitchAPIHandler.Objects;
+
+namespace Twitchy.ViewModels
+{
+    public class TopGameStreamsViewModel : INotifyPropertyChanged
+    {
+        private bool _isLoading = false;
+
+        public bool IsLoading
+        {
+            get
+            {
+                return _isLoading;
+            }
+            set
+            {
+                _isLoading = value;
+                NotifyPropertyChanged("IsLoading");
+
+            }
+        }
+
+        public TopGameStreamsViewModel()
+        {
+            this.StreamList = new ObservableCollection<TwitchAPIHandler.Objects.Stream>();
+            this.IsLoading = false;
+
+        }
+
+        public ObservableCollection<TwitchAPIHandler.Objects.Stream> StreamList
+        {
+            get;
+            private set;
+        }
+
+        public void LoadPage(string gameName, int pageNumber)
+        {
+            if (pageNumber == 0) this.StreamList.Clear();
+
+            IsLoading = true;
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.TOP_STREAMS_FOR_GAME_PATH, gameName, 8 * pageNumber)));
+            request.BeginGetResponse(new AsyncCallback(ReadCallback), request);
+        }
+
+        private void ReadCallback(IAsyncResult asynchronousResult)
+        {
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)asynchronousResult.AsyncState;
+                HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asynchronousResult);
+                using (StreamReader reader = new StreamReader(response.GetResponseStream()))
+                {
+                    JToken o = JObject.Parse(reader.ReadLine());
+                    JArray featured = JArray.Parse(o.SelectToken("streams").ToString());
+
+                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+
+                        foreach (var arrayValue in featured)
+                        {
+                            var viewers = 0;
+                            var preview = new Preview();
+                            var channel = new Channel();
+                            var small = new BitmapImage();
+                            var medium = new BitmapImage();
+                            string display_name, name, status;
+
+
+                            try
+                            {
+                                viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
+                                small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()));
+                                medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()));
+                                display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
+                                name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
+                                status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
+
+                                preview = new Preview
+                                {
+                                    small = small,
+                                    medium = medium
+                                };
+
+                                channel = new Channel
+                                {
+                                    display_name = display_name,
+                                    name = name,
+                                    status = status
+                                };
+                            }
+
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine(ex);
+                            }
+
+                            this.StreamList.Add(new TwitchAPIHandler.Objects.Stream()
+                            {
+                                channel = channel,
+                                preview = preview,
+                                viewers = viewers
+                            });
+
+                        }
+                        IsLoading = false;
+                    });
+
+                }
+            }
+            catch (Exception e)
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    MessageBox.Show("Network error occured " + e.Message);
+                });
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(String propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (null != handler)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+}

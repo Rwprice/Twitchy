@@ -200,7 +200,7 @@ namespace TwitchTV.ViewModels
         public async void SaveSettings()
         {
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            StorageFile textFile = await localFolder.CreateFileAsync("settings", CreationCollisionOption.ReplaceExisting);
+            StorageFile textFile = await localFolder.CreateFileAsync("settingV2", CreationCollisionOption.ReplaceExisting);
 
             using (IRandomAccessStream textStream = await textFile.OpenAsync(FileAccessMode.ReadWrite))
             {
@@ -219,7 +219,7 @@ namespace TwitchTV.ViewModels
                 string contents;
 
                 StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-                StorageFile textFile = await localFolder.GetFileAsync("settings");
+                StorageFile textFile = await localFolder.GetFileAsync("settingV2");
 
                 using (IRandomAccessStream textStream = await textFile.OpenReadAsync())
                 {

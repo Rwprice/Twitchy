@@ -65,6 +65,8 @@ namespace TwitchAPIHandler.Objects
             }
         }
 
+        public static string TOP_STREAMS_FOR_GAME_PATH = PathStrings.TOP_STREAMS_FOR_GAME_PATH;
+
         public static async Task<ObservableCollection<Stream>> GetFeaturedStreams()
         {
             Uri front_page_streams_path = new Uri(PathStrings.FRONT_PAGE_STREAMS_PATH);
@@ -107,9 +109,9 @@ namespace TwitchAPIHandler.Objects
             }
         }
 
-        public static async Task<ObservableCollection<Stream>> GetTopStreamsForGame(string gameName)
+        public static async Task<ObservableCollection<Stream>> GetTopStreamsForGame(string gameName, int pageNumber)
         {
-            Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_FOR_GAME_PATH, gameName, 0));
+            Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_FOR_GAME_PATH, gameName, 8 * pageNumber));
             var request = HttpWebRequest.Create(top_streams_path);
             request.Method = "GET";
             try
@@ -188,7 +190,7 @@ namespace TwitchAPIHandler.Objects
             return received;
         }
 
-        private static List<Stream> JsonToFeaturedStreamsList(string json)
+        public static List<Stream> JsonToFeaturedStreamsList(string json)
         {
             List<Stream> featuredStreams = new List<Stream>();
             JToken o = JObject.Parse(json);
@@ -217,7 +219,7 @@ namespace TwitchAPIHandler.Objects
             return featuredStreams;
         }
 
-        private static List<Stream> JsonToTopStreamsList(string json)
+        public static List<Stream> JsonToTopStreamsList(string json)
         {
             List<Stream> featuredStreams = new List<Stream>();
             JToken o = JObject.Parse(json);
@@ -245,7 +247,7 @@ namespace TwitchAPIHandler.Objects
             return featuredStreams;
         }
 
-        private static List<Stream> JsonToSearchResults(string json)
+        public static List<Stream> JsonToSearchResults(string json)
         {
             List<Stream> featuredStreams = new List<Stream>();
             JToken o = JObject.Parse(json);
@@ -273,7 +275,7 @@ namespace TwitchAPIHandler.Objects
             return featuredStreams;
         }
 
-        private static List<Stream> JsonToFollowedStreamsList(string json)
+        public static List<Stream> JsonToFollowedStreamsList(string json)
         {
             List<Stream> featuredStreams = new List<Stream>();
             JToken o = JObject.Parse(json);

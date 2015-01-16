@@ -12,7 +12,7 @@
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d"
-    shell:SystemTray.IsVisible="False">
+    shell:SystemTray.IsVisible="True">
 
     <Grid x:Name="LayoutRoot" Background="Transparent">
 
@@ -30,7 +30,7 @@
 
         <!--Top Streams-->
         <phone:PanoramaItem x:Name="TGHeader" Orientation="Vertical">
-            <ListBox x:Name="TopStreamsList"
+            <phone:LongListSelector x:Name="TopStreamsList"
 				ItemTemplate="{StaticResource TopStreamsTemplate}"
 				SelectionChanged="TopStreamsList_SelectionChanged"/>
         </phone:PanoramaItem>

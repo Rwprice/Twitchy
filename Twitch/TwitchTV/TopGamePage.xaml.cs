@@ -12,85 +12,75 @@ using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Data;
+using Twitchy.ViewModels;
 
 namespace TwitchTV
 {
     public partial class TopGamePage : PhoneApplicationPage
     {
-        /// <summary>
-        /// Top Streams
-        /// </summary>
-        private ObservableCollection<Stream> _TopStreams;
-        public ObservableCollection<Stream> TopStreams
-        {
-            get
-            {
-                return _TopStreams;
-            }
-            set
-            {
-                if (value != _TopStreams)
-                {
-                    _TopStreams = value;
-                    NotifyPropertyChanged("TopStreams");
-                }
-            }
-        }
+        private int _pageNumber = 0;
+        private int _offsetKnob = 1;
+        TopGameStreamsViewModel _viewModel;  
 
         public TopGamePage()
         {
             InitializeComponent();
+            _viewModel = new TopGameStreamsViewModel();
             this.TGHeader.Header = App.ViewModel.curTopGame.game.name;
-            PropertyChanged += TopGamePage_PropertyChanged;
+            TopStreamsList.ItemRealized += resultList_ItemRealized;
+            this.Loaded += new RoutedEventHandler(TopGamePage_Loaded);
         }
 
-        private void TopGamePage_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void TopGamePage_Loaded(object sender, RoutedEventArgs e)
         {
-            this.TopStreamsList.ItemsSource = this.TopStreams;
-        }
-
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
-        {
-            try
+            this.TopStreamsList.ItemsSource = _viewModel.StreamList;
+            var progressIndicator = SystemTray.ProgressIndicator;
+            if (progressIndicator != null)
             {
-                this.TopStreamsList.SelectedItem = null;
-
-                this.TopStreams = await Stream.GetTopStreamsForGame(App.ViewModel.curTopGame.game.name);
-
-                if (this.TopStreams.Count == 0)
-                    MessageBox.Show("No streams can be loaded for this game");
+                return;
             }
 
-            catch (Exception ex)
-            {
-                MessageBox.Show("Can't load the top streams for this game", "Well, this is embarrassing...", MessageBoxButton.OK);
-                Debug.WriteLine(ex.Message);
-            }
+            progressIndicator = new ProgressIndicator();
+
+            SystemTray.SetProgressIndicator(this, progressIndicator);
+
+            Binding binding = new Binding("IsLoading") { Source = _viewModel };
+            BindingOperations.SetBinding(
+                progressIndicator, ProgressIndicator.IsVisibleProperty, binding);
+
+            binding = new Binding("IsLoading") { Source = _viewModel };
+            BindingOperations.SetBinding(
+                progressIndicator, ProgressIndicator.IsIndeterminateProperty, binding);
+
+            progressIndicator.Text = "Loading streams...";
+
+            _pageNumber = 1;
+
+            _viewModel.LoadPage(App.ViewModel.curTopGame.game.name, _pageNumber++);
         }
 
-        private void SendToVideoPage(object sender, System.Windows.Input.GestureEventArgs e)
+        private void resultList_ItemRealized(object sender, ItemRealizationEventArgs e)
         {
-            int index = int.Parse(((StackPanel)sender).Name.Remove(0, 2));
-            App.ViewModel.stream = this.TopStreams[index];
-            NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+            if (!_viewModel.IsLoading && TopStreamsList.ItemsSource != null && TopStreamsList.ItemsSource.Count >= _offsetKnob)
+            {
+                if (e.ItemKind == LongListSelectorItemKind.Item)
+                {
+                    if ((e.Container.Content as Stream).Equals(TopStreamsList.ItemsSource[TopStreamsList.ItemsSource.Count - _offsetKnob]))
+                    {
+                        Debug.WriteLine("Searching for {0}", _pageNumber);
+                        _viewModel.LoadPage(App.ViewModel.curTopGame.game.name, _pageNumber++);
+                    }
+                }
+            }
         }
 
         private void TopStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (((Stream)((ListBox)sender).SelectedItem) != null)
+            if (((Stream)((LongListSelector)sender).SelectedItem) != null)
             {
-                App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
+                App.ViewModel.stream = ((Stream)((LongListSelector)sender).SelectedItem);
                 NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String propertyName)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (null != handler)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
             }
         }
     }
