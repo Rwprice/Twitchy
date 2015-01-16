@@ -12,7 +12,7 @@
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait"  Orientation="Portrait"
-    shell:SystemTray.IsVisible="False">
+    shell:SystemTray.IsVisible="True">
 
     <Grid x:Name="LayoutRoot">
 
@@ -29,9 +29,9 @@
 
             <DataTemplate x:Name="GamesTemplate">
                 <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0">
-                    <Image Source="{Binding game.box.medium}" Height="136" Width="190"/>
+                    <Image Source="{Binding box.medium}" Height="136" Width="190"/>
                     <StackPanel>
-                        <TextBlock Text="{Binding game.name}" FontSize="26" />
+                        <TextBlock Text="{Binding name}" FontSize="26" />
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>
@@ -48,10 +48,10 @@
                             <TextBlock Text="Search"/>
                         </Button>
                     </StackPanel>
-                    <ListBox x:Name="StreamsList"
+                    <phone:LongListSelector x:Name="StreamsList"
 						ItemTemplate="{StaticResource StreamsTemplate}"
 						SelectionChanged="StreamsList_SelectionChanged" 
-						MaxHeight="410"/>
+						MaxHeight="380"/>
                 </StackPanel>
             </phone:PanoramaItem>
 
@@ -64,10 +64,10 @@
                             <TextBlock Text="Search"/>
                         </Button>
                     </StackPanel>
-                    <ListBox x:Name="GamesList"
+                    <phone:LongListSelector x:Name="GamesList"
 						ItemTemplate="{StaticResource GamesTemplate}"
 						SelectionChanged="GamesList_SelectionChanged"
-						MaxHeight="410"/>
+						MaxHeight="380"/>
                 </StackPanel>
             </phone:PanoramaItem>
         </phone:Panorama>

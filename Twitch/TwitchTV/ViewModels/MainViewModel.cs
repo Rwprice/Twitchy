@@ -40,46 +40,6 @@ namespace TwitchTV.ViewModels
         public bool LockLandscape = false;
 
         /// <summary>
-        /// Search Streams
-        /// </summary>
-        private ObservableCollection<Stream> _SearchStreams;
-        public ObservableCollection<Stream> SearchStreams
-        {
-            get
-            {
-                return _SearchStreams;
-            }
-            set
-            {
-                if (value != _SearchStreams)
-                {
-                    _SearchStreams = value;
-                    NotifyPropertyChanged("SearchStreams");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Search Games
-        /// </summary>
-        private ObservableCollection<TopGame> _SearchGames;
-        public ObservableCollection<TopGame> SearchGames
-        {
-            get
-            {
-                return _SearchGames;
-            }
-            set
-            {
-                if (value != _SearchGames)
-                {
-                    _SearchGames = value;
-                    NotifyPropertyChanged("SearchGames");
-                }
-            }
-        }
-
-        /// <summary>
         /// Featured Streams
         /// </summary>
         private ObservableCollection<Stream> _FeaturedStreams;

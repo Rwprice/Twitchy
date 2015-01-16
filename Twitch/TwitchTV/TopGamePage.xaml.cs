@@ -55,7 +55,7 @@ namespace TwitchTV
 
             progressIndicator.Text = "Loading streams...";
 
-            _pageNumber = 1;
+            _pageNumber = 0;
 
             _viewModel.LoadPage(App.ViewModel.curTopGame.game.name, _pageNumber++);
         }
@@ -68,8 +68,11 @@ namespace TwitchTV
                 {
                     if ((e.Container.Content as Stream).Equals(TopStreamsList.ItemsSource[TopStreamsList.ItemsSource.Count - _offsetKnob]))
                     {
-                        Debug.WriteLine("Searching for {0}", _pageNumber);
-                        _viewModel.LoadPage(App.ViewModel.curTopGame.game.name, _pageNumber++);
+                        if (TopStreamsList.ItemsSource.Count % 8 == 0)
+                        {
+                            Debug.WriteLine("Searching for {0}", _pageNumber);
+                            _viewModel.LoadPage(App.ViewModel.curTopGame.game.name, _pageNumber++);
+                        }
                     }
                 }
             }

@@ -66,6 +66,8 @@ namespace TwitchAPIHandler.Objects
         }
 
         public static string TOP_STREAMS_FOR_GAME_PATH = PathStrings.TOP_STREAMS_FOR_GAME_PATH;
+        public static string SEARCH_GAME_PATH = PathStrings.SEARCH_GAME_PATH;
+        public static string SEARCH_STREAM_PATH = PathStrings.SEARCH_STREAM_PATH;
 
         public static async Task<ObservableCollection<Stream>> GetFeaturedStreams()
         {
@@ -97,48 +99,6 @@ namespace TwitchAPIHandler.Objects
             {
                 var response = await HttpRequest(request);
                 var streams = JsonToTopStreamsList(response);
-                var streamsToReturn = new ObservableCollection<Stream>();
-                foreach (var stream in streams)
-                    streamsToReturn.Add(stream);
-                return streamsToReturn;
-            }
-
-            catch
-            {
-                return new ObservableCollection<Stream>();
-            }
-        }
-
-        public static async Task<ObservableCollection<Stream>> GetTopStreamsForGame(string gameName, int pageNumber)
-        {
-            Uri top_streams_path = new Uri(string.Format(PathStrings.TOP_STREAMS_FOR_GAME_PATH, gameName, 8 * pageNumber));
-            var request = HttpWebRequest.Create(top_streams_path);
-            request.Method = "GET";
-            try
-            {
-                var response = await HttpRequest(request);
-                var streams = JsonToTopStreamsList(response);
-                var streamsToReturn = new ObservableCollection<Stream>();
-                foreach (var stream in streams)
-                    streamsToReturn.Add(stream);
-                return streamsToReturn;
-            }
-
-            catch
-            {
-                return new ObservableCollection<Stream>();
-            }
-        }
-
-        public static async Task<ObservableCollection<Stream>> SearchStreams(string query)
-        {
-            Uri search_streams_path = new Uri(string.Format(PathStrings.SEARCH_STREAM_PATH, query));
-            var request = HttpWebRequest.Create(search_streams_path);
-            request.Method = "GET";
-            try
-            {
-                var response = await HttpRequest(request);
-                var streams = JsonToSearchResults(response);
                 var streamsToReturn = new ObservableCollection<Stream>();
                 foreach (var stream in streams)
                     streamsToReturn.Add(stream);
@@ -226,34 +186,6 @@ namespace TwitchAPIHandler.Objects
             JArray featured = JArray.Parse(o.SelectToken("streams").ToString());
 
             foreach (var arrayValue in featured)
-            {
-                featuredStreams.Add(new Stream()
-                {
-                    viewers = int.Parse(arrayValue.SelectToken("viewers").ToString()),
-                    preview = new Preview
-                    {
-                        small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString())),
-                        medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()))
-                    },
-                    channel = new Channel
-                    {
-                        display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString(),
-                        name = arrayValue.SelectToken("channel").SelectToken("name").ToString(),
-                        status = arrayValue.SelectToken("channel").SelectToken("status").ToString()
-                    }
-                });
-            }
-
-            return featuredStreams;
-        }
-
-        public static List<Stream> JsonToSearchResults(string json)
-        {
-            List<Stream> featuredStreams = new List<Stream>();
-            JToken o = JObject.Parse(json);
-            JArray streams = JArray.Parse(o.SelectToken("streams").ToString());
-
-            foreach (var arrayValue in streams)
             {
                 featuredStreams.Add(new Stream()
                 {

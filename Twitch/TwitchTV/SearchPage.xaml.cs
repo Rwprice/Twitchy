@@ -9,58 +9,104 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using TwitchAPIHandler.Objects;
+using Twitchy.ViewModels;
+using System.Windows.Data;
 
 namespace TwitchTV
 {
     public partial class SearchPage : PhoneApplicationPage
     {
+        private int _pageNumberGames = 0;
+        private int _offsetKnobGames = 1;
+        private int _pageNumberStreams = 0;
+        private int _offsetKnobStreams = 1;
+        SearchViewModel _viewModel;
+
         public SearchPage()
         {
             InitializeComponent();
-            App.ViewModel.PropertyChanged += ViewModel_PropertyChanged;
+            _viewModel = new SearchViewModel();
+            GamesList.ItemRealized += gamesList_ItemRealized;
+            StreamsList.ItemRealized += streamsList_ItemRealized;
+            this.Loaded += new RoutedEventHandler(SearchPage_Loaded);
         }
 
-        void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void streamsList_ItemRealized(object sender, ItemRealizationEventArgs e)
         {
-            if (e.PropertyName == "SearchStreams")
+            if (!_viewModel.IsLoading && StreamsList.ItemsSource != null && StreamsList.ItemsSource.Count >= _offsetKnobStreams)
             {
-                this.StreamsList.ItemsSource = App.ViewModel.SearchStreams;
-
-                if (App.ViewModel.SearchStreams.Count == 0)
+                if (e.ItemKind == LongListSelectorItemKind.Item)
                 {
-                    MessageBox.Show("This search returned no results");
-                }
-            }
-
-            if (e.PropertyName == "SearchGames")
-            {
-                this.GamesList.ItemsSource = App.ViewModel.SearchGames;
-
-                if (App.ViewModel.SearchGames.Count == 0)
-                {
-                    MessageBox.Show("This search returned no results");
+                    if ((e.Container.Content as Stream).Equals(StreamsList.ItemsSource[StreamsList.ItemsSource.Count - _offsetKnobStreams]))
+                    {
+                        if (StreamsList.ItemsSource.Count % 8 == 0)
+                        {
+                            Debug.WriteLine("Searching for {0}", _pageNumberStreams);
+                            _viewModel.SearchGames(StreamsSearchBox.Text, _pageNumberStreams++);
+                        }
+                    }
                 }
             }
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private void SearchPage_Loaded(object sender, RoutedEventArgs e)
         {
+            this.GamesList.ItemsSource = _viewModel.GameList;
+            this.StreamsList.ItemsSource = _viewModel.StreamList;
+
             this.StreamsList.SelectedItem = null;
             this.GamesList.SelectedItem = null;
 
             this.StreamsSearchBox.Text = "Search...";
             this.GamesSearchBox.Text = "Search...";
+
+            var progressIndicator = SystemTray.ProgressIndicator;
+            if (progressIndicator != null)
+            {
+                return;
+            }
+
+            progressIndicator = new ProgressIndicator();
+
+            SystemTray.SetProgressIndicator(this, progressIndicator);
+
+            Binding binding = new Binding("IsLoading") { Source = _viewModel };
+            BindingOperations.SetBinding(
+                progressIndicator, ProgressIndicator.IsVisibleProperty, binding);
+
+            binding = new Binding("IsLoading") { Source = _viewModel };
+            BindingOperations.SetBinding(
+                progressIndicator, ProgressIndicator.IsIndeterminateProperty, binding);
+
+            progressIndicator.Text = "Loading streams...";
         }
 
-        private async void StreamSearchButton_Click(object sender, RoutedEventArgs e)
+        private void gamesList_ItemRealized(object sender, ItemRealizationEventArgs e)
+        {
+            if (!_viewModel.IsLoading && GamesList.ItemsSource != null && GamesList.ItemsSource.Count >= _offsetKnobGames)
+            {
+                if (e.ItemKind == LongListSelectorItemKind.Item)
+                {
+                    if ((e.Container.Content as Game).Equals(GamesList.ItemsSource[GamesList.ItemsSource.Count - _offsetKnobGames]))
+                    {
+                        if (GamesList.ItemsSource.Count % 8 == 0)
+                        {
+                            Debug.WriteLine("Searching for {0}", _pageNumberGames);
+                            _viewModel.SearchGames(GamesSearchBox.Text, _pageNumberGames++);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void StreamSearchButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (this.StreamsSearchBox.Text != "Search...")
                 {
-                    if(App.ViewModel.SearchStreams != null)
-                        App.ViewModel.SearchStreams.Clear();
-                    App.ViewModel.SearchStreams = await Stream.SearchStreams(this.StreamsSearchBox.Text);
+                    _pageNumberStreams = 0;
+                    _viewModel.SearchStreams(this.StreamsSearchBox.Text, _pageNumberStreams++);
                 }
             }
 
@@ -71,13 +117,14 @@ namespace TwitchTV
             }
         }
 
-        private async void GameSearchButton_Click(object sender, RoutedEventArgs e)
+        private void GameSearchButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (this.GamesSearchBox.Text != "Search...")
                 {
-                    App.ViewModel.SearchGames = await TopGame.SearchGames(this.GamesSearchBox.Text);
+                    _pageNumberGames = 0;
+                    _viewModel.SearchGames(this.GamesSearchBox.Text, _pageNumberGames++);
                 }
             }
 
@@ -90,18 +137,24 @@ namespace TwitchTV
 
         private void StreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (((Stream)((ListBox)sender).SelectedItem) != null)
+            if (((Stream)((LongListSelector)sender).SelectedItem) != null)
             {
-                App.ViewModel.stream = ((Stream)((ListBox)sender).SelectedItem);
+                App.ViewModel.stream = ((Stream)((LongListSelector)sender).SelectedItem);
                 NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
 
         private void GamesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (((TopGame)((ListBox)sender).SelectedItem) != null)
+            if (((Game)((LongListSelector)sender).SelectedItem) != null)
             {
-                App.ViewModel.curTopGame = ((TopGame)((ListBox)sender).SelectedItem);
+                var selected = ((Game)((LongListSelector)sender).SelectedItem);
+                var topGameToSave = new TopGame()
+                {
+                    game = selected
+                };
+
+                App.ViewModel.curTopGame = topGameToSave;
                 NavigationService.Navigate(new Uri("/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
