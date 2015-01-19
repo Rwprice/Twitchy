@@ -139,7 +139,7 @@
     <value>https://api.twitch.tv/kraken/search/streams?limit=8&amp;offset={1}&amp;q={0}&amp;live=true</value>
   </data>
   <data name="SEARCH_GAME_PATH" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/search/games?limit=8&amp;offset={1}&amp;q={0}&amp;live=true&amp;hls=true&amp;type=suggest</value>
+    <value>https://api.twitch.tv/kraken/search/games?&amp;offset={1}&amp;q={0}&amp;live=true&amp;hls=true&amp;type=suggest</value>
   </data>
   <data name="GET_AUTHORIZATION_TOKEN" xml:space="preserve">
     <value>https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&amp;client_id=b4v9ttxqtldlobe5jswfqdhrmzp52hi&amp;redirect_uri=http://localhost&amp;scope=user_read chat_login user_follows_edit</value>

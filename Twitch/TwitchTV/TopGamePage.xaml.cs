@@ -68,11 +68,8 @@ namespace TwitchTV
                 {
                     if ((e.Container.Content as Stream).Equals(TopStreamsList.ItemsSource[TopStreamsList.ItemsSource.Count - _offsetKnob]))
                     {
-                        if (TopStreamsList.ItemsSource.Count % 8 == 0)
-                        {
-                            Debug.WriteLine("Searching for {0}", _pageNumber);
-                            _viewModel.LoadPage(App.ViewModel.curTopGame.game.name, _pageNumber++);
-                        }
+                        Debug.WriteLine("Searching for {0}", _pageNumber);
+                        _viewModel.LoadPage(App.ViewModel.curTopGame.game.name, _pageNumber++);
                     }
                 }
             }

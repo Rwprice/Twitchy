@@ -124,7 +124,7 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/search/games?limit=8&amp;offset={1}&amp;q={0}&amp;live=true&amp;hls=true&amp;type=suggest.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/search/games?&amp;offset={1}&amp;q={0}&amp;live=true&amp;hls=true&amp;type=suggest.
         /// </summary>
         internal static string SEARCH_GAME_PATH {
             get {

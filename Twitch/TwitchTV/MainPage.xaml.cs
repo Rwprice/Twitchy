@@ -78,6 +78,7 @@ namespace TwitchTV
                 this.TopStreamsList.SelectedItem = null;
                 this.TopGamesList.SelectedItem = null;
                 this.FollowedStreamsList.SelectedItem = null;
+                App.ViewModel.curTopGame = null;
 
                 if (App.ViewModel.user == null)
                 {

@@ -15,6 +15,7 @@ namespace Twitchy.ViewModels
     public class TopGameStreamsViewModel : INotifyPropertyChanged
     {
         private bool _isLoading = false;
+        private bool _isStreamsLoaded = false;
 
         public bool IsLoading
         {
@@ -26,6 +27,20 @@ namespace Twitchy.ViewModels
             {
                 _isLoading = value;
                 NotifyPropertyChanged("IsLoading");
+
+            }
+        }
+
+        public bool IsStreamsLoaded
+        {
+            get
+            {
+                return _isStreamsLoaded;
+            }
+            set
+            {
+                _isStreamsLoaded = value;
+                NotifyPropertyChanged("IsStreamsLoaded");
 
             }
         }
@@ -45,11 +60,18 @@ namespace Twitchy.ViewModels
 
         public void LoadPage(string gameName, int pageNumber)
         {
-            if (pageNumber == 0) this.StreamList.Clear();
+            if (pageNumber == 0)
+            {
+                this.StreamList.Clear();
+                IsStreamsLoaded = false;
+            }
 
-            IsLoading = true;
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.TOP_STREAMS_FOR_GAME_PATH, gameName, 8 * pageNumber)));
-            request.BeginGetResponse(new AsyncCallback(ReadCallback), request);
+            if (!IsStreamsLoaded)
+            {
+                IsLoading = true;
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.TOP_STREAMS_FOR_GAME_PATH, gameName, 8 * pageNumber)));
+                request.BeginGetResponse(new AsyncCallback(ReadCallback), request);
+            }
         }
 
         private void ReadCallback(IAsyncResult asynchronousResult)
@@ -65,52 +87,55 @@ namespace Twitchy.ViewModels
 
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-
-                        foreach (var arrayValue in featured)
+                        if (featured.Count == 0)
+                            IsStreamsLoaded = true;
+                        else
                         {
-                            var viewers = 0;
-                            var preview = new Preview();
-                            var channel = new Channel();
-                            var small = new BitmapImage();
-                            var medium = new BitmapImage();
-                            string display_name, name, status;
-
-
-                            try
+                            foreach (var arrayValue in featured)
                             {
-                                viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
-                                small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()));
-                                medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()));
-                                display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
-                                name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
-                                status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
+                                var viewers = 0;
+                                var preview = new Preview();
+                                var channel = new Channel();
+                                var small = new BitmapImage();
+                                var medium = new BitmapImage();
+                                string display_name, name, status;
 
-                                preview = new Preview
+
+                                try
                                 {
-                                    small = small,
-                                    medium = medium
-                                };
+                                    viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
+                                    small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()));
+                                    medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()));
+                                    display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
+                                    name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
+                                    status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
 
-                                channel = new Channel
+                                    preview = new Preview
+                                    {
+                                        small = small,
+                                        medium = medium
+                                    };
+
+                                    channel = new Channel
+                                    {
+                                        display_name = display_name,
+                                        name = name,
+                                        status = status
+                                    };
+                                }
+
+                                catch (Exception ex)
                                 {
-                                    display_name = display_name,
-                                    name = name,
-                                    status = status
-                                };
+                                    Debug.WriteLine(ex);
+                                }
+
+                                this.StreamList.Add(new TwitchAPIHandler.Objects.Stream()
+                                {
+                                    channel = channel,
+                                    preview = preview,
+                                    viewers = viewers
+                                });
                             }
-
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine(ex);
-                            }
-
-                            this.StreamList.Add(new TwitchAPIHandler.Objects.Stream()
-                            {
-                                channel = channel,
-                                preview = preview,
-                                viewers = viewers
-                            });
-
                         }
                         IsLoading = false;
                     });

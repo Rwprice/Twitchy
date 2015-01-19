@@ -15,6 +15,7 @@ namespace Twitchy.ViewModels
     public class SearchViewModel : INotifyPropertyChanged
     {
         private bool _isLoading = false;
+        private bool _isStreamsLoaded = false;
 
         public bool IsLoading
         {
@@ -30,11 +31,26 @@ namespace Twitchy.ViewModels
             }
         }
 
+        public bool IsStreamsLoaded
+        {
+            get
+            {
+                return _isStreamsLoaded;
+            }
+            set
+            {
+                _isStreamsLoaded = value;
+                NotifyPropertyChanged("IsStreamsLoaded");
+
+            }
+        }
+
         public SearchViewModel()
         {
             this.StreamList = new ObservableCollection<TwitchAPIHandler.Objects.Stream>();
             this.GameList = new ObservableCollection<Game>();
             this.IsLoading = false;
+            this.IsStreamsLoaded = false;
         }
 
         public ObservableCollection<TwitchAPIHandler.Objects.Stream> StreamList
@@ -111,11 +127,18 @@ namespace Twitchy.ViewModels
 
         public void SearchStreams(string streamName, int pageNumber)
         {
-            if (pageNumber == 0) this.StreamList.Clear();
+            if (pageNumber == 0)
+            {
+                this.StreamList.Clear();
+                IsStreamsLoaded = false;
+            }
 
-            IsLoading = true;
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.SEARCH_STREAM_PATH, streamName, 8 * pageNumber)));
-            request.BeginGetResponse(new AsyncCallback(ReadStreamsCallback), request);
+            if (!IsStreamsLoaded)
+            {
+                IsLoading = true;
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.SEARCH_STREAM_PATH, streamName, 8 * pageNumber)));
+                request.BeginGetResponse(new AsyncCallback(ReadStreamsCallback), request);
+            }
         }
 
         private void ReadStreamsCallback(IAsyncResult asynchronousResult)
@@ -131,45 +154,50 @@ namespace Twitchy.ViewModels
 
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
-                        foreach (var arrayValue in streams)
+                        if (streams.Count == 0)
+                            IsStreamsLoaded = true;
+                        else
                         {
-                            string name = "";
-                            string display_name = "";
-                            string status = "";
-                            var small = new BitmapImage();
-                            var medium = new BitmapImage();
-                            int viewers = 0;
-
-                            try
+                            foreach (var arrayValue in streams)
                             {
-                                display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
-                                name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
-                                status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
-                                small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()));
-                                medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()));
-                                viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
-                            }
+                                string name = "";
+                                string display_name = "";
+                                string status = "";
+                                var small = new BitmapImage();
+                                var medium = new BitmapImage();
+                                int viewers = 0;
 
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine(ex);
-                            }
-
-                            StreamList.Add(new TwitchAPIHandler.Objects.Stream()
-                            {
-                                channel = new Channel()
+                                try
                                 {
-                                    display_name = display_name,
-                                    name = name,
-                                    status = status
-                                },
-                                preview = new Preview()
+                                    display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
+                                    name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
+                                    status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
+                                    small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()));
+                                    medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()));
+                                    viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
+                                }
+
+                                catch (Exception ex)
                                 {
-                                    medium = medium,
-                                    small = small
-                                },
-                                viewers = viewers
-                            });
+                                    Debug.WriteLine(ex);
+                                }
+
+                                StreamList.Add(new TwitchAPIHandler.Objects.Stream()
+                                {
+                                    channel = new Channel()
+                                    {
+                                        display_name = display_name,
+                                        name = name,
+                                        status = status
+                                    },
+                                    preview = new Preview()
+                                    {
+                                        medium = medium,
+                                        small = small
+                                    },
+                                    viewers = viewers
+                                });
+                            }
                         }
                         IsLoading = false;
                     });
