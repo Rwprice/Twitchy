@@ -47,6 +47,7 @@ namespace TwitchAPIHandler.Objects
         }
 
         public static string TOP_GAMES_PATH = PathStrings.TOP_GAMES_PATH;
+        public static string NO_BOX_ART = PathStrings.NO_BOX_ART;
     }
 
     public class Game

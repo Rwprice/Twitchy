@@ -177,6 +177,9 @@
     <Content Include="Assets\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\noBoxArt.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\refresh_icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

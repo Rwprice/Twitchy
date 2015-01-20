@@ -141,7 +141,7 @@ namespace TwitchTV.ViewModels
 
         void medium_ImageFailed(object sender, ExceptionRoutedEventArgs e)
         {
-            
+            ((BitmapImage)(sender)).UriSource = new Uri(TopGame.NO_BOX_ART, UriKind.Relative);
         }
 
         public void ClearList()

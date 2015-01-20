@@ -124,6 +124,15 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to /Assets/noBoxArt.jpg.
+        /// </summary>
+        internal static string NO_BOX_ART {
+            get {
+                return ResourceManager.GetString("NO_BOX_ART", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://api.twitch.tv/kraken/search/games?&amp;offset={1}&amp;q={0}&amp;live=true&amp;hls=true&amp;type=suggest.
         /// </summary>
         internal static string SEARCH_GAME_PATH {

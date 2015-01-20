@@ -156,4 +156,7 @@
   <data name="IS_STREAM_FOLLOWED_PATH" xml:space="preserve">
     <value>https://api.twitch.tv/kraken/users/{0}/follows/channels/{1}</value>
   </data>
+  <data name="NO_BOX_ART" xml:space="preserve">
+    <value>/Assets/noBoxArt.jpg</value>
+  </data>
 </root>
