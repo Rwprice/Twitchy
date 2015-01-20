@@ -89,13 +89,13 @@ namespace Twitchy.ViewModels
                     {
                         foreach (var arrayValue in games)
                         {
-                            string name = "";
                             var medium = new BitmapImage();
+                            string name = arrayValue.SelectToken("name").ToString();
 
                             try
                             {
-                                name = arrayValue.SelectToken("name").ToString();
                                 medium = new BitmapImage(new Uri(arrayValue.SelectToken("box").SelectToken("medium").ToString()));
+                                medium.ImageFailed += ImageFailed;
                             }
 
                             catch (Exception ex)
@@ -120,8 +120,9 @@ namespace Twitchy.ViewModels
             {
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    MessageBox.Show("Network error occured " + e.Message);
+                    MessageBox.Show("Network error occured: Couldn't load the search results");
                 });
+                Debug.WriteLine(e);
             }
         }
 
@@ -160,21 +161,20 @@ namespace Twitchy.ViewModels
                         {
                             foreach (var arrayValue in streams)
                             {
-                                string name = "";
-                                string display_name = "";
-                                string status = "";
+                                var display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
+                                var name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
+                                var status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
+                                int viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
                                 var small = new BitmapImage();
                                 var medium = new BitmapImage();
-                                int viewers = 0;
 
                                 try
                                 {
-                                    display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
-                                    name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
-                                    status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
                                     small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()));
                                     medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()));
-                                    viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
+
+                                    small.ImageFailed += ImageFailed;
+                                    medium.ImageFailed += ImageFailed;
                                 }
 
                                 catch (Exception ex)
@@ -208,9 +208,15 @@ namespace Twitchy.ViewModels
             {
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    MessageBox.Show("Network error occured " + e.Message);
+                    MessageBox.Show("Network error occured: Couldn't load the search results");
                 });
+                Debug.WriteLine(e);
             }
+        }
+
+        void ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

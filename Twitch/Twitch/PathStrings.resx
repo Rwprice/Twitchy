@@ -145,7 +145,7 @@
     <value>https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&amp;client_id=b4v9ttxqtldlobe5jswfqdhrmzp52hi&amp;redirect_uri=http://localhost&amp;scope=user_read chat_login user_follows_edit</value>
   </data>
   <data name="GET_FOLLOWED_STREAMS" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/streams/followed?oauth_token={0}</value>
+    <value>https://api.twitch.tv/kraken/streams/followed?oauth_token={0}&amp;offset={1}&amp;limit=8</value>
   </data>
   <data name="GET_USER_PATH" xml:space="preserve">
     <value>https://api.twitch.tv/kraken/user?oauth_token={0}</value>

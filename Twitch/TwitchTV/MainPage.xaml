@@ -117,21 +117,21 @@
 
             <!--Top Streams-->
             <phone:PanoramaItem Header="Top Streams" Orientation="Vertical">
-                <ListBox x:Name="TopStreamsList"
+                <phone:LongListSelector x:Name="TopStreamsList"
 					ItemTemplate="{StaticResource TopStreamsTemplate}"
 					SelectionChanged="TopStreamsList_SelectionChanged"/>
             </phone:PanoramaItem>
 
             <!--Top Games-->
             <phone:PanoramaItem Header="Top Games" Orientation="Vertical">
-                <ListBox x:Name="TopGamesList"
+                <phone:LongListSelector x:Name="TopGamesList"
 					ItemTemplate="{StaticResource TopGamesTemplate}"
 					SelectionChanged="TopGamesList_SelectionChanged"/>
             </phone:PanoramaItem>
 
             <!--Followed Streams-->
             <phone:PanoramaItem Header="Following" Orientation="Vertical">
-                <ListBox x:Name="FollowedStreamsList"
+                <phone:LongListSelector x:Name="FollowedStreamsList"
 					ItemTemplate="{StaticResource TopStreamsTemplate}"
 					SelectionChanged="FollowedStreamsList_SelectionChanged"/>
             </phone:PanoramaItem>

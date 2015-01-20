@@ -27,14 +27,7 @@ namespace TwitchTV.ViewModels
         /// <summary>
         /// Timestamp of the last update of the main menu streams
         /// </summary>
-        public DateTime lastUpdate { get; set; }
-
-        /// <summary>
-        /// Timestamp of the last update of the main menu streams
-        /// </summary>
         public User user { get; set; }
-
-        private bool alreadyLoadedFromToken = false;
 
         public bool AutoJoinChat = false;
         public bool LockLandscape = false;
@@ -55,66 +48,6 @@ namespace TwitchTV.ViewModels
                 {
                     _FeaturedStreams = value;
                     NotifyPropertyChanged("FeaturedStreams");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Top Games
-        /// </summary>
-        private ObservableCollection<TopGame> _TopGames;
-        public ObservableCollection<TopGame> TopGames
-        {
-            get
-            {
-                return _TopGames;
-            }
-            set
-            {
-                if (value != _TopGames)
-                {
-                    _TopGames = value;
-                    NotifyPropertyChanged("TopGames");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Top Streams
-        /// </summary>
-        private ObservableCollection<Stream> _TopStreams;
-        public ObservableCollection<Stream> TopStreams
-        {
-            get
-            {
-                return _TopStreams;
-            }
-            set
-            {
-                if (value != _TopStreams)
-                {
-                    _TopStreams = value;
-                    NotifyPropertyChanged("TopStreams");
-                }
-            }
-        }
-
-        /// <summary>
-        /// Top Streams
-        /// </summary>
-        private ObservableCollection<Stream> _FollowedStreams;
-        public ObservableCollection<Stream> FollowedStreams
-        {
-            get
-            {
-                return _FollowedStreams;
-            }
-            set
-            {
-                if (value != _FollowedStreams)
-                {
-                    _FollowedStreams = value;
-                    NotifyPropertyChanged("FollowedStreams");
                 }
             }
         }
@@ -142,19 +75,7 @@ namespace TwitchTV.ViewModels
 
         public async void LoadData()
         {
-            if (lastUpdate == null || !alreadyLoadedFromToken || lastUpdate.AddMinutes(2) <= DateTime.Now)
-            {
-                this.FeaturedStreams = await Stream.GetFeaturedStreams();
-                this.TopGames = await TopGame.GetTopGames();
-                this.TopStreams = await Stream.GetTopStreams();
-                if (user != null)
-                {
-                    this.FollowedStreams = await Stream.GetFollowedStreams(user.Oauth);
-                    alreadyLoadedFromToken = true;
-                }
-
-                lastUpdate = DateTime.Now;
-            }
+            this.FeaturedStreams = await Stream.GetFeaturedStreams();
         }
 
         public async void SaveSettings()

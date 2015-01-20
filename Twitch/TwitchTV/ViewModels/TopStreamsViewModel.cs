@@ -1,18 +1,21 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using System.Xml;
 using TwitchAPIHandler.Objects;
 
-namespace Twitchy.ViewModels
+namespace TwitchTV.ViewModels
 {
-    public class TopGameStreamsViewModel : INotifyPropertyChanged
+    class TopStreamsViewModel: INotifyPropertyChanged
     {
         private bool _isLoading = false;
         private bool _isStreamsLoaded = false;
@@ -45,7 +48,7 @@ namespace Twitchy.ViewModels
             }
         }
 
-        public TopGameStreamsViewModel()
+        public TopStreamsViewModel()
         {
             this.StreamList = new ObservableCollection<TwitchAPIHandler.Objects.Stream>();
             this.IsLoading = false;
@@ -58,7 +61,7 @@ namespace Twitchy.ViewModels
             private set;
         }
 
-        public void LoadPage(string gameName, int pageNumber)
+        public void LoadPage(int pageNumber)
         {
             if (pageNumber == 0)
             {
@@ -69,7 +72,7 @@ namespace Twitchy.ViewModels
             if (!IsStreamsLoaded)
             {
                 IsLoading = true;
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.TOP_STREAMS_FOR_GAME_PATH, gameName, 8 * pageNumber)));
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.TOP_STREAMS_PATH, 8 * pageNumber)));
                 request.BeginGetResponse(new AsyncCallback(ReadCallback), request);
             }
         }
@@ -101,7 +104,17 @@ namespace Twitchy.ViewModels
                                 var viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
                                 var display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
                                 var name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
-                                var status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
+                                var status = "";
+
+                                try
+                                {
+                                    status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
+                                }
+
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine(ex);
+                                }
 
                                 try
                                 {
@@ -147,7 +160,7 @@ namespace Twitchy.ViewModels
             {
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    MessageBox.Show("Network error occured: Couldn't load Top Streams for this Game");
+                    MessageBox.Show("Network error occured: Couldn't load Top Streams");
                 });
                 Debug.WriteLine(e);
             }
@@ -156,6 +169,13 @@ namespace Twitchy.ViewModels
         void ImageFailed(object sender, ExceptionRoutedEventArgs e)
         {
             
+        }
+
+        public void ClearList()
+        {
+            StreamList.Clear();
+            IsLoading = false;
+            IsStreamsLoaded = false;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

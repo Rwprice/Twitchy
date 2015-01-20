@@ -12,7 +12,7 @@ using System.ComponentModel;
 
 namespace TwitchAPIHandler.Objects
 {
-    public class TopGame : INotifyPropertyChanged
+    public class TopGame
     {
         private int _channels;
         public int channels
@@ -26,7 +26,6 @@ namespace TwitchAPIHandler.Objects
                 if (value != _channels)
                 {
                     _channels = value;
-                    NotifyPropertyChanged("channels");
                 }
             }
         }
@@ -43,85 +42,11 @@ namespace TwitchAPIHandler.Objects
                 if (value != _game)
                 {
                     _game = value;
-                    NotifyPropertyChanged("game");
                 }
             }
         }
 
-        public static async Task<ObservableCollection<TopGame>> GetTopGames()
-        {
-            Uri top_games_path = new Uri(string.Format(PathStrings.TOP_GAMES_PATH, 0));
-            var request = HttpWebRequest.Create(top_games_path);
-            request.Method = "GET";
-            try
-            {
-                var response = await HttpRequest(request);
-                var games = JsonToTopGames(response);
-                var gamesToReturn = new ObservableCollection<TopGame>();
-                foreach (var game in games)
-                    gamesToReturn.Add(game);
-                return gamesToReturn;
-            }
-
-            catch
-            {
-                return new ObservableCollection<TopGame>();
-            }
-        }
-
-        private static List<TopGame> JsonToTopGames(string json)
-        {
-            List<TopGame> topGames = new List<TopGame>();
-            JToken o = JObject.Parse(json);
-            JArray featured = JArray.Parse(o.SelectToken("top").ToString());
-
-            foreach (var arrayValue in featured)
-            {
-                topGames.Add(new TopGame()
-                {
-                    channels = int.Parse(arrayValue.SelectToken("channels").ToString()),
-                    game = new Game
-                    {
-                        name = arrayValue.SelectToken("game").SelectToken("name").ToString(),
-                        box = new Box
-                        {
-                            medium = new BitmapImage(new Uri(arrayValue.SelectToken("game").SelectToken("box").SelectToken("medium").ToString()))
-                        }
-                    },
-                });
-            }
-
-            return topGames;
-        }
-
-        private static async Task<string> HttpRequest(WebRequest request)
-        {
-            string received = "";
-
-            using (var response = (HttpWebResponse)(await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null)))
-            {
-                using (var responseStream = response.GetResponseStream())
-                {
-                    using (var sr = new StreamReader(responseStream))
-                    {
-                        received = await sr.ReadToEndAsync();
-                    }
-                }
-            }
-
-
-            return received;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String propertyName)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (null != handler)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
+        public static string TOP_GAMES_PATH = PathStrings.TOP_GAMES_PATH;
     }
 
     public class Game

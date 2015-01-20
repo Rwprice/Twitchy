@@ -88,7 +88,7 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/followed?oauth_token={0}.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/followed?oauth_token={0}&amp;offset={1}&amp;limit=8.
         /// </summary>
         internal static string GET_FOLLOWED_STREAMS {
             get {
