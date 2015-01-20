@@ -12,6 +12,7 @@ using Windows.Storage;
 using Windows.Storage.Streams;
 using TwitchTV.ViewModels;
 using System.Windows.Data;
+using System.Threading.Tasks;
 
 namespace TwitchTV
 {
@@ -60,7 +61,7 @@ namespace TwitchTV
             this.Loaded += new RoutedEventHandler(MainPage_Loaded);
         }
 
-        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
+        private void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -68,19 +69,6 @@ namespace TwitchTV
                 TopGamesList.SelectedItem = null;
                 FollowedStreamsList.SelectedItem = null;
                 App.ViewModel.curTopGame = null;
-
-                if (App.ViewModel.user == null)
-                {
-                    var user = await User.TryLoadUser();
-                    if (user != null)
-                    {
-                        App.ViewModel.user = user;
-                        this.Account.Text = "Logout";
-                    }
-                }
-
-                else
-                    this.Account.Text = "Logout";
 
                 TopStreamsList.ItemsSource = _topStreamsViewModel.StreamList;
                 TopGamesList.ItemsSource = _topGamesViewModel.GamesList;
@@ -263,7 +251,7 @@ namespace TwitchTV
             Refresh();
         }
 
-        private void Refresh()
+        private async void Refresh()
         {
             if (isNetwork)
             {
@@ -284,6 +272,20 @@ namespace TwitchTV
                 _followedPageNumber = 0;
                 _followedOffsetKnob = 1;
 
+
+                if (App.ViewModel.user == null)
+                {
+                    var user = await User.TryLoadUser();
+                    if (user != null)
+                    {
+                        App.ViewModel.user = user;
+                        this.Account.Text = "Logout";
+                    }
+                }
+
+                else
+                    this.Account.Text = "Logout";
+
                 if (App.ViewModel.user != null)
                 {
                     _followedViewModel.LoadPage(App.ViewModel.user.Oauth, _followedPageNumber++);
@@ -299,6 +301,67 @@ namespace TwitchTV
             if (lastUpdate == null || (!alreadyLoadedFromToken && App.ViewModel.user != null) || lastUpdate.AddMinutes(2) <= DateTime.Now)
             {
                 Refresh();
+            }
+        }
+
+        private void Open_Click(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+            App.ViewModel.stream = stream;
+            NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+        }
+
+        private async void Follow_Click(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+
+            if (((string)((MenuItem)(sender)).Header) == "Unfollow")
+            {
+                await User.UnfollowStream(stream.channel.name, App.ViewModel.user);
+                ((MenuItem)(sender)).Header = "Follow";
+            }
+
+            else
+            {
+                await User.FollowStream(stream.channel.name, App.ViewModel.user);
+                ((MenuItem)(sender)).Header = "Unfollow";
+            }
+
+            _followedViewModel.ClearList();
+            _followedPageNumber = 0;
+            _followedOffsetKnob = 1;
+
+            if (App.ViewModel.user != null)
+            {
+                _followedViewModel.LoadPage(App.ViewModel.user.Oauth, _followedPageNumber++);
+                alreadyLoadedFromToken = true;
+            }
+        }
+
+        private void Pin_to_Start_Click(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+        }
+
+        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+        {
+            var contextMenu = sender as ContextMenu;
+            if (App.ViewModel.user != null)
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        Stream stream = (Stream)(sender as ContextMenu).DataContext;
+                        Task<bool> isFollowedTask = User.IsStreamFollowed(stream.channel.name, App.ViewModel.user);
+                        var awaiter = isFollowedTask.GetAwaiter();
+
+                        awaiter.OnCompleted(new Action(() =>
+                            {
+                                ((MenuItem)(contextMenu.Items[1])).IsEnabled = true;
+
+                                if (awaiter.GetResult())
+                                    ((MenuItem)(contextMenu.Items[1])).Header = "Unfollow";
+                            }));
+                    });
             }
         }
     }

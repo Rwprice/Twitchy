@@ -95,7 +95,7 @@ namespace Twitchy.ViewModels
                             try
                             {
                                 medium = new BitmapImage(new Uri(arrayValue.SelectToken("box").SelectToken("medium").ToString()));
-                                medium.ImageFailed += ImageFailed;
+                                medium.ImageFailed += game_ImageFailed;
                             }
 
                             catch (Exception ex)
@@ -124,6 +124,11 @@ namespace Twitchy.ViewModels
                 });
                 Debug.WriteLine(e);
             }
+        }
+
+        private void game_ImageFailed(object sender, ExceptionRoutedEventArgs e)
+        {
+            ((BitmapImage)(sender)).UriSource = new Uri(TopGame.NO_BOX_ART, UriKind.Relative);
         }
 
         public void SearchStreams(string streamName, int pageNumber)

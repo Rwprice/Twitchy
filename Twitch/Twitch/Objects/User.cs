@@ -54,7 +54,7 @@ namespace TwitchAPIHandler.Objects
         public static async void SaveUser(User user)
         {
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            StorageFile textFile = await localFolder.CreateFileAsync("user", CreationCollisionOption.ReplaceExisting);
+            StorageFile textFile = await localFolder.CreateFileAsync("user2", CreationCollisionOption.ReplaceExisting);
 
             using (IRandomAccessStream textStream = await textFile.OpenAsync(FileAccessMode.ReadWrite))
             {
@@ -74,7 +74,7 @@ namespace TwitchAPIHandler.Objects
                 string contents;
 
                 StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-                StorageFile textFile = await localFolder.GetFileAsync("user");
+                StorageFile textFile = await localFolder.GetFileAsync("user2");
 
                 using (IRandomAccessStream textStream = await textFile.OpenReadAsync())
                 {
@@ -102,7 +102,7 @@ namespace TwitchAPIHandler.Objects
         public static async void LogoutUser()
         {
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
-            StorageFile textFile = await localFolder.GetFileAsync("user");
+            StorageFile textFile = await localFolder.GetFileAsync("user2");
             await textFile.DeleteAsync();
         }
 
