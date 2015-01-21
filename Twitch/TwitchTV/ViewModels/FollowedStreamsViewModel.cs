@@ -108,23 +108,30 @@ namespace TwitchTV.ViewModels
 
                                 try
                                 {
-                                    small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()));
-                                    medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()));
-
-                                    small.ImageFailed += ImageFailed;
-                                    medium.ImageFailed += ImageFailed;
-
                                     status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
                                 }
 
                                 catch (Exception ex)
                                 {
                                     Debug.WriteLine(ex);
-
                                     if (status == "")
                                     {
                                         status = display_name;
                                     }
+                                }
+
+                                try
+                                {
+                                    small = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("small").ToString()));
+                                    medium = new BitmapImage(new Uri(arrayValue.SelectToken("preview").SelectToken("medium").ToString()));
+
+                                    small.ImageFailed += ImageFailed;
+                                    medium.ImageFailed += ImageFailed;
+                                }
+
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine(ex);
                                 }
 
                                 preview = new Preview

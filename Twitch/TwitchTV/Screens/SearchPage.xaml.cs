@@ -137,7 +137,7 @@ namespace TwitchTV
             if (((Stream)((LongListSelector)sender).SelectedItem) != null)
             {
                 App.ViewModel.stream = ((Stream)((LongListSelector)sender).SelectedItem);
-                NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+                NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
 
@@ -152,7 +152,7 @@ namespace TwitchTV
                 };
 
                 App.ViewModel.curTopGame = topGameToSave;
-                NavigationService.Navigate(new Uri("/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
+                NavigationService.Navigate(new Uri("/Screens/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
 

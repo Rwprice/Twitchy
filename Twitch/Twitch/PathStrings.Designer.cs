@@ -79,6 +79,15 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/followed?oauth_token={0}.
+        /// </summary>
+        internal static string GET_ALL_FOLLOWED_STREAMS {
+            get {
+                return ResourceManager.GetString("GET_ALL_FOLLOWED_STREAMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://api.twitch.tv/kraken/oauth2/authorize?response_type=token&amp;client_id=b4v9ttxqtldlobe5jswfqdhrmzp52hi&amp;redirect_uri=http://localhost&amp;scope=user_read chat_login user_follows_edit.
         /// </summary>
         internal static string GET_AUTHORIZATION_TOKEN {

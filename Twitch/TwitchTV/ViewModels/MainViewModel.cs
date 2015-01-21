@@ -31,6 +31,7 @@ namespace TwitchTV.ViewModels
 
         public bool AutoJoinChat = false;
         public bool LockLandscape = false;
+        public bool LiveTilesEnabled = false;
 
         /// <summary>
         /// Featured Streams
@@ -87,7 +88,7 @@ namespace TwitchTV.ViewModels
             {
                 using (DataWriter textWriter = new DataWriter(textStream))
                 {
-                    textWriter.WriteString(AutoJoinChat.ToString() + "\n" + LockLandscape.ToString());
+                    textWriter.WriteString(AutoJoinChat.ToString() + "\n" + LockLandscape.ToString() + "\n" + LiveTilesEnabled.ToString());
                     await textWriter.StoreAsync();
                 }
             }
@@ -116,6 +117,7 @@ namespace TwitchTV.ViewModels
 
                 bool.TryParse(lines[0], out AutoJoinChat);
                 bool.TryParse(lines[1], out LockLandscape);
+                bool.TryParse(lines[2], out LiveTilesEnabled);
             }
 
             catch { }

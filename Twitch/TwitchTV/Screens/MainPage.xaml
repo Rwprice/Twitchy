@@ -30,7 +30,7 @@
             <DataTemplate x:Name="TopStreamsTemplate">
                 <StackPanel Orientation="Horizontal" Margin="12,2,0,4" Height="105" Width="432">
                     <toolkit:ContextMenuService.ContextMenu>
-                        <toolkit:ContextMenu x:Name="ContextMenu" Opened="ContextMenu_Opened">
+                        <toolkit:ContextMenu x:Name="ContextMenu">
                             <toolkit:MenuItem 
                                 Name="Open"  
                                 Header="Open"
@@ -39,6 +39,7 @@
                                 Name="Follow"  
                                 Header="Follow"
                                 Click="Follow_Click"
+                                Loaded="Follow_Loaded"
                                 IsEnabled="False"/>
                             <toolkit:MenuItem 
                                 Name="Pin_to_Start"  

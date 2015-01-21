@@ -159,4 +159,7 @@
   <data name="NO_BOX_ART" xml:space="preserve">
     <value>/Assets/noBoxArt.jpg</value>
   </data>
+  <data name="GET_ALL_FOLLOWED_STREAMS" xml:space="preserve">
+    <value>https://api.twitch.tv/kraken/streams/followed?oauth_token={0}</value>
+  </data>
 </root>

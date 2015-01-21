@@ -70,6 +70,7 @@ namespace TwitchAPIHandler.Objects
         public static string SEARCH_STREAM_PATH = PathStrings.SEARCH_STREAM_PATH;
         public static string TOP_STREAMS_PATH = PathStrings.TOP_STREAMS_PATH;
         public static string GET_FOLLOWED_STREAMS = PathStrings.GET_FOLLOWED_STREAMS;
+        public static string GET_ALL_FOLLOWED_STREAMS = PathStrings.GET_ALL_FOLLOWED_STREAMS;
 
         public static async Task<ObservableCollection<Stream>> GetFeaturedStreams()
         {

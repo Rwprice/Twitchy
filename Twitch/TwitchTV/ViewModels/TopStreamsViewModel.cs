@@ -114,6 +114,10 @@ namespace TwitchTV.ViewModels
                                 catch (Exception ex)
                                 {
                                     Debug.WriteLine(ex);
+                                    if (status == "")
+                                    {
+                                        status = display_name;
+                                    }
                                 }
 
                                 try

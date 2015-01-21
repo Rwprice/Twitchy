@@ -13,6 +13,7 @@ using Windows.Storage.Streams;
 using TwitchTV.ViewModels;
 using System.Windows.Data;
 using System.Threading.Tasks;
+using Microsoft.Phone.Scheduler;
 
 namespace TwitchTV
 {
@@ -183,7 +184,7 @@ namespace TwitchTV
             {
                 int index = int.Parse(((Canvas)sender).Name.Remove(0, 2));
                 App.ViewModel.stream = App.ViewModel.FeaturedStreams[index];
-                NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+                NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
             catch { }
         }
@@ -191,7 +192,7 @@ namespace TwitchTV
         private void SettingTapped(object sender, System.Windows.Input.GestureEventArgs e)
         {
             if((((TextBlock)sender).Text) != "Logout")
-                NavigationService.Navigate(new Uri("/" + (((TextBlock)sender).Text) + "Page.xaml", UriKind.RelativeOrAbsolute));
+                NavigationService.Navigate(new Uri("/Screens/" + (((TextBlock)sender).Text) + "Page.xaml", UriKind.RelativeOrAbsolute));
 
             else if ((((TextBlock)sender).Text) == "Logout")
             {
@@ -219,7 +220,7 @@ namespace TwitchTV
             if (((Stream)((LongListSelector)sender).SelectedItem) != null)
             {
                 App.ViewModel.stream = ((Stream)((LongListSelector)sender).SelectedItem);
-                NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+                NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
 
@@ -228,7 +229,7 @@ namespace TwitchTV
             if (((TopGame)((LongListSelector)sender).SelectedItem) != null)
             {
                 App.ViewModel.curTopGame = ((TopGame)((LongListSelector)sender).SelectedItem);
-                NavigationService.Navigate(new Uri("/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
+                NavigationService.Navigate(new Uri("/Screens/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
 
@@ -237,13 +238,13 @@ namespace TwitchTV
             if (((Stream)((LongListSelector)sender).SelectedItem) != null)
             {
                 App.ViewModel.stream = ((Stream)((LongListSelector)sender).SelectedItem);
-                NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+                NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
 
         private void SearchButton_Click(object sender, EventArgs e)
         {
-            NavigationService.Navigate(new Uri("/SearchPage.xaml", UriKind.RelativeOrAbsolute));
+            NavigationService.Navigate(new Uri("/Screens/SearchPage.xaml", UriKind.RelativeOrAbsolute));
         }
 
         private void RefreshButton_Click(object sender, EventArgs e)
@@ -308,7 +309,7 @@ namespace TwitchTV
         {
             Stream stream = (Stream)(sender as MenuItem).DataContext;
             App.ViewModel.stream = stream;
-            NavigationService.Navigate(new Uri("/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+            NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
         }
 
         private async void Follow_Click(object sender, RoutedEventArgs e)
@@ -343,25 +344,25 @@ namespace TwitchTV
             Stream stream = (Stream)(sender as MenuItem).DataContext;
         }
 
-        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
+        private void Follow_Loaded(object sender, RoutedEventArgs e)
         {
-            var contextMenu = sender as ContextMenu;
             if (App.ViewModel.user != null)
             {
                 Deployment.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    var contextMenu = sender as ContextMenu;
+                    Stream stream = (Stream)(sender as ContextMenu).DataContext;
+                    Task<bool> isFollowedTask = User.IsStreamFollowed(stream.channel.name, App.ViewModel.user);
+                    var awaiter = isFollowedTask.GetAwaiter();
+
+                    awaiter.OnCompleted(new Action(() =>
                     {
-                        Stream stream = (Stream)(sender as ContextMenu).DataContext;
-                        Task<bool> isFollowedTask = User.IsStreamFollowed(stream.channel.name, App.ViewModel.user);
-                        var awaiter = isFollowedTask.GetAwaiter();
+                        ((MenuItem)(contextMenu.Items[1])).IsEnabled = true;
 
-                        awaiter.OnCompleted(new Action(() =>
-                            {
-                                ((MenuItem)(contextMenu.Items[1])).IsEnabled = true;
-
-                                if (awaiter.GetResult())
-                                    ((MenuItem)(contextMenu.Items[1])).Header = "Unfollow";
-                            }));
-                    });
+                        if (awaiter.GetResult())
+                            ((MenuItem)(contextMenu.Items[1])).Header = "Unfollow";
+                    }));
+                });
             }
         }
     }

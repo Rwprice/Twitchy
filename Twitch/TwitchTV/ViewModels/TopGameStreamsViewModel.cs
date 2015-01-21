@@ -101,7 +101,21 @@ namespace Twitchy.ViewModels
                                 var viewers = int.Parse(arrayValue.SelectToken("viewers").ToString());
                                 var display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
                                 var name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
-                                var status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
+                                var status = "";
+
+                                try
+                                {
+                                    status = arrayValue.SelectToken("channel").SelectToken("status").ToString();
+                                }
+
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine(ex);
+                                    if (status == "")
+                                    {
+                                        status = display_name;
+                                    }
+                                }
 
                                 try
                                 {

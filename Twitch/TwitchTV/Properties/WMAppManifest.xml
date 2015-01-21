@@ -14,7 +14,10 @@
       <Capability Name="ID_CAP_PHONEDIALER" />
     </Capabilities>
     <Tasks>
-      <DefaultTask Name="_default" NavigationPage="MainPage.xaml" />
+      <DefaultTask Name="_default" NavigationPage="/Screens/MainPage.xaml" />
+      <ExtendedTask Name="UpdateLiveTileTask">
+        <BackgroundServiceAgent Specifier="ScheduledTaskAgent" Name="UpdateLiveTileTask" Source="LiveTileTaskAgent" Type="LiveTileTaskAgent.ScheduledAgent" />
+      </ExtendedTask>
     </Tasks>
     <Tokens>
       <PrimaryToken TokenID="TwitchTVToken" TaskName="_default">
