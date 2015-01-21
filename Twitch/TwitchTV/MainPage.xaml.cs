@@ -348,7 +348,7 @@ namespace TwitchTV
             var contextMenu = sender as ContextMenu;
             if (App.ViewModel.user != null)
             {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                Deployment.Current.Dispatcher.InvokeAsync(() =>
                     {
                         Stream stream = (Stream)(sender as ContextMenu).DataContext;
                         Task<bool> isFollowedTask = User.IsStreamFollowed(stream.channel.name, App.ViewModel.user);
