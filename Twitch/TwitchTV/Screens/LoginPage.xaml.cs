@@ -12,6 +12,7 @@ using TwitchAPIHandler;
 using TwitchAPIHandler.Objects;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using System.Diagnostics;
 
 namespace TwitchTV
 {
@@ -28,14 +29,20 @@ namespace TwitchTV
         {
             if (e.Uri.Host == "localhost")
             {
-                string token = e.Uri.AbsoluteUri.Substring(e.Uri.AbsoluteUri.IndexOf('=') + 1);
-                token = token.Remove(token.IndexOf('&'));
+                if (e.Uri.AbsoluteUri.Contains("error=access_denied"))
+                    Debug.WriteLine("Login was cancelled");
 
-                var user = await User.GetUserFromOauth(token);
+                else
+                {
+                    string token = e.Uri.AbsoluteUri.Substring(e.Uri.AbsoluteUri.IndexOf('=') + 1);
+                    token = token.Remove(token.IndexOf('&'));
 
-                User.SaveUser(user);
+                    var user = await User.GetUserFromOauth(token);
 
-                App.ViewModel.user = user;
+                    User.SaveUser(user);
+
+                    App.ViewModel.user = user;                    
+                }
 
                 await this.WebBrowser.ClearCookiesAsync();
                 await this.WebBrowser.ClearInternetCacheAsync();

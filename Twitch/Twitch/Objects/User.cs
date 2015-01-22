@@ -8,11 +8,14 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Microsoft.Phone.Scheduler;
 
 namespace TwitchAPIHandler.Objects
 {
     public class User
     {
+        private static string liveTileTaskName = "UpdateLiveTileTask";
+
         public string Name { get; set; }
         public string DisplayName { get; set; }
         public string Oauth { get; set; }
@@ -104,6 +107,13 @@ namespace TwitchAPIHandler.Objects
             StorageFolder localFolder = ApplicationData.Current.LocalFolder;
             StorageFile textFile = await localFolder.GetFileAsync("user2");
             await textFile.DeleteAsync();
+
+            if (ScheduledActionService.Find(liveTileTaskName) != null)
+            {
+                //if the agent exists, remove and then add it to ensure
+                //the agent's schedule is updated to avoid expiration
+                ScheduledActionService.Remove(liveTileTaskName);
+            }
         }
 
         public static async Task<bool> IsStreamFollowed(string stream, User user)

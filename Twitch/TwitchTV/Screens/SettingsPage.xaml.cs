@@ -75,9 +75,9 @@ namespace TwitchTV
                     periodicTask.Description = App.ViewModel.user.Oauth;
                     ScheduledActionService.Add(periodicTask);
 
-#if DEBUG
-                    ScheduledActionService.LaunchForTest(taskName, TimeSpan.FromSeconds(30));
-#endif
+                    #if DEBUG
+                        ScheduledActionService.LaunchForTest(taskName, TimeSpan.FromSeconds(30));
+                    #endif
                 }
                 catch (InvalidOperationException exception)
                 {

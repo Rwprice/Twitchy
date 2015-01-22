@@ -199,6 +199,7 @@ namespace TwitchTV
                 User.LogoutUser();
 
                 App.ViewModel.user = null;
+                App.ViewModel.LiveTilesEnabled = false;
 
                 MessageBox.Show("User has been logged out!");
 
@@ -344,26 +345,26 @@ namespace TwitchTV
             Stream stream = (Stream)(sender as MenuItem).DataContext;
         }
 
-        private void Follow_Loaded(object sender, RoutedEventArgs e)
+        private async void Follow_Loaded(object sender, RoutedEventArgs e)
         {
             if (App.ViewModel.user != null)
             {
-                Deployment.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    var contextMenu = sender as ContextMenu;
-                    Stream stream = (Stream)(sender as ContextMenu).DataContext;
-                    Task<bool> isFollowedTask = User.IsStreamFollowed(stream.channel.name, App.ViewModel.user);
-                    var awaiter = isFollowedTask.GetAwaiter();
+                var menuItem = sender as MenuItem;
+                var contextMenu = menuItem.Parent as ContextMenu;
+                Stream stream = (Stream)contextMenu.DataContext;
+                bool isFollowedTask = await User.IsStreamFollowed(stream.channel.name, App.ViewModel.user);
 
-                    awaiter.OnCompleted(new Action(() =>
-                    {
-                        ((MenuItem)(contextMenu.Items[1])).IsEnabled = true;
+                menuItem.IsEnabled = true;
 
-                        if (awaiter.GetResult())
-                            ((MenuItem)(contextMenu.Items[1])).Header = "Unfollow";
-                    }));
-                });
+                if (isFollowedTask)
+                    menuItem.Header = "Unfollow";
             }
+        }
+
+        private void ContextMenu_Unloaded(object sender, RoutedEventArgs e)
+        {
+            ContextMenu conmen = (sender as ContextMenu);
+            conmen.ClearValue(FrameworkElement.DataContextProperty);
         }
     }
 }
