@@ -2,6 +2,7 @@
 using SM.Media;
 using SM.Media.Playlists;
 using SM.Media.Segments;
+using SM.Media.Utility;
 using SM.Media.Web;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -21,6 +23,8 @@ namespace TwitchTV
 {
     public partial class PlayerPage : PhoneApplicationPage
     {
+
+        #region Variables
         public AccessToken token { get; set; }
         public M3U8Playlist playlist { get; set; }
         public string quality { get; set; }
@@ -30,26 +34,26 @@ namespace TwitchTV
         public bool isScrolling = false;
         public bool chatJoined = false;
         public bool isLoggedIn = false;
-        public bool navigatedFrom = false;
         public bool rejoinChat = false;
+        #endregion
 
-        readonly IHttpClients _httpClients;
-        IMediaElementManager _mediaElementManager;
-        PlaylistSegmentManager _playlist;
-        ITsMediaManager _tsMediaManager;
-        TsMediaStreamSource _tsMediaStreamSource;
-        Program program;
-        ISubProgram subProgram;
+        #region Video
+        IMediaStreamFacade _mediaStreamFacade;
+        #endregion
 
+        #region UI
         DispatcherTimer uiTimeout;
         DispatcherTimer chatGoToBottom;
+        #endregion
 
+        #region Chat
         ChatClient client;
         ObservableCollection<ChatLine> ChatList = new ObservableCollection<ChatLine>();
         public static Dictionary<string, string> userColors = new Dictionary<string, string>();
         public static Random random = new Random();
         ScrollViewer scrollViewer;
         BackgroundWorker backgroundWorker = new BackgroundWorker();
+        #endregion
 
         public PlayerPage()
         {
@@ -58,7 +62,6 @@ namespace TwitchTV
             token = new AccessToken();
             playlist = new M3U8Playlist();
             InitializeComponent();
-            _httpClients = new HttpClients();
 
             if (App.ViewModel.LockLandscape)
             {
@@ -89,164 +92,50 @@ namespace TwitchTV
             backgroundWorker.WorkerReportsProgress = true;
         }
 
-        void chatGoToBottom_Tick(object sender, EventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            isScrolling = false;
+            if ((App.ViewModel.AutoJoinChat || rejoinChat) && isLoggedIn)
+            {
+                JoinChatAndListen();
+            }
+
+            if (this.Orientation == PageOrientation.Landscape || this.Orientation == PageOrientation.LandscapeLeft || this.Orientation == PageOrientation.LandscapeRight)
+            {
+                mediaElement1.Margin = new Thickness(0);
+                mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
+                mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+            }
+
+            else
+            {
+                mediaElement1.Margin = new Thickness(0, 70, 0, 0);
+                mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+            }
+
+            GetQualities();
+            base.OnNavigatedTo(e);
         }
 
-        private void uiTimeout_Tick(object sender, EventArgs e)
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            if (this.TaskBar.Opacity == 1)
-                ToggleUI();
+            if (chatJoined)
+                rejoinChat = true;
+
+            CleanupMedia();
+            client = null;
+
+            base.OnNavigatedFrom(e);
         }
 
-        private async void GetQualities()
+        #region Video Methods
+        void playVideo()
         {
             try
             {
-                if (isLoggedIn)
-                {
-                    isFollowed = await User.IsStreamFollowed(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                var task = PlayCurrentTrackAsync();
 
-                    if (isFollowed)
-                        this.FavoriteLabel.Text = "Unfollow";
-                    else
-                        this.FavoriteLabel.Text = "Follow";
-                }
-
-                token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
-                playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
-
-                if (string.IsNullOrEmpty(quality))
-                    quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
-
-                this.QualitySelection.ItemsSource = playlist.streams.Keys;
-                this.QualitySelection.SelectedItem = quality;
-
-                firstRun = false;
-            }
-
-            catch (Exception ex)
-            {
-                MessageBox.Show("Can't load the qualities list of this stream", "Well, this is embarrassing...", MessageBoxButton.OK);
-                Debug.WriteLine(ex.Message);
-            }
-
-            if (!navigatedFrom)
-                playVideo();
-        }
-
-        async void playVideo()
-        {
-            try
-            {
-                CleanupMedia();
-
-                if (null != _playlist)
-                {
-                    _playlist.Dispose();
-                    _playlist = null;
-                }
-
-                if (null != _tsMediaStreamSource)
-                {
-                    _tsMediaStreamSource.Dispose();
-                    _tsMediaStreamSource = null;
-                }
-
-                var segmentsFactory = new SegmentsFactory(_httpClients);
-
-                var programManager = new ProgramManager(_httpClients, segmentsFactory.CreateStreamSegments)
-                {
-                    Playlists = new Uri[] { M3U8Playlist.indexUri }
-                };
-
-                var programs = await programManager.LoadAsync();
-
-                program = programs.Values.FirstOrDefault();
-
-                subProgram = program.SubPrograms.ElementAt(playlist.GetIndexOfQuality(quality));
-
-                var programClient = _httpClients.CreatePlaylistClient(program.Url);
-
-                _playlist = new PlaylistSegmentManager(uri => new CachedWebRequest(uri, programClient), subProgram, segmentsFactory.CreateStreamSegments);
-
-                #region MediaElementManager
-                _mediaElementManager = new MediaElementManager(Dispatcher,
-                    () =>
-                    {
-                        var me = new MediaElement();
-
-                        if (this.Orientation == PageOrientation.Landscape || this.Orientation == PageOrientation.LandscapeLeft || this.Orientation == PageOrientation.LandscapeRight)
-                        {
-                            me = new MediaElement
-                            {
-                                Margin = new Thickness(0),
-                                VerticalAlignment = System.Windows.VerticalAlignment.Stretch,
-                                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch
-                            };
-                        }
-
-                        else
-                        {
-                            me = new MediaElement
-                            {
-                                Margin = new Thickness(0,70,0,0),
-                                VerticalAlignment = System.Windows.VerticalAlignment.Top,
-                                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch
-                            };
-                        }
-                        
-
-                        me.MediaFailed += mediaElement1_MediaFailed;
-                        me.CurrentStateChanged += mediaElement1_CurrentStateChanged;
-                        me.BufferingProgressChanged += OnBufferingProgressChanged;
-                        ContentPanel.Children.Add(me);
-
-                        mediaElement1 = me;
-                        mediaElement1.Tap += mediaElement1_Tap;
-
-                        UpdateState(MediaElementState.Opening);
-
-                        return me;
-                    },
-                    me =>
-                    {
-                        if (null != me)
-                        {
-                            Debug.Assert(ReferenceEquals(me, mediaElement1));
-
-                            ContentPanel.Children.Remove(me);
-
-                            me.MediaFailed -= mediaElement1_MediaFailed;
-                            me.CurrentStateChanged -= mediaElement1_CurrentStateChanged;
-                            me.BufferingProgressChanged -= OnBufferingProgressChanged;
-                        }
-
-                        mediaElement1 = null;
-
-                        UpdateState(MediaElementState.Closed);
-                    });
-                #endregion
-
-                var segmentReaderManager = new SegmentReaderManager(new[] { _playlist }, _httpClients.CreateSegmentClient);
-
-                if (!navigatedFrom)
-                {
-                    if (null != _tsMediaManager)
-                        _tsMediaManager.OnStateChange -= TsMediaManagerOnOnStateChange;
-
-                    _tsMediaStreamSource = new TsMediaStreamSource();
-
-                    _tsMediaManager = new TsMediaManager(segmentReaderManager, _mediaElementManager, _tsMediaStreamSource);
-
-                    _tsMediaManager.OnStateChange += TsMediaManagerOnOnStateChange;
-
-                    this.uiTimeout.Start();
-                }
-
-                if(!navigatedFrom)
-                    _tsMediaManager.Play();
+                TaskCollector.Default.Add(task, "PlayerPage playVideo");
             }
 
             catch (Exception ex)
@@ -257,114 +146,77 @@ namespace TwitchTV
             }
         }
 
-        async void CleanupMedia()
+        async Task PlayCurrentTrackAsync()
         {
+            var track = playlist.streams[quality];
+
+            if (null == track)
+            {
+                await _mediaStreamFacade.StopAsync(CancellationToken.None);
+
+                mediaElement1.Stop();
+                mediaElement1.Source = null;
+
+                return;
+            }
+
+            mediaElement1.Source = null;
+
             try
             {
-                if (null != _tsMediaManager)
-                    _tsMediaManager.Close();
+                InitializeMediaStream();
 
-                _tsMediaManager = null;
+                var mss = await _mediaStreamFacade.CreateMediaStreamSourceAsync(track, CancellationToken.None);
 
-                if (null != _playlist)
-                    await _playlist.StopAsync();
+                if (null == mss)
+                {
+                    Debug.WriteLine("PlayerPage.PlayCurrentTrackAsync() Unable to create media stream source");
+                    return;
+                }
 
-                _playlist = null;
-
-                if (null != _mediaElementManager)
-                    await _mediaElementManager.Close();
-
-                _mediaElementManager = null;
+                mediaElement1.SetSource(mss);
             }
-
             catch (Exception ex)
             {
-                MessageBox.Show("There was an issue while closing the stream", "Well, this is embarrassing...", MessageBoxButton.OK);
-                Debug.WriteLine(ex.Message);
+                Debug.WriteLine("PlayerPage.PlayCurrentTrackAsync() Unable to create media stream source: " + ex.Message);
+                return;
             }
+
+            mediaElement1.Play();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        void InitializeMediaStream()
         {
-            if (null != _mediaElementManager)
-            {
-                _mediaElementManager.Close()
-                                    .Wait();
-            }
+            if (null != _mediaStreamFacade)
+                return;
 
-            if ((App.ViewModel.AutoJoinChat || rejoinChat) && isLoggedIn)
-            {
-                JoinChatAndListen();
-            }
-
-            GetQualities();
-            base.OnNavigatedTo(e);
+            _mediaStreamFacade = MediaStreamFacadeSettings.Parameters.Create();
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        void StopMedia()
         {
-            if (!e.Uri.ToString().Contains("external"))
-                navigatedFrom = true;
-            else
-            {
-                if (chatJoined)
-                    rejoinChat = true;
-            }
-
-            CleanupMedia();
-
-            if (null != _mediaElementManager)
-            {
-                _mediaElementManager.Close()
-                                    .Wait();
-            }
-
-            client = null;
-
-            base.OnNavigatedFrom(e);
+            if (null != mediaElement1)
+                mediaElement1.Source = null;
         }
 
-        void OnBufferingProgressChanged(object sender, RoutedEventArgs routedEventArgs)
+        void CleanupMedia()
         {
-            mediaElement1_CurrentStateChanged(sender, routedEventArgs);
-        }
+            StopMedia();
 
-        void mediaElement1_CurrentStateChanged(object sender, RoutedEventArgs e)
-        {
-            var state = null == mediaElement1 ? MediaElementState.Closed : mediaElement1.CurrentState;
+            if (null == _mediaStreamFacade)
+                return;
 
-            if (null != _mediaElementManager)
-            {
-                var managerState = _tsMediaManager.State;
+            var mediaStreamFacade = _mediaStreamFacade;
 
-                if (MediaElementState.Closed == state)
-                {
-                    if (TsMediaManager.MediaState.OpenMedia == managerState || TsMediaManager.MediaState.Opening == managerState || TsMediaManager.MediaState.Playing == managerState)
-                        state = MediaElementState.Opening;
-                }
-            }
+            _mediaStreamFacade = null;
 
-            UpdateState(state);
+            //Don't block the dispose
+            mediaStreamFacade.DisposeBackground("PlayerPage CleanupMedia");
         }
 
         void UpdateState(MediaElementState state)
         {
-            
-        }
-
-        void TsMediaManagerOnOnStateChange(object sender, TsMediaManagerStateEventArgs tsMediaManagerStateEventArgs)
-        {
-            Dispatcher.InvokeAsync(() =>
-            {
-                var message = tsMediaManagerStateEventArgs.Message;
-
-                if (!string.IsNullOrWhiteSpace(message))
-                {
-                    
-                }
-
-                mediaElement1_CurrentStateChanged(null, null);
-            });
+            Debug.WriteLine("MediaElement State: " + state);
         }
 
         private void mediaElement1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
@@ -381,7 +233,7 @@ namespace TwitchTV
                 if (!string.IsNullOrEmpty(obj))
                 {
                     quality = obj;
-                    GetQualities();
+                    playVideo();
                 }
             }
         }
@@ -389,6 +241,99 @@ namespace TwitchTV
         private void mediaElement1_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             ToggleUI();
+        }
+
+        void mediaElement1_CurrentStateChanged(object sender, RoutedEventArgs e)
+        {
+            var state = null == mediaElement1 ? MediaElementState.Closed : mediaElement1.CurrentState;
+
+            if (null != _mediaStreamFacade)
+            {
+                var managerState = _mediaStreamFacade.State;
+
+                if (MediaElementState.Closed == state)
+                {
+                    if (TsMediaManager.MediaState.OpenMedia == managerState || TsMediaManager.MediaState.Opening == managerState || TsMediaManager.MediaState.Playing == managerState)
+                        state = MediaElementState.Opening;
+                }
+            }
+
+            UpdateState(state);
+        }
+        #endregion
+
+        #region API
+        private async void FavoriteButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (isLoggedIn)
+            {
+                if (isFollowed)
+                {
+                    this.Focus();
+                    this.FavoriteButton.IsEnabled = false;
+                    await User.UnfollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                    isFollowed = false;
+                    this.FavoriteLabel.Text = "Follow";
+                    if (this.FavoriteButton.Opacity == .5)
+                        this.FavoriteButton.IsEnabled = true;
+                }
+                else
+                {
+                    this.Focus();
+                    this.FavoriteButton.IsEnabled = false;
+                    await User.FollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                    isFollowed = true;
+                    this.FavoriteLabel.Text = "Unfollow";
+                    if (this.FavoriteButton.Opacity == .5)
+                        this.FavoriteButton.IsEnabled = true;
+                }
+            }
+        }
+
+        private async void GetQualities()
+        {
+            try
+            {
+                if (isLoggedIn)
+                {
+                    isFollowed = await User.IsStreamFollowed(App.ViewModel.stream.channel.name, App.ViewModel.user);
+
+                    if (isFollowed)
+                        this.FavoriteLabel.Text = "Unfollow";
+                    else
+                        this.FavoriteLabel.Text = "Follow";
+                }
+
+                if (firstRun)
+                {
+                    token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
+                    playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
+
+                    if (string.IsNullOrEmpty(quality))
+                        quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
+
+                    this.QualitySelection.ItemsSource = playlist.streams.Keys;
+                    this.QualitySelection.SelectedItem = quality;
+                }
+
+                firstRun = false;
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show("Can't load the qualities list of this stream", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
+            }
+
+            playVideo();
+        }
+        #endregion
+
+        #region UI
+        private void uiTimeout_Tick(object sender, EventArgs e)
+        {
+            if (this.TaskBar.Opacity == 1)
+                ToggleUI();
         }
 
         private void ToggleUI()
@@ -480,33 +425,6 @@ namespace TwitchTV
             this.uiTimeout.Start();
         }
 
-        private async void FavoriteButton_Tap(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            if (isLoggedIn)
-            {
-                if (isFollowed)
-                {
-                    this.Focus();
-                    this.FavoriteButton.IsEnabled = false;
-                    await User.UnfollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
-                    isFollowed = false;
-                    this.FavoriteLabel.Text = "Follow";
-                    if (this.FavoriteButton.Opacity == .5)
-                        this.FavoriteButton.IsEnabled = true;
-                }
-                else
-                {
-                    this.Focus();
-                    this.FavoriteButton.IsEnabled = false;
-                    await User.FollowStream(App.ViewModel.stream.channel.name, App.ViewModel.user);
-                    isFollowed = true;
-                    this.FavoriteLabel.Text = "Unfollow";
-                    if (this.FavoriteButton.Opacity == .5)
-                        this.FavoriteButton.IsEnabled = true;
-                }
-            }
-        }
-
         protected override void OnOrientationChanged(OrientationChangedEventArgs e)
         {
             if ((e.Orientation == PageOrientation.Landscape || e.Orientation == PageOrientation.LandscapeLeft || e.Orientation == PageOrientation.LandscapeRight) || App.ViewModel.LockLandscape)
@@ -532,6 +450,13 @@ namespace TwitchTV
             ToggleUI();
 
             base.OnOrientationChanged(e);
+        }
+        #endregion
+
+        #region Chat
+        void chatGoToBottom_Tick(object sender, EventArgs e)
+        {
+            isScrolling = false;
         }
 
         private void SendMessageBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
@@ -737,5 +662,6 @@ namespace TwitchTV
                 JoinChatAndListen();
             }
         }
+        #endregion
     }
 }
