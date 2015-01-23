@@ -369,7 +369,7 @@ namespace TwitchTV
             Stream stream = (Stream)(sender as MenuItem).DataContext;
             ShellTile tile;
 
-            if ((sender as MenuItem).Header == "Pin to Start")
+            if ((sender as MenuItem).Header.ToString() == "Pin to Start")
             {
                 tile = FindTile(stream.channel.name);
 
@@ -378,10 +378,10 @@ namespace TwitchTV
                     StandardTileData tileData = new StandardTileData
                     {
                         Title = stream.channel.display_name,
-                        BackgroundImage = new Uri("/Images/logo.png", UriKind.Relative),
+                        BackgroundImage = new Uri("/Assets/logo.png", UriKind.Relative),
                     };
 
-                    string tileUri = string.Concat("/Screens/PlayerPage.xaml/", stream.channel.name);
+                    string tileUri = string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name);
                     ShellTile.Create(new Uri(tileUri, UriKind.Relative), tileData);
                 }
             }
@@ -394,6 +394,17 @@ namespace TwitchTV
                     tile.Delete();
                 }
             }
+        }
+
+        private void Pin_to_Start_Loaded(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+            ShellTile tile = FindTile(stream.channel.name);
+
+            if (tile == null)
+                (sender as MenuItem).Header = "Pin to Start";
+            else
+                (sender as MenuItem).Header = "Unpin from Start";
         }
 
         private ShellTile FindTile(string partOfUri)
