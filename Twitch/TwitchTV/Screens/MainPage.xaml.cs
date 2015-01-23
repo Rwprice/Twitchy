@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -340,11 +341,6 @@ namespace TwitchTV
             }
         }
 
-        private void Pin_to_Start_Click(object sender, RoutedEventArgs e)
-        {
-            Stream stream = (Stream)(sender as MenuItem).DataContext;
-        }
-
         private async void Follow_Loaded(object sender, RoutedEventArgs e)
         {
             if (App.ViewModel.user != null)
@@ -366,5 +362,47 @@ namespace TwitchTV
             ContextMenu conmen = (sender as ContextMenu);
             conmen.ClearValue(FrameworkElement.DataContextProperty);
         }
+
+        #region Secondary Tile
+        private void Pin_to_Start_Click(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+            ShellTile tile;
+
+            if ((sender as MenuItem).Header == "Pin to Start")
+            {
+                tile = FindTile(stream.channel.name);
+
+                if (tile == null)
+                {
+                    StandardTileData tileData = new StandardTileData
+                    {
+                        Title = stream.channel.display_name,
+                        BackgroundImage = new Uri("/Images/logo.png", UriKind.Relative),
+                    };
+
+                    string tileUri = string.Concat("/Screens/PlayerPage.xaml/", stream.channel.name);
+                    ShellTile.Create(new Uri(tileUri, UriKind.Relative), tileData);
+                }
+            }
+
+            else
+            {
+                tile = FindTile(stream.channel.name);
+                if (tile != null)
+                {
+                    tile.Delete();
+                }
+            }
+        }
+
+        private ShellTile FindTile(string partOfUri)
+        {
+            ShellTile shellTile = ShellTile.ActiveTiles.FirstOrDefault(
+                tile => tile.NavigationUri.ToString().Contains(partOfUri));
+
+            return shellTile;
+        }
+        #endregion
     }
 }

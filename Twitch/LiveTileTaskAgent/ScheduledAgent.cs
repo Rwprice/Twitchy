@@ -65,11 +65,17 @@ namespace LiveTileTaskAgent
                         StreamsList.Add(display_name);
                     }
 
-                    string content = string.Format("{0} is live now!", StreamsList[rand.Next(0, StreamsList.Count)]);
+                    string content = "No streams followed are live";
+
+                    if (StreamsList.Count > 0)
+                    {
+                        content = string.Format("{0} is live now!", StreamsList[rand.Next(0, StreamsList.Count)]);
+                    }
 
                     FlipTileData flipTileData = new FlipTileData()
                     {
                         BackContent = content,
+                        Count = StreamsList.Count
                     };
 
                     ShellTile appTile = ShellTile.ActiveTiles.First();
