@@ -44,7 +44,8 @@
                             <toolkit:MenuItem 
                                 Name="Pin_to_Start"  
                                 Header="Pin to Start"
-                                Click="Pin_to_Start_Click"/>
+                                Click="Pin_to_Start_Click"
+                                Loaded="Pin_to_Start_Loaded"/>
                         </toolkit:ContextMenu>
                     </toolkit:ContextMenuService.ContextMenu>
                     <Image Source="{Binding preview.small}" Width="130" Height="130"/>
