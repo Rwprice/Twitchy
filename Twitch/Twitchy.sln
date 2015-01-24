@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchAPIHandler", "C:\src\Twitch-Windows-Phone-8\Twitch\Twitch\TwitchAPIHandler.csproj", "{A117E9E7-F939-4B97-B69B-6DD45061DB86}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwitchAPIHandler", "Twitch\TwitchAPIHandler.csproj", "{A117E9E7-F939-4B97-B69B-6DD45061DB86}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twitchy", "TwitchTV\Twitchy.csproj", "{30B779BD-58C5-4929-BC9F-890F4460E09C}"
 EndProject
