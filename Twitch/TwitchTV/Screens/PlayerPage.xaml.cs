@@ -76,8 +76,8 @@ namespace TwitchTV
             if(App.ViewModel.stream != null)
                 this.Status.Text = App.ViewModel.stream.channel.status;
 
-            if (!isLoggedIn)
-                this.ConnectToChatText.Text = "Log in to join chat";
+           // if (!isLoggedIn)
+             //   this.ConnectToChatText.Text = "Log in to join chat";
 
             uiTimeout = new DispatcherTimer();
             uiTimeout.Interval = new TimeSpan(0, 0, 4);
@@ -94,7 +94,7 @@ namespace TwitchTV
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if ((App.ViewModel.AutoJoinChat || rejoinChat) && isLoggedIn)
+            if ((App.ViewModel.AutoJoinChat || rejoinChat))
             {
                 JoinChatAndListen();
             }
@@ -520,14 +520,29 @@ namespace TwitchTV
                 ChatList.Add(new ChatLine { Message = "Connecting to chat...", UserName = "", Color = "#ffffff" });
                 this.ChatBox.ItemsSource = this.ChatList;
 
-                IRCConfig config = new IRCConfig
+                IRCConfig config;
+                if (isLoggedIn)
                 {
-                    channel = App.ViewModel.stream.channel.name,
-                    nick = App.ViewModel.user.Name,
-                    pass = "oauth:" + App.ViewModel.user.Oauth,
-                    server = "irc.twitch.tv",
-                    port = 6667
-                };
+                    config = new IRCConfig
+                    {
+                        channel = App.ViewModel.stream.channel.name,
+                        nick = App.ViewModel.user.Name,
+                        pass = "oauth:" + App.ViewModel.user.Oauth,
+                        server = "irc.twitch.tv",
+                        port = 6667
+                    };
+                }
+                else
+                {
+                    config = new IRCConfig
+                    {
+                        channel = App.ViewModel.stream.channel.name,
+                        nick = "justinfan"+random.Next(0,999999)+random.Next(0,99999999),
+                        pass = "NoPasswordNeeded",
+                        server = "irc.twitch.tv",
+                        port = 6667
+                    };
+                }
 
                 client = new ChatClient(config);
                 client.sendData("JOIN", "#" + config.channel);
@@ -624,6 +639,7 @@ namespace TwitchTV
 
         public void ScrollIfAtBottom()
         {
+          
             if (scrollViewer == null)
             {
                 scrollViewer = FindScrollViewer(this.ChatBox);
@@ -633,13 +649,21 @@ namespace TwitchTV
             if (!isScrolling)
             {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.ExtentHeight);
+                
             }
+          
+
+            
         }
 
         void scrollViewer_ManipulationStarted(object sender, System.Windows.Input.ManipulationStartedEventArgs e)
         {
             isScrolling = true;
             chatGoToBottom.Start();
+
+            
+
+            
         }
 
         static ScrollViewer FindScrollViewer(DependencyObject parent)
@@ -657,10 +681,7 @@ namespace TwitchTV
 
         private void ConnectToChat_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            if (isLoggedIn)
-            {
-                JoinChatAndListen();
-            }
+            JoinChatAndListen();
         }
         #endregion
     }
