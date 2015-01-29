@@ -296,6 +296,8 @@ namespace TwitchTV
                 }
             }
 
+
+
             lastUpdate = DateTime.Now;
         }
 

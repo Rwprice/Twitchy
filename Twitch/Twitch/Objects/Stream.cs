@@ -93,6 +93,42 @@ namespace TwitchAPIHandler.Objects
             }
         }
 
+        public static async Task<Stream> GetStream(string streamName)
+        {
+            Uri path = new Uri(string.Format(PathStrings.GET_STREAM, streamName));
+            var request = HttpWebRequest.Create(path);
+            request.Method = "GET";
+            try
+            {
+                var response = await HttpRequest(request);
+                JToken o = JObject.Parse(response);
+                JToken stream = o.SelectToken("stream");
+
+                var streamToReturn = new Stream()
+                {
+                    viewers = int.Parse(stream.SelectToken("viewers").ToString()),
+                    preview = new Preview
+                    {
+                        small = new BitmapImage(new Uri(stream.SelectToken("preview").SelectToken("small").ToString())),
+                        medium = new BitmapImage(new Uri(stream.SelectToken("preview").SelectToken("medium").ToString()))
+                    },
+                    channel = new Channel
+                    {
+                        display_name = stream.SelectToken("channel").SelectToken("display_name").ToString(),
+                        name = stream.SelectToken("channel").SelectToken("name").ToString(),
+                        status = stream.SelectToken("channel").SelectToken("status").ToString()
+                    }
+                };
+                
+                return streamToReturn;
+            }
+
+            catch
+            {
+                return new Stream();
+            }
+        }
+
         private static async Task<string> HttpRequest(WebRequest request)
         {
             string received = "";

@@ -106,6 +106,15 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/{0}.
+        /// </summary>
+        internal static string GET_STREAM {
+            get {
+                return ResourceManager.GetString("GET_STREAM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://api.twitch.tv/kraken/user?oauth_token={0}.
         /// </summary>
         internal static string GET_USER_PATH {

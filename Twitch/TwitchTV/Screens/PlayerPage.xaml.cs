@@ -30,7 +30,6 @@ namespace TwitchTV
         public string quality { get; set; }
 
         public bool isFollowed = false;
-        public bool firstRun = true;
         public bool isScrolling = false;
         public bool chatJoined = false;
         public bool isLoggedIn = false;
@@ -57,24 +56,9 @@ namespace TwitchTV
 
         public PlayerPage()
         {
-            isLoggedIn = App.ViewModel.user != null;
-
             token = new AccessToken();
             playlist = new M3U8Playlist();
             InitializeComponent();
-
-            if (App.ViewModel.LockLandscape)
-            {
-                this.TaskBar.Opacity = 0;
-                this.Status.Opacity = 0;
-                this.QualitySelection.Opacity = 0;
-                this.FavoriteButton.Opacity = 0;
-                this.FavoriteLabel.Opacity = 0;
-                this.SupportedOrientations = SupportedPageOrientation.Landscape;
-            }
-            
-            if(App.ViewModel.stream != null)
-                this.Status.Text = App.ViewModel.stream.channel.status;
 
             uiTimeout = new DispatcherTimer();
             uiTimeout.Interval = new TimeSpan(0, 0, 4);
@@ -91,6 +75,25 @@ namespace TwitchTV
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            if (e.Uri.OriginalString.Contains('?'))
+            {
+                var streamName = e.Uri.OriginalString.Substring(e.Uri.OriginalString.IndexOf('?') + 1);
+                LoadSettingsAndStream(streamName);
+            }
+
+            isLoggedIn = App.ViewModel.user != null;
+            this.Status.Text = App.ViewModel.stream.channel.status;
+
+            if (App.ViewModel.LockLandscape)
+            {
+                this.TaskBar.Opacity = 0;
+                this.Status.Opacity = 0;
+                this.QualitySelection.Opacity = 0;
+                this.FavoriteButton.Opacity = 0;
+                this.FavoriteLabel.Opacity = 0;
+                this.SupportedOrientations = SupportedPageOrientation.Landscape;
+            }
+
             if ((App.ViewModel.AutoJoinChat || rejoinChat))
             {
                 JoinChatAndListen();
@@ -110,7 +113,11 @@ namespace TwitchTV
                 mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
             }
 
-            GetQualities();
+            if (quality == null)
+                GetQualities();
+
+            else
+                playVideo();
             base.OnNavigatedTo(e);
         }
 
@@ -127,9 +134,30 @@ namespace TwitchTV
 
         //Method to Update UI when navigating directly
         //to the player plage from the home screen
-        private void LoadSettingsAndStream()
+        private async void LoadSettingsAndStream(string streamName)
         {
+            App.ViewModel.LoadSettings();
 
+            if (App.ViewModel.stream == null)
+            {
+                App.ViewModel.stream = new Stream() { channel = new Channel() { name = streamName } };
+
+                //Load stream
+                App.ViewModel.stream = await Stream.GetStream(streamName);
+                this.Status.Text = App.ViewModel.stream.channel.status;
+            }
+
+            if (App.ViewModel.user == null)
+            {
+                var user = await User.TryLoadUser();
+                if (user != null)
+                {
+                    App.ViewModel.user = user;
+                    isLoggedIn = true;
+                }
+            }
+
+            IsFollowed(App.ViewModel.stream.channel.name);
         }
 
         #region Video Methods
@@ -231,7 +259,7 @@ namespace TwitchTV
 
         private void QualitySelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!firstRun)
+            if (quality != null) // Lowest hasn't been set yet
             {
                 var obj = (string)((ListPicker)(sender)).SelectedItem;
                 if (!string.IsNullOrEmpty(obj))
@@ -294,13 +322,13 @@ namespace TwitchTV
             }
         }
 
-        private async void GetQualities()
+        private async void IsFollowed(string streamName)
         {
-            try
+            if (isLoggedIn)
             {
-                if (isLoggedIn)
+                try
                 {
-                    isFollowed = await User.IsStreamFollowed(App.ViewModel.stream.channel.name, App.ViewModel.user);
+                    bool isFollowed = await User.IsStreamFollowed(streamName, App.ViewModel.user);
 
                     if (isFollowed)
                         this.FavoriteLabel.Text = "Unfollow";
@@ -308,19 +336,27 @@ namespace TwitchTV
                         this.FavoriteLabel.Text = "Follow";
                 }
 
-                if (firstRun)
+                catch (Exception ex)
                 {
-                    token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
-                    playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
-
-                    if (string.IsNullOrEmpty(quality))
-                        quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
-
-                    this.QualitySelection.ItemsSource = playlist.streams.Keys;
-                    this.QualitySelection.SelectedItem = quality;
+                    Debug.WriteLine("Couldn't load followed status: " + ex);
                 }
+            }
+        }
 
-                firstRun = false;
+        private async void GetQualities()
+        {
+            IsFollowed(App.ViewModel.stream.channel.name);
+
+            try
+            {
+                token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
+                playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
+                this.QualitySelection.ItemsSource = playlist.streams.Keys;
+
+                if (string.IsNullOrEmpty(quality))
+                    quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
+                
+                this.QualitySelection.SelectedItem = quality;
             }
 
             catch (Exception ex)
@@ -328,8 +364,6 @@ namespace TwitchTV
                 MessageBox.Show("Can't load the qualities list of this stream", "Well, this is embarrassing...", MessageBoxButton.OK);
                 Debug.WriteLine(ex.Message);
             }
-
-            playVideo();
         }
         #endregion
 
