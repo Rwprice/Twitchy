@@ -74,8 +74,7 @@ namespace LiveTileTaskAgent
 
                     FlipTileData flipTileData = new FlipTileData()
                     {
-                        BackContent = content,
-                        Count = StreamsList.Count
+                        BackContent = content
                     };
 
                     ShellTile appTile = ShellTile.ActiveTiles.First();

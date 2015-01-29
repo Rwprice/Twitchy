@@ -76,9 +76,6 @@ namespace TwitchTV
             if(App.ViewModel.stream != null)
                 this.Status.Text = App.ViewModel.stream.channel.status;
 
-           // if (!isLoggedIn)
-             //   this.ConnectToChatText.Text = "Log in to join chat";
-
             uiTimeout = new DispatcherTimer();
             uiTimeout.Interval = new TimeSpan(0, 0, 4);
             uiTimeout.Tick += uiTimeout_Tick;
@@ -126,6 +123,13 @@ namespace TwitchTV
             client = null;
 
             base.OnNavigatedFrom(e);
+        }
+
+        //Method to Update UI when navigating directly
+        //to the player plage from the home screen
+        private void LoadSettingsAndStream()
+        {
+
         }
 
         #region Video Methods
@@ -639,7 +643,6 @@ namespace TwitchTV
 
         public void ScrollIfAtBottom()
         {
-          
             if (scrollViewer == null)
             {
                 scrollViewer = FindScrollViewer(this.ChatBox);
@@ -649,21 +652,13 @@ namespace TwitchTV
             if (!isScrolling)
             {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.ExtentHeight);
-                
             }
-          
-
-            
         }
 
         void scrollViewer_ManipulationStarted(object sender, System.Windows.Input.ManipulationStartedEventArgs e)
         {
             isScrolling = true;
             chatGoToBottom.Start();
-
-            
-
-            
         }
 
         static ScrollViewer FindScrollViewer(DependencyObject parent)
