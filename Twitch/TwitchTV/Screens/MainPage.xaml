@@ -32,17 +32,14 @@
                     <toolkit:ContextMenuService.ContextMenu>
                         <toolkit:ContextMenu x:Name="ContextMenu" Unloaded="ContextMenu_Unloaded">
                             <toolkit:MenuItem 
-                                Name="Open"  
                                 Header="Open"
                                 Click="Open_Click"/>
                             <toolkit:MenuItem 
-                                Name="Follow"  
                                 Header="Follow"
                                 Click="Follow_Click"
                                 Loaded="Follow_Loaded"
                                 IsEnabled="False"/>
                             <toolkit:MenuItem 
-                                Name="Pin_to_Start"  
                                 Header="Pin to Start"
                                 Click="Pin_to_Start_Click"
                                 Loaded="Pin_to_Start_Loaded"/>
@@ -65,6 +62,33 @@
                     </StackPanel>
                 </StackPanel>
             </DataTemplate>
+            
+            <DataTemplate x:Name="FrontPageTemplate">
+                <StackPanel>
+                    <toolkit:ContextMenuService.ContextMenu>
+                        <toolkit:ContextMenu x:Name="ContextMenu" Unloaded="ContextMenu_Unloaded">
+                            <toolkit:MenuItem 
+                                Header="Open"
+                                Click="Open_Click"/>
+                            <toolkit:MenuItem 
+                                Header="Follow"
+                                Click="Follow_Click"
+                                Loaded="Follow_Loaded"
+                                IsEnabled="False"/>
+                            <toolkit:MenuItem 
+                                Header="Pin to Start"
+                                Click="Pin_to_Start_Click"
+                                Loaded="Pin_to_Start_Loaded"/>
+                        </toolkit:ContextMenu>
+                    </toolkit:ContextMenuService.ContextMenu>
+                    <Canvas Height="200" Width="320" Margin="12,0,0,0">
+                        <Border Height="200" Width="320" Background="Black"/>
+                        <Image Source="{Binding preview.medium}" Margin="0,30,0,0"/>
+                        <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
+                        <TextBlock Text="{Binding channel.display_name}"/>
+                    </Canvas>
+                </StackPanel>
+            </DataTemplate>
 
         </Grid.Resources>
 
@@ -75,71 +99,21 @@
             </phone:Panorama.Background>
 
             <!--Front Page-->
-            <phone:PanoramaItem Header="Featured Streams" Orientation="Horizontal">
-                <!--Double wide Panorama with large image placeholders-->
-                <Grid x:Name="FeaturedStreams">
-                    <StackPanel Margin="0,4,16,0" Orientation="Vertical" VerticalAlignment="Top">
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                            <Canvas x:Name="FP0" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Border Height="200" Width="320" Background="Black"/>
-                                <Image x:Name="FP0Image"/>
-                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock x:Name="FP0Text" Text="Loading..."/>
-                            </Canvas>
-                            <Canvas x:Name="FP2" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Border Height="200" Width="320" Background="Black"/>
-                                <Image x:Name="FP2Image"/>
-                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock x:Name="FP2Text" Text="Loading..."/>
-                            </Canvas>
-                            <Canvas x:Name="FP4" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Border Height="200" Width="320" Background="Black"/>
-                                <Image x:Name="FP4Image"/>
-                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock x:Name="FP4Text" Text="Loading..."/>
-                            </Canvas>
-                            <Canvas x:Name="FP6" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Border Height="200" Width="320" Background="Black"/>
-                                <Image x:Name="FP6Image"/>
-                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock x:Name="FP6Text" Text="Loading..."/>
-                            </Canvas>
-                        </StackPanel>
-                        <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="0,12,0,0">
-                            <Canvas x:Name="FP1" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Border Height="200" Width="320" Background="Black"/>
-                                <Image x:Name="FP1Image" />
-                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock x:Name="FP1Text" Text="Loading..."/>
-                            </Canvas>
-                            <Canvas x:Name="FP3" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Border Height="200" Width="320" Background="Black"/>
-                                <Image x:Name="FP3Image"/>
-                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock x:Name="FP3Text" Text="Loading..."/>
-                            </Canvas>
-                            <Canvas x:Name="FP5" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Border Height="200" Width="320" Background="Black"/>
-                                <Image x:Name="FP5Image"/>
-                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock x:Name="FP5Text" Text="Loading..."/>
-                            </Canvas>
-                            <Canvas x:Name="FP7" Height="200" Width="320" Tap="FrontPageIconTapped" Margin="12,0,0,0">
-                                <Border Height="200" Width="320" Background="Black"/>
-                                <Image x:Name="FP7Image"/>
-                                <Border Height="30" Width="320" Background="DarkGray" Opacity=".6"/>
-                                <TextBlock x:Name="FP7Text" Text="Loading..."/>
-                            </Canvas>
-                        </StackPanel>
-                    </StackPanel>
-                </Grid>
+            <phone:PanoramaItem Header="Featured Streams" Orientation="Horizontal" Width="1450" >
+                <phone:LongListSelector x:Name="FeaturedStreams"
+					                    ItemTemplate="{StaticResource FrontPageTemplate}"
+					                    SelectionChanged="StreamsList_SelectionChanged"
+                                        LayoutMode="Grid"
+                                        GridCellSize="340, 220"
+                                        ScrollViewer.ManipulationMode="System">
+                </phone:LongListSelector>
             </phone:PanoramaItem>
 
             <!--Top Streams-->
             <phone:PanoramaItem Header="Top Streams" Orientation="Vertical">
                 <phone:LongListSelector x:Name="TopStreamsList"
 					ItemTemplate="{StaticResource TopStreamsTemplate}"
-					SelectionChanged="TopStreamsList_SelectionChanged"/>
+					SelectionChanged="StreamsList_SelectionChanged"/>
             </phone:PanoramaItem>
 
             <!--Top Games-->
@@ -153,7 +127,7 @@
             <phone:PanoramaItem Header="Following" Orientation="Vertical">
                 <phone:LongListSelector x:Name="FollowedStreamsList"
 					ItemTemplate="{StaticResource TopStreamsTemplate}"
-					SelectionChanged="FollowedStreamsList_SelectionChanged"/>
+					SelectionChanged="StreamsList_SelectionChanged"/>
             </phone:PanoramaItem>
 
             <!--Settings-->

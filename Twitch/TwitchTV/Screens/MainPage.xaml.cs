@@ -37,8 +37,6 @@ namespace TwitchTV
         public bool isNetwork { get; set; }
         private bool alreadyLoadedFromToken = false;
         private DateTime lastUpdate { get; set; }
-
-        PeriodicTask periodicTask;
         private static string liveTileTaskName = "LiveTileTask";
 
         public MainPage()
@@ -72,16 +70,12 @@ namespace TwitchTV
         {
             try
             {
-                TopStreamsList.SelectedItem = null;
-                TopGamesList.SelectedItem = null;
-                FollowedStreamsList.SelectedItem = null;
                 App.ViewModel.curTopGame = null;
 
                 TopStreamsList.ItemsSource = _topStreamsViewModel.StreamList;
                 TopGamesList.ItemsSource = _topGamesViewModel.GamesList;
                 FollowedStreamsList.ItemsSource = _followedViewModel.StreamList;
-
-                _featuredViewModel.PropertyChanged += FeaturedStreams_PropertyChanged;
+                FeaturedStreams.ItemsSource = _featuredViewModel.StreamList;
 
                 var progressIndicator = SystemTray.ProgressIndicator;
                 if (progressIndicator != null)
@@ -172,30 +166,6 @@ namespace TwitchTV
             Debug.WriteLine(e.Error.Message);
         }
 
-        void FeaturedStreams_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            Image image;
-            TextBlock text;
-            for (int i = 0; i < _featuredViewModel.StreamList.Count; i++)
-            {
-                image = (Image)this.FeaturedStreams.FindName("FP" + i + "Image");
-                image.Source = _featuredViewModel.StreamList[i].preview.medium;
-                text = (TextBlock)this.FeaturedStreams.FindName("FP" + i + "Text");
-                text.Text = _featuredViewModel.StreamList[i].channel.display_name;
-            }
-        }
-
-        private void FrontPageIconTapped(object sender, System.Windows.Input.GestureEventArgs e)
-        {
-            try
-            {
-                int index = int.Parse(((Canvas)sender).Name.Remove(0, 2));
-                App.ViewModel.stream = _featuredViewModel.StreamList[index];
-                NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
-            }
-            catch { }
-        }
-
         private void SettingTapped(object sender, System.Windows.Input.GestureEventArgs e)
         {
             if((((TextBlock)sender).Text) != "Logout")
@@ -223,7 +193,7 @@ namespace TwitchTV
             }
         }
 
-        private void TopStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void StreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (((Stream)((LongListSelector)sender).SelectedItem) != null)
             {
@@ -238,15 +208,6 @@ namespace TwitchTV
             {
                 App.ViewModel.curTopGame = ((TopGame)((LongListSelector)sender).SelectedItem);
                 NavigationService.Navigate(new Uri("/Screens/TopGamePage.xaml", UriKind.RelativeOrAbsolute));
-            }
-        }
-
-        private void FollowedStreamsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (((Stream)((LongListSelector)sender).SelectedItem) != null)
-            {
-                App.ViewModel.stream = ((Stream)((LongListSelector)sender).SelectedItem);
-                NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
 
@@ -350,7 +311,7 @@ namespace TwitchTV
 
         private async void Follow_Loaded(object sender, RoutedEventArgs e)
         {
-            //if (App.ViewModel.user != null)
+            if (App.ViewModel.user != null)
             {
                 var menuItem = sender as MenuItem;
                 var contextMenu = menuItem.Parent as ContextMenu;
