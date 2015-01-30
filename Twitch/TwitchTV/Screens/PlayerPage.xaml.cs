@@ -144,6 +144,13 @@ namespace TwitchTV
 
                 //Load stream
                 App.ViewModel.stream = await Stream.GetStream(streamName);
+
+                if (App.ViewModel.stream.channel == null)
+                {
+                    MessageBox.Show("This Stream appears to be offline!");
+                    Application.Current.Terminate();
+                }
+
                 this.Status.Text = App.ViewModel.stream.channel.status;
             }
 
@@ -351,6 +358,12 @@ namespace TwitchTV
             {
                 token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
                 playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
+                if(playlist == null)
+                {
+                    MessageBox.Show("This Stream appears to be offline!");
+                    Application.Current.Terminate();
+                }
+
                 this.QualitySelection.ItemsSource = playlist.streams.Keys;
 
                 if (string.IsNullOrEmpty(quality))

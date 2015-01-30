@@ -21,6 +21,9 @@ namespace TwitchAPIHandler.Objects
             request.Method = "GET";
             var response = await HttpRequest(request);
 
+            if (response == null)
+                return null;
+
             return new M3U8Playlist
             {
                 streams = GetStreamsFromM3U8(response)
@@ -29,21 +32,27 @@ namespace TwitchAPIHandler.Objects
 
         private static async Task<string> HttpRequest(WebRequest request)
         {
-            string received = "";
-
-            using (var response = (HttpWebResponse)(await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null)))
+            try
             {
-                using (var responseStream = response.GetResponseStream())
+                string received = "";
+
+                using (var response = (HttpWebResponse)(await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null)))
                 {
-                    using (var sr = new StreamReader(responseStream))
+                    using (var responseStream = response.GetResponseStream())
                     {
-                        received = await sr.ReadToEndAsync();
+                        using (var sr = new StreamReader(responseStream))
+                        {
+                            received = await sr.ReadToEndAsync();
+                        }
                     }
                 }
+                return received;
             }
-
-
-            return received;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return null;
+            }
         }
 
         private static Dictionary<string, Uri> GetStreamsFromM3U8(string fileContent)
