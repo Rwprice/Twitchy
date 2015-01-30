@@ -71,27 +71,7 @@ namespace TwitchAPIHandler.Objects
         public static string TOP_STREAMS_PATH = PathStrings.TOP_STREAMS_PATH;
         public static string GET_FOLLOWED_STREAMS = PathStrings.GET_FOLLOWED_STREAMS;
         public static string GET_ALL_FOLLOWED_STREAMS = PathStrings.GET_ALL_FOLLOWED_STREAMS;
-
-        public static async Task<ObservableCollection<Stream>> GetFeaturedStreams()
-        {
-            Uri front_page_streams_path = new Uri(PathStrings.FRONT_PAGE_STREAMS_PATH);
-            var request = HttpWebRequest.Create(front_page_streams_path);
-            request.Method = "GET";
-            try
-            {
-                var response = await HttpRequest(request);
-                var streams = JsonToFeaturedStreamsList(response);
-                var streamsToReturn = new ObservableCollection<Stream>();
-                foreach (var stream in streams)
-                    streamsToReturn.Add(stream);
-                return streamsToReturn;
-            }
-
-            catch
-            {
-                return new ObservableCollection<Stream>();
-            }
-        }
+        public static string FRONT_PAGE_STREAMS_PATH = PathStrings.FRONT_PAGE_STREAMS_PATH;
 
         public static async Task<Stream> GetStream(string streamName)
         {
@@ -104,22 +84,41 @@ namespace TwitchAPIHandler.Objects
                 JToken o = JObject.Parse(response);
                 JToken stream = o.SelectToken("stream");
 
+                var channel = new Channel();
+
+                var viewers = int.Parse(stream.SelectToken("viewers").ToString());
+                var display_name = stream.SelectToken("channel").SelectToken("display_name").ToString();
+                var name = stream.SelectToken("channel").SelectToken("name").ToString();
+                var status = "";
+                var logo = stream.SelectToken("channel").SelectToken("logo").ToString();
+
+                try
+                {
+                    status = stream.SelectToken("channel").SelectToken("status").ToString();
+                }
+
+                catch (Exception ex)
+                {
+                    if (status == "")
+                    {
+                        status = display_name;
+                    }
+                }
+
+                channel = new Channel
+                {
+                    display_name = display_name,
+                    name = name,
+                    status = status,
+                    logoUri = logo
+                };
+
                 var streamToReturn = new Stream()
                 {
-                    viewers = int.Parse(stream.SelectToken("viewers").ToString()),
-                    preview = new Preview
-                    {
-                        small = new BitmapImage(new Uri(stream.SelectToken("preview").SelectToken("small").ToString())),
-                        medium = new BitmapImage(new Uri(stream.SelectToken("preview").SelectToken("medium").ToString()))
-                    },
-                    channel = new Channel
-                    {
-                        display_name = stream.SelectToken("channel").SelectToken("display_name").ToString(),
-                        name = stream.SelectToken("channel").SelectToken("name").ToString(),
-                        status = stream.SelectToken("channel").SelectToken("status").ToString()
-                    }
+                    channel = channel,
+                    viewers = viewers
                 };
-                
+
                 return streamToReturn;
             }
 
@@ -147,35 +146,6 @@ namespace TwitchAPIHandler.Objects
             return received;
         }
 
-        public static List<Stream> JsonToFeaturedStreamsList(string json)
-        {
-            List<Stream> featuredStreams = new List<Stream>();
-            JToken o = JObject.Parse(json);
-            JArray featured = JArray.Parse(o.SelectToken("featured").ToString());
-
-            foreach (var arrayValue in featured)
-            {
-                JToken stream = arrayValue.SelectToken("stream");
-                featuredStreams.Add(new Stream()
-                {
-                    viewers = int.Parse(stream.SelectToken("viewers").ToString()),
-                    preview = new Preview
-                    {
-                        small = new BitmapImage(new Uri(stream.SelectToken("preview").SelectToken("small").ToString())),
-                        medium = new BitmapImage(new Uri(stream.SelectToken("preview").SelectToken("medium").ToString()))
-                    },
-                    channel = new Channel
-                    {
-                        display_name = stream.SelectToken("channel").SelectToken("display_name").ToString(),
-                        name = stream.SelectToken("channel").SelectToken("name").ToString(),
-                        status = stream.SelectToken("channel").SelectToken("status").ToString()
-                    }
-                });
-            }
-
-            return featuredStreams;
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String propertyName)
         {
@@ -198,5 +168,6 @@ namespace TwitchAPIHandler.Objects
         public string status { get; set; }
         public string display_name { get; set; }
         public string name { get; set; }
+        public string logoUri { get; set; }
     }
 }

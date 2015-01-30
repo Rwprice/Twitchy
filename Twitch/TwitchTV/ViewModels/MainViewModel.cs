@@ -14,69 +14,17 @@ namespace TwitchTV.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        /// <summary>
-        /// Place holder for the stream while switching screens
-        /// </summary>
         public Stream stream { get; set; }
-
-        /// <summary>
-        /// Place holder for the chosen top game while switching screens
-        /// </summary>
         public TopGame curTopGame { get; set; }
-
-        /// <summary>
-        /// Timestamp of the last update of the main menu streams
-        /// </summary>
         public User user { get; set; }
 
         public bool AutoJoinChat = false;
         public bool LockLandscape = false;
         public bool LiveTilesEnabled = false;
 
-        /// <summary>
-        /// Featured Streams
-        /// </summary>
-        private ObservableCollection<Stream> _FeaturedStreams;
-        public ObservableCollection<Stream> FeaturedStreams
-        {
-            get
-            {
-                return _FeaturedStreams;
-            }
-            set
-            {
-                if (value != _FeaturedStreams)
-                {
-                    _FeaturedStreams = value;
-                    NotifyPropertyChanged("FeaturedStreams");
-                }
-            }
-        }
-
         public MainViewModel()
         {
 
-        }
-
-        public bool IsDataLoaded
-        {
-            get;
-            private set;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String propertyName)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (null != handler)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        public async void LoadData()
-        {
-            this.FeaturedStreams = await Stream.GetFeaturedStreams();
         }
 
         public async void SaveSettings()
@@ -122,5 +70,7 @@ namespace TwitchTV.ViewModels
 
             catch { }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

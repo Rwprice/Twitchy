@@ -102,6 +102,7 @@ namespace Twitchy.ViewModels
                                 var display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
                                 var name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
                                 var status = "";
+                                var logo = arrayValue.SelectToken("channel").SelectToken("logo").ToString();
 
                                 try
                                 {
@@ -141,7 +142,8 @@ namespace Twitchy.ViewModels
                                 {
                                     display_name = display_name,
                                     name = name,
-                                    status = status
+                                    status = status,
+                                    logoUri = logo
                                 };
 
                                 StreamList.Add(new TwitchAPIHandler.Objects.Stream()

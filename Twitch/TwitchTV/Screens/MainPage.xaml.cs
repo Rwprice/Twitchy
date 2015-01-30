@@ -32,9 +32,14 @@ namespace TwitchTV
         private int _followedOffsetKnob = 1;
         FollowedStreamsViewModel _followedViewModel;
 
+        FeaturedStreamsViewModel _featuredViewModel;
+
         public bool isNetwork { get; set; }
         private bool alreadyLoadedFromToken = false;
         private DateTime lastUpdate { get; set; }
+
+        PeriodicTask periodicTask;
+        private static string liveTileTaskName = "LiveTileTask";
 
         public MainPage()
         {
@@ -50,11 +55,11 @@ namespace TwitchTV
             this.FrontPageAd.ErrorOccurred += FrontPageAd_ErrorOccurred;
 
             App.ViewModel.LoadSettings();
-            App.ViewModel.PropertyChanged += ViewModel_PropertyChanged;
 
             _topStreamsViewModel = new TopStreamsViewModel();
             _topGamesViewModel = new TopGamesViewModel();
             _followedViewModel = new FollowedStreamsViewModel();
+            _featuredViewModel = new FeaturedStreamsViewModel();
 
             TopStreamsList.ItemRealized += topStreamsList_ItemRealized;
             TopGamesList.ItemRealized += topGamesList_ItemRealized;
@@ -76,6 +81,8 @@ namespace TwitchTV
                 TopGamesList.ItemsSource = _topGamesViewModel.GamesList;
                 FollowedStreamsList.ItemsSource = _followedViewModel.StreamList;
 
+                _featuredViewModel.PropertyChanged += FeaturedStreams_PropertyChanged;
+
                 var progressIndicator = SystemTray.ProgressIndicator;
                 if (progressIndicator != null)
                 {
@@ -95,6 +102,8 @@ namespace TwitchTV
                     progressIndicator, ProgressIndicator.IsIndeterminateProperty, binding);
 
                 progressIndicator.Text = "Loading...";
+
+                StartPeriodicAgent(liveTileTaskName);
             }
 
             catch (Exception ex)
@@ -163,19 +172,16 @@ namespace TwitchTV
             Debug.WriteLine(e.Error.Message);
         }
 
-        void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void FeaturedStreams_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "FeaturedStreams")
+            Image image;
+            TextBlock text;
+            for (int i = 0; i < _featuredViewModel.StreamList.Count; i++)
             {
-                Image image;
-                TextBlock text;
-                for (int i = 0; i < App.ViewModel.FeaturedStreams.Count; i++)
-                {
-                    image = (Image)this.FeaturedStreams.FindName("FP" + i + "Image");
-                    image.Source = App.ViewModel.FeaturedStreams[i].preview.medium;
-                    text = (TextBlock)this.FeaturedStreams.FindName("FP" + i + "Text");
-                    text.Text = App.ViewModel.FeaturedStreams[i].channel.display_name;
-                }
+                image = (Image)this.FeaturedStreams.FindName("FP" + i + "Image");
+                image.Source = _featuredViewModel.StreamList[i].preview.medium;
+                text = (TextBlock)this.FeaturedStreams.FindName("FP" + i + "Text");
+                text.Text = _featuredViewModel.StreamList[i].channel.display_name;
             }
         }
 
@@ -184,7 +190,7 @@ namespace TwitchTV
             try
             {
                 int index = int.Parse(((Canvas)sender).Name.Remove(0, 2));
-                App.ViewModel.stream = App.ViewModel.FeaturedStreams[index];
+                App.ViewModel.stream = _featuredViewModel.StreamList[index];
                 NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
             catch { }
@@ -259,7 +265,6 @@ namespace TwitchTV
             if (isNetwork)
             {
                 lastUpdate = DateTime.MinValue;
-                App.ViewModel.LoadData();
 
                 _topStreamsViewModel.ClearList();
                 _topStreamsPageNumber = 0;
@@ -275,6 +280,8 @@ namespace TwitchTV
                 _followedPageNumber = 0;
                 _followedOffsetKnob = 1;
 
+                _featuredViewModel.ClearList();
+                _featuredViewModel.LoadPage();
 
                 if (App.ViewModel.user == null)
                 {
@@ -295,8 +302,6 @@ namespace TwitchTV
                     alreadyLoadedFromToken = true;
                 }
             }
-
-
 
             lastUpdate = DateTime.Now;
         }
@@ -345,7 +350,7 @@ namespace TwitchTV
 
         private async void Follow_Loaded(object sender, RoutedEventArgs e)
         {
-            if (App.ViewModel.user != null)
+            //if (App.ViewModel.user != null)
             {
                 var menuItem = sender as MenuItem;
                 var contextMenu = menuItem.Parent as ContextMenu;
@@ -379,8 +384,8 @@ namespace TwitchTV
                 {
                     StandardTileData tileData = new StandardTileData
                     {
-                        Title = stream.channel.display_name,
-                        BackgroundImage = new Uri("/Assets/logo.png", UriKind.Relative),
+                        BackContent = stream.channel.display_name,
+                        BackgroundImage = new Uri(stream.channel.logoUri),
                     };
 
                     string tileUri = string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name);
@@ -415,6 +420,43 @@ namespace TwitchTV
                 tile => tile.NavigationUri.ToString().Contains(partOfUri));
 
             return shellTile;
+        }
+
+        private void StartPeriodicAgent(string name)
+        {
+            try
+            {
+                if (ScheduledActionService.Find(name) != null)
+                {
+                    //if the agent exists, remove and then add it to ensure
+                    //the agent's schedule is updated to avoid expiration
+                    RemoveAgent(name);
+                }
+
+                PeriodicTask periodicTask = new PeriodicTask(name);
+                periodicTask.Description = (App.ViewModel.user != null && App.ViewModel.LiveTilesEnabled) ? App.ViewModel.user.Oauth : "No OAuth to use";
+                ScheduledActionService.Add(periodicTask);
+
+                #if DEBUG
+                ScheduledActionService.LaunchForTest(name, TimeSpan.FromSeconds(10));
+                #endif
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+            }
+        }
+
+        private void RemoveAgent(string name)
+        {
+            try
+            {
+                ScheduledActionService.Remove(name);
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception);
+            }
         }
         #endregion
     }

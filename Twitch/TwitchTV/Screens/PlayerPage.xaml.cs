@@ -34,7 +34,7 @@ namespace TwitchTV
         public bool chatJoined = false;
         public bool isLoggedIn = false;
         public bool rejoinChat = false;
-        #endregion
+        
 
         #region Video
         IMediaStreamFacade _mediaStreamFacade;
@@ -52,6 +52,7 @@ namespace TwitchTV
         public static Random random = new Random();
         ScrollViewer scrollViewer;
         BackgroundWorker backgroundWorker = new BackgroundWorker();
+        #endregion
         #endregion
 
         public PlayerPage()

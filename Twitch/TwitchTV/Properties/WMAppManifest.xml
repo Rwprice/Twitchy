@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
   <DefaultLanguage xmlns="" code="en-US" />
-  <App xmlns="" ProductID="{30b779bd-58c5-4929-bc9f-890f4460e09c}" Title="Twitchy" RuntimeType="Silverlight" Version="2.0.2.0" Genre="apps.normal" Author="Ryan Price" Description="Watch live video game streams from TwitchTV" Publisher="Earthquake Unicorn Productions" PublisherID="{3f927707-aac9-49f1-acba-8dade4d1b4fc}">
+  <App xmlns="" ProductID="{30b779bd-58c5-4929-bc9f-890f4460e09c}" Title="Twitchy" RuntimeType="Silverlight" Version="3.0.0.0" Genre="apps.normal" Author="Ryan Price" Description="Watch live video game streams from TwitchTV" Publisher="Earthquake Unicorn Productions" PublisherID="{3f927707-aac9-49f1-acba-8dade4d1b4fc}">
     <IconPath IsRelative="true" IsResource="false">Assets\logo.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />
@@ -21,28 +21,31 @@
     </Tasks>
     <Tokens>
       <PrimaryToken TokenID="TwitchTVToken" TaskName="_default">
-        <TemplateFlip>
+        <TemplateIconic>
           <SmallImageURI IsRelative="true" IsResource="false">Assets\logo.png</SmallImageURI>
           <Count>0</Count>
-          <BackgroundImageURI IsRelative="true" IsResource="false">Assets\logo.png</BackgroundImageURI>
+          <IconImageURI IsRelative="true" IsResource="false">Assets\logo.png</IconImageURI>
           <Title>Twitchy</Title>
-          <BackContent>
-          </BackContent>
-          <BackBackgroundImageURI>
-          </BackBackgroundImageURI>
-          <BackTitle>
-          </BackTitle>
-          <DeviceLockImageURI>
+          <Message>
+          </Message>
+          <BackgroundColor>
+          </BackgroundColor>
+          <HasLarge>True</HasLarge>
+          <LargeContent1>
+          </LargeContent1>
+          <LargeContent2>
+          </LargeContent2>
+          <LargeContent3>
+          </LargeContent3>
+          <DeviceLockImageURI IsRelative="true" IsResource="false">
           </DeviceLockImageURI>
-          <HasLarge>
-          </HasLarge>
-        </TemplateFlip>
+        </TemplateIconic>
       </PrimaryToken>
     </Tokens>
     <ScreenResolutions>
-      <ScreenResolution Name="ID_RESOLUTION_WVGA" />
-      <ScreenResolution Name="ID_RESOLUTION_WXGA" />
       <ScreenResolution Name="ID_RESOLUTION_HD720P" />
+      <ScreenResolution Name="ID_RESOLUTION_WXGA" />
+      <ScreenResolution Name="ID_RESOLUTION_WVGA" />
     </ScreenResolutions>
   </App>
 </Deployment>

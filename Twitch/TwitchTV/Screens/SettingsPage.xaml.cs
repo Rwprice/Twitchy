@@ -14,7 +14,7 @@ namespace TwitchTV
 {
     public partial class SettingsPage : PhoneApplicationPage
     {
-        private static string taskName = "UpdateLiveTileTask";
+        private static string liveTileTaskName = "LiveTileTask";
 
         public SettingsPage()
         {
@@ -64,28 +64,24 @@ namespace TwitchTV
 
                 try
                 {
-                    if (ScheduledActionService.Find(taskName) != null)
+                    if (ScheduledActionService.Find(liveTileTaskName) != null)
                     {
                         //if the agent exists, remove and then add it to ensure
                         //the agent's schedule is updated to avoid expiration
-                        ScheduledActionService.Remove(taskName);
+                        ScheduledActionService.Remove(liveTileTaskName);
                     }
 
-                    PeriodicTask periodicTask = new PeriodicTask(taskName);
+                    PeriodicTask periodicTask = new PeriodicTask(liveTileTaskName);
                     periodicTask.Description = App.ViewModel.user.Oauth;
                     ScheduledActionService.Add(periodicTask);
 
                     #if DEBUG
-                        ScheduledActionService.LaunchForTest(taskName, TimeSpan.FromSeconds(30));
+                    ScheduledActionService.LaunchForTest(liveTileTaskName, TimeSpan.FromSeconds(10));
                     #endif
                 }
-                catch (InvalidOperationException exception)
+                catch (Exception exception)
                 {
-                    MessageBox.Show(exception.Message);
-                }
-                catch (SchedulerServiceException schedulerException)
-                {
-                    MessageBox.Show(schedulerException.Message);
+                    Console.WriteLine(exception);
                 }
             }
         }
@@ -94,11 +90,26 @@ namespace TwitchTV
         {
             App.ViewModel.LiveTilesEnabled = false;
 
-            if (ScheduledActionService.Find(taskName) != null)
+            try
             {
-                //if the agent exists, remove and then add it to ensure
-                //the agent's schedule is updated to avoid expiration
-                ScheduledActionService.Remove(taskName);
+                if (ScheduledActionService.Find(liveTileTaskName) != null)
+                {
+                    //if the agent exists, remove and then add it to ensure
+                    //the agent's schedule is updated to avoid expiration
+                    ScheduledActionService.Remove(liveTileTaskName);
+                }
+
+                PeriodicTask periodicTask = new PeriodicTask(liveTileTaskName);
+                periodicTask.Description = "No OAuth to use";
+                ScheduledActionService.Add(periodicTask);
+
+                #if DEBUG
+                ScheduledActionService.LaunchForTest(liveTileTaskName, TimeSpan.FromSeconds(10));
+                #endif
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
             }
         }
     }
