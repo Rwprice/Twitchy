@@ -49,7 +49,7 @@ namespace LiveTileTaskAgent
                 {
                     if (task.Description != "No OAuth to use")
                     {
-                        LiveTileHelper.UpdateLiveTile(task.Description);
+                        await LiveTileHelper.UpdateLiveTile(task.Description);
                         await LiveTileHelper.UpdateSecondaryTiles();
                     }
 

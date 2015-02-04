@@ -20,9 +20,9 @@ namespace LiveTileTaskAgent
 {
     public class LiveTileHelper
     {
-        static string imageFolder = @"\Shared\ShellContent";
+        static string imageFolder = "shared\\shellcontent\\";
 
-        public async static void UpdateLiveTile(string oAuth)
+        public async static Task<bool> UpdateLiveTile(string oAuth)
         {
             var StreamsList = new List<TwitchAPIHandler.Objects.Stream>();
             string received = "";
@@ -87,6 +87,8 @@ namespace LiveTileTaskAgent
             }
 
             catch { }
+
+            return true;
         }
 
         public async static Task<bool> UpdateSecondaryTiles()
@@ -104,7 +106,7 @@ namespace LiveTileTaskAgent
                 StandardTileData tileData = new StandardTileData();
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    tileData.BackgroundImage = GetImagePath(stream.channel.name, streamLive);
+                    tileData.BackgroundImage = GetImagePath(streamName, streamLive);
                     tile.Update(tileData);
                 });
             }
@@ -189,15 +191,15 @@ namespace LiveTileTaskAgent
                 channelName = channelName + ".jpg";
 
             string filePath = System.IO.Path.Combine(imageFolder, channelName);
-            return new Uri(@"isostore" + filePath, UriKind.Absolute);
+            return new Uri("isostore:" + filePath, UriKind.RelativeOrAbsolute);
         }
 
         public static void DeleteImage(string channelName)
         {
             using (IsolatedStorageFile local = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                local.DeleteFile(channelName + ".jpg");
-                local.DeleteFile("live-" + channelName + ".jpg");
+                local.DeleteFile(System.IO.Path.Combine(imageFolder, channelName + ".jpg"));
+                local.DeleteFile(System.IO.Path.Combine(imageFolder, "live-" + channelName + ".jpg"));
             }
         }
     }
