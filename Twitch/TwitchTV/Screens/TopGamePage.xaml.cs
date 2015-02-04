@@ -81,6 +81,7 @@ namespace TwitchTV
             if (((Stream)((LongListSelector)sender).SelectedItem) != null)
             {
                 App.ViewModel.stream = ((Stream)((LongListSelector)sender).SelectedItem);
+                ((LongListSelector)sender).SelectedItem = null;
                 NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
