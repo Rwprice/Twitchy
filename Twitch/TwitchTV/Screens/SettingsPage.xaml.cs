@@ -9,6 +9,9 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using TwitchTV.Resources;
 using Microsoft.Phone.Scheduler;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using LiveTileTaskAgent;
 
 namespace TwitchTV
 {
@@ -61,6 +64,7 @@ namespace TwitchTV
             else
             {
                 App.ViewModel.LiveTilesEnabled = true;
+                LiveTileHelper.UpdateLiveTile(App.ViewModel.user.Oauth);
 
                 try
                 {
@@ -74,10 +78,6 @@ namespace TwitchTV
                     PeriodicTask periodicTask = new PeriodicTask(liveTileTaskName);
                     periodicTask.Description = App.ViewModel.user.Oauth;
                     ScheduledActionService.Add(periodicTask);
-
-                    #if DEBUG
-                    ScheduledActionService.LaunchForTest(liveTileTaskName, TimeSpan.FromSeconds(10));
-                    #endif
                 }
                 catch (Exception exception)
                 {

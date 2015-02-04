@@ -97,7 +97,7 @@ namespace TwitchAPIHandler.Objects
                     status = stream.SelectToken("channel").SelectToken("status").ToString();
                 }
 
-                catch (Exception ex)
+                catch
                 {
                     if (status == "")
                     {

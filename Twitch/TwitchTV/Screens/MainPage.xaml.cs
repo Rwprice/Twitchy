@@ -1,20 +1,18 @@
-﻿using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
+﻿#define DEBUG
+
+using LiveTileTaskAgent;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Net.NetworkInformation;
-using Microsoft.Phone.Shell;
-using TwitchAPIHandler.Objects;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using TwitchTV.ViewModels;
-using System.Windows.Data;
-using System.Threading.Tasks;
 using Microsoft.Phone.Scheduler;
+using Microsoft.Phone.Shell;
+using System;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Navigation;
+using TwitchAPIHandler.Objects;
+using TwitchTV.ViewModels;
 
 namespace TwitchTV
 {
@@ -96,8 +94,6 @@ namespace TwitchTV
                     progressIndicator, ProgressIndicator.IsIndeterminateProperty, binding);
 
                 progressIndicator.Text = "Loading...";
-
-                StartPeriodicAgent(liveTileTaskName);
             }
 
             catch (Exception ex)
@@ -123,7 +119,7 @@ namespace TwitchTV
                     {
                         if ((e.Container.Content as Stream).Equals(FollowedStreamsList.ItemsSource[FollowedStreamsList.ItemsSource.Count - _followedOffsetKnob]))
                         {
-                            Debug.WriteLine("Searching for {0}", _followedPageNumber);
+                            Debug.WriteLine("Searching for Followed Page {0}", _followedPageNumber);
                             _followedViewModel.LoadPage(App.ViewModel.user.Oauth, _followedPageNumber++);
                         }
                     }
@@ -139,7 +135,7 @@ namespace TwitchTV
                 {
                     if ((e.Container.Content as TopGame).Equals(TopGamesList.ItemsSource[TopGamesList.ItemsSource.Count - _topGamesOffsetKnob]))
                     {
-                        Debug.WriteLine("Searching for {0}", _topGamesPageNumber);
+                        Debug.WriteLine("Searching for Top Games Page {0}", _topGamesPageNumber);
                         _topGamesViewModel.LoadPage(_topGamesPageNumber++);
                     }
                 }
@@ -154,7 +150,7 @@ namespace TwitchTV
                 {
                     if ((e.Container.Content as Stream).Equals(TopStreamsList.ItemsSource[TopStreamsList.ItemsSource.Count - _topStreamsOffsetKnob]))
                     {
-                        Debug.WriteLine("Searching for {0}", _topStreamsPageNumber);
+                        Debug.WriteLine("Searching for Top Streams Page {0}", _topStreamsPageNumber);
                         _topStreamsViewModel.LoadPage(_topStreamsPageNumber++);
                     }
                 }
@@ -265,6 +261,8 @@ namespace TwitchTV
             }
 
             lastUpdate = DateTime.Now;
+
+            StartPeriodicAgent(liveTileTaskName);
         }
 
         private void TryRefresh()
@@ -331,7 +329,7 @@ namespace TwitchTV
             conmen.ClearValue(FrameworkElement.DataContextProperty);
         }
 
-        #region Secondary Tile
+        #region Live Tiles
         private void Pin_to_Start_Click(object sender, RoutedEventArgs e)
         {
             Stream stream = (Stream)(sender as MenuItem).DataContext;
@@ -339,27 +337,29 @@ namespace TwitchTV
 
             if ((sender as MenuItem).Header.ToString() == "Pin to Start")
             {
-                tile = FindTile(stream.channel.name);
+                tile = LiveTileHelper.FindTile(stream.channel.name);
 
                 if (tile == null)
                 {
                     StandardTileData tileData = new StandardTileData
                     {
-                        BackContent = stream.channel.display_name,
-                        BackgroundImage = new Uri(stream.channel.logoUri),
+                        BackgroundImage = new Uri(stream.channel.logoUri)
                     };
 
                     string tileUri = string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name);
                     ShellTile.Create(new Uri(tileUri, UriKind.Relative), tileData);
+
+                    LiveTileHelper.SaveTileImages(stream.channel.name, new Uri(stream.channel.logoUri));
                 }
             }
 
             else
             {
-                tile = FindTile(stream.channel.name);
+                tile = LiveTileHelper.FindTile(stream.channel.name);
                 if (tile != null)
                 {
                     tile.Delete();
+                    LiveTileHelper.DeleteImage(stream.channel.name);
                 }
             }
         }
@@ -367,20 +367,12 @@ namespace TwitchTV
         private void Pin_to_Start_Loaded(object sender, RoutedEventArgs e)
         {
             Stream stream = (Stream)(sender as MenuItem).DataContext;
-            ShellTile tile = FindTile(stream.channel.name);
+            ShellTile tile = LiveTileHelper.FindTile(stream.channel.name);
 
             if (tile == null)
                 (sender as MenuItem).Header = "Pin to Start";
             else
                 (sender as MenuItem).Header = "Unpin from Start";
-        }
-
-        private ShellTile FindTile(string partOfUri)
-        {
-            ShellTile shellTile = ShellTile.ActiveTiles.FirstOrDefault(
-                tile => tile.NavigationUri.ToString().Contains(partOfUri));
-
-            return shellTile;
         }
 
         private void StartPeriodicAgent(string name)
@@ -397,15 +389,15 @@ namespace TwitchTV
                 PeriodicTask periodicTask = new PeriodicTask(name);
                 periodicTask.Description = (App.ViewModel.user != null && App.ViewModel.LiveTilesEnabled) ? App.ViewModel.user.Oauth : "No OAuth to use";
                 ScheduledActionService.Add(periodicTask);
-
-                #if DEBUG
-                ScheduledActionService.LaunchForTest(name, TimeSpan.FromSeconds(10));
-                #endif
             }
             catch (Exception exception)
             {
                 Console.WriteLine(exception);
             }
+
+            #if DEBUG
+            ScheduledActionService.LaunchForTest(name, TimeSpan.FromSeconds(60));
+            #endif
         }
 
         private void RemoveAgent(string name)
