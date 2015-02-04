@@ -146,8 +146,8 @@ namespace LiveTileTaskAgent
         public static void SaveTileImages(string channelName, Uri image)
         {
             var bitmapImage = new BitmapImage() { CreateOptions = BitmapCreateOptions.None };
-            bitmapImage.ImageFailed += (s, e) => { };
-            bitmapImage.DownloadProgress += (s, e) => { };
+            bitmapImage.ImageFailed += (s, e) => 
+            { };
             bitmapImage.ImageOpened += (s, e) =>
             {
                 #region Create Image with Live Logo
