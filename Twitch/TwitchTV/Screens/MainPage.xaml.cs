@@ -346,10 +346,9 @@ namespace TwitchTV
                         BackgroundImage = new Uri(stream.channel.logoUri)
                     };
 
+                    LiveTileHelper.SaveTileImages(stream.channel.name, new Uri(stream.channel.logoUri));
                     string tileUri = string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name);
                     ShellTile.Create(new Uri(tileUri, UriKind.Relative), tileData);
-
-                    LiveTileHelper.SaveTileImages(stream.channel.name, new Uri(stream.channel.logoUri));
                 }
             }
 

@@ -106,8 +106,12 @@ namespace LiveTileTaskAgent
                 StandardTileData tileData = new StandardTileData();
                 Deployment.Current.Dispatcher.BeginInvoke(() =>
                 {
-                    tileData.BackgroundImage = GetImagePath(streamName, streamLive);
-                    tile.Update(tileData);
+                    var image = GetImagePath(streamName, streamLive);
+                    if (image != null)
+                    {
+                        tileData.BackgroundImage = image;
+                        tile.Update(tileData);
+                    }
                 });
             }
             return true;
@@ -165,9 +169,17 @@ namespace LiveTileTaskAgent
                     BitmapImage icon = new BitmapImage();
                     icon.CreateOptions = BitmapCreateOptions.None;
                     icon.UriSource = new Uri("/Assets/live_icon.png", UriKind.Relative);
-                    WriteableBitmap iconWB = new WriteableBitmap(bitmapImage);
+                    WriteableBitmap iconWB = new WriteableBitmap(icon);
 
-                    writeableBitmap.Blit(new Rect(0, 0, writeableBitmap.PixelWidth, writeableBitmap.PixelHeight), iconWB, new Rect(100, 100, 32, 32));
+                    int AnsX1 = 175;
+                    int AnsY1 = 0;
+                    int AnsX2 = 300;
+                    int AnsY2 = 125;
+
+                    Rect sourceRect = new Rect(0, 0, iconWB.PixelWidth, iconWB.PixelHeight);
+                    Rect destRect = new Rect(AnsX1, AnsY1, AnsX2 - AnsX1, AnsY2 - AnsY1);
+
+                    writeableBitmap.Blit(destRect, iconWB, sourceRect);
                     writeableBitmap.Invalidate();
 
                     string onlineFilePath = System.IO.Path.Combine(imageFolder, "live-" + channelName + ".jpg");
@@ -179,7 +191,10 @@ namespace LiveTileTaskAgent
                 #endregion
             };
 
-            bitmapImage.UriSource = image;
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                bitmapImage.UriSource = image;
+            });
         }
 
         public static Uri GetImagePath(string channelName, bool live)
@@ -191,7 +206,14 @@ namespace LiveTileTaskAgent
                 channelName = channelName + ".jpg";
 
             string filePath = System.IO.Path.Combine(imageFolder, channelName);
-            return new Uri("isostore:" + filePath, UriKind.RelativeOrAbsolute);
+
+            using (IsolatedStorageFile local = IsolatedStorageFile.GetUserStoreForApplication())
+            {
+                if(local.FileExists(filePath))
+                    return new Uri("isostore:" + filePath, UriKind.RelativeOrAbsolute);
+            }
+
+            return null;
         }
 
         public static void DeleteImage(string channelName)
