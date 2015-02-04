@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:UI="clr-namespace:Microsoft.Advertising.Mobile.UI;assembly=Microsoft.Advertising.Mobile.UI"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     x:Class="TwitchTV.SearchPage"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
@@ -19,6 +20,22 @@
         <Grid.Resources>
             <DataTemplate x:Name="StreamsTemplate">
                 <StackPanel Orientation="Horizontal" Margin="12,2,0,4" Height="105" Width="432">
+                    <toolkit:ContextMenuService.ContextMenu>
+                        <toolkit:ContextMenu x:Name="ContextMenu" Unloaded="ContextMenu_Unloaded">
+                            <toolkit:MenuItem 
+                                Header="Open"
+                                Click="Open_Click"/>
+                            <toolkit:MenuItem 
+                                Header="Follow"
+                                Click="Follow_Click"
+                                Loaded="Follow_Loaded"
+                                IsEnabled="False"/>
+                            <toolkit:MenuItem 
+                                Header="Pin to Start"
+                                Click="Pin_to_Start_Click"
+                                Loaded="Pin_to_Start_Loaded"/>
+                        </toolkit:ContextMenu>
+                    </toolkit:ContextMenuService.ContextMenu>
                     <Image Source="{Binding preview.small}" Width="130" Height="130"/>
                     <StackPanel Width="311" Margin="8,-7,0,0">
                         <TextBlock Text="{Binding channel.display_name}" TextWrapping="Wrap" Margin="10,0" Style="{StaticResource PhoneTextExtraLargeStyle}" FontSize="{StaticResource PhoneFontSizeLarge}" />

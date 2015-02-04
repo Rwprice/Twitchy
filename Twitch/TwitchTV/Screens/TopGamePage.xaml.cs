@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Data;
 using Twitchy.ViewModels;
+using LiveTileTaskAgent;
 
 namespace TwitchTV
 {
@@ -83,5 +84,100 @@ namespace TwitchTV
                 NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
             }
         }
+
+        #region Context Menu
+
+        private void Open_Click(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+            App.ViewModel.stream = stream;
+            NavigationService.Navigate(new Uri("/Screens/PlayerPage.xaml", UriKind.RelativeOrAbsolute));
+        }
+
+        private async void Follow_Click(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+
+            if (((string)((MenuItem)(sender)).Header) == "Unfollow")
+            {
+                await User.UnfollowStream(stream.channel.name, App.ViewModel.user);
+                ((MenuItem)(sender)).Header = "Follow";
+            }
+
+            else
+            {
+                await User.FollowStream(stream.channel.name, App.ViewModel.user);
+                ((MenuItem)(sender)).Header = "Unfollow";
+            }
+        }
+
+        private async void Follow_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (App.ViewModel.user != null)
+            {
+                var menuItem = sender as MenuItem;
+                var contextMenu = menuItem.Parent as ContextMenu;
+                Stream stream = (Stream)contextMenu.DataContext;
+                bool isFollowedTask = await User.IsStreamFollowed(stream.channel.name, App.ViewModel.user);
+
+                menuItem.IsEnabled = true;
+
+                if (isFollowedTask)
+                    menuItem.Header = "Unfollow";
+            }
+        }
+
+        private void ContextMenu_Unloaded(object sender, RoutedEventArgs e)
+        {
+            ContextMenu conmen = (sender as ContextMenu);
+            conmen.ClearValue(FrameworkElement.DataContextProperty);
+        }
+
+        #region Live Tiles
+        private void Pin_to_Start_Click(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+            ShellTile tile;
+
+            if ((sender as MenuItem).Header.ToString() == "Pin to Start")
+            {
+                tile = LiveTileHelper.FindTile(stream.channel.name);
+
+                if (tile == null)
+                {
+                    StandardTileData tileData = new StandardTileData
+                    {
+                        BackgroundImage = new Uri(stream.channel.logoUri)
+                    };
+
+                    LiveTileHelper.SaveTileImages(stream.channel.name, new Uri(stream.channel.logoUri));
+                    string tileUri = string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name);
+                    ShellTile.Create(new Uri(tileUri, UriKind.Relative), tileData);
+                }
+            }
+
+            else
+            {
+                tile = LiveTileHelper.FindTile(stream.channel.name);
+                if (tile != null)
+                {
+                    tile.Delete();
+                    LiveTileHelper.DeleteImage(stream.channel.name);
+                }
+            }
+        }
+
+        private void Pin_to_Start_Loaded(object sender, RoutedEventArgs e)
+        {
+            Stream stream = (Stream)(sender as MenuItem).DataContext;
+            ShellTile tile = LiveTileHelper.FindTile(stream.channel.name);
+
+            if (tile == null)
+                (sender as MenuItem).Header = "Pin to Start";
+            else
+                (sender as MenuItem).Header = "Unpin from Start";
+        }
+        #endregion
+        #endregion
     }
 }

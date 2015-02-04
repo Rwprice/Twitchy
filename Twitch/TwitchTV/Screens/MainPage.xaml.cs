@@ -273,6 +273,8 @@ namespace TwitchTV
             }
         }
 
+        #region Context Menu
+
         private void Open_Click(object sender, RoutedEventArgs e)
         {
             Stream stream = (Stream)(sender as MenuItem).DataContext;
@@ -410,6 +412,7 @@ namespace TwitchTV
                 Debug.WriteLine(exception);
             }
         }
+        #endregion
         #endregion
     }
 }
