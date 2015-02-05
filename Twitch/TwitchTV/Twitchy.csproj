@@ -172,6 +172,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\noProfPic.png" />
     <Content Include="Assets\backgroundart.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

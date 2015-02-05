@@ -1,6 +1,4 @@
-﻿#define DEBUG
-
-using LiveTileTaskAgent;
+﻿using LiveTileTaskAgent;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Net.NetworkInformation;
 using Microsoft.Phone.Scheduler;
@@ -345,12 +343,18 @@ namespace TwitchTV
 
                 if (tile == null)
                 {
+                    Uri uri;
+                    if (stream.channel.logoUri != "")
+                        uri = new Uri(stream.channel.logoUri);
+                    else
+                        uri = new Uri("/Assets/noProfPic.png", UriKind.Relative);
+
                     StandardTileData tileData = new StandardTileData
                     {
-                        BackgroundImage = new Uri(stream.channel.logoUri)
+                        BackgroundImage = uri
                     };
 
-                    LiveTileHelper.SaveTileImages(stream.channel.name, new Uri(stream.channel.logoUri));
+                    LiveTileHelper.SaveTileImages(stream.channel.name, uri);
                     string tileUri = string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name);
                     ShellTile.Create(new Uri(tileUri, UriKind.Relative), tileData);
                 }
@@ -397,10 +401,6 @@ namespace TwitchTV
             {
                 Console.WriteLine(exception);
             }
-
-            #if DEBUG
-            ScheduledActionService.LaunchForTest(name, TimeSpan.FromSeconds(60));
-            #endif
         }
 
         private void RemoveAgent(string name)

@@ -1,6 +1,4 @@
-﻿#define DEBUG
-
-using Microsoft.Phone.Scheduler;
+﻿using Microsoft.Phone.Scheduler;
 using Microsoft.Phone.Shell;
 using Newtonsoft.Json.Linq;
 using System;
@@ -57,10 +55,6 @@ namespace LiveTileTaskAgent
                         LiveTileHelper.ResetLiveTile();
                 }
             }
-
-            #if DEBUG
-            ScheduledActionService.LaunchForTest(liveTileTaskName, TimeSpan.FromSeconds(60));
-            #endif
 
             NotifyComplete();
         }

@@ -247,12 +247,18 @@ namespace TwitchTV
 
                 if (tile == null)
                 {
+                    Uri uri;
+                    if (stream.channel.logoUri != "")
+                        uri = new Uri(stream.channel.logoUri);
+                    else
+                        uri = new Uri("/Assets/noProfPic.png", UriKind.Relative);
+
                     StandardTileData tileData = new StandardTileData
                     {
-                        BackgroundImage = new Uri(stream.channel.logoUri)
+                        BackgroundImage = uri
                     };
 
-                    LiveTileHelper.SaveTileImages(stream.channel.name, new Uri(stream.channel.logoUri));
+                    LiveTileHelper.SaveTileImages(stream.channel.name, uri);
                     string tileUri = string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name);
                     ShellTile.Create(new Uri(tileUri, UriKind.Relative), tileData);
                 }

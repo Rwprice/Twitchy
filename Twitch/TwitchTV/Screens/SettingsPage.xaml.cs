@@ -102,10 +102,6 @@ namespace TwitchTV
                 PeriodicTask periodicTask = new PeriodicTask(liveTileTaskName);
                 periodicTask.Description = "No OAuth to use";
                 ScheduledActionService.Add(periodicTask);
-
-                #if DEBUG
-                ScheduledActionService.LaunchForTest(liveTileTaskName, TimeSpan.FromSeconds(10));
-                #endif
             }
             catch (Exception exception)
             {
