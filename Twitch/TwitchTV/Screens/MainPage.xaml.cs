@@ -351,7 +351,8 @@ namespace TwitchTV
 
                     StandardTileData tileData = new StandardTileData
                     {
-                        BackgroundImage = uri
+                        BackgroundImage = uri,
+                        Title = stream.channel.display_name
                     };
 
                     LiveTileHelper.SaveTileImages(stream.channel.name, uri);
