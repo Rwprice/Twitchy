@@ -10,6 +10,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using TwitchTV.Resources;
 using TwitchTV.ViewModels;
+using System.Windows.Media;
 
 namespace TwitchTV
 {
@@ -44,6 +45,8 @@ namespace TwitchTV
         /// </summary>
         public App()
         {
+            ThemeManager.ToDarkTheme();
+
             UnhandledException += Application_UnhandledException;
 
             // Standard XAML initialization
