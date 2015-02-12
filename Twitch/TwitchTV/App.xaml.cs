@@ -144,6 +144,8 @@ namespace TwitchTV
             RootFrame = new PhoneApplicationFrame();
             RootFrame.Navigated += CompleteInitializePhoneApplication;
 
+            RootFrame.UriMapper = new UriMapper();
+
             // Handle navigation failures
             RootFrame.NavigationFailed += RootFrame_NavigationFailed;
 

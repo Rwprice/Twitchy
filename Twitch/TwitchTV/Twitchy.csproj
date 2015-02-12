@@ -116,6 +116,7 @@
     <Compile Include="Screens\TopGamePage.xaml.cs">
       <DependentUpon>TopGamePage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UriMapper .cs" />
     <Compile Include="ViewModels\FeaturedStreamsViewModel.cs" />
     <Compile Include="ViewModels\FollowedStreamsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

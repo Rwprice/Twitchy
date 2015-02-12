@@ -42,6 +42,9 @@
         </TemplateIconic>
       </PrimaryToken>
     </Tokens>
+    <Extensions>
+      <Protocol Name="twitch" NavUriFragment="encodedLaunchUri=%s" TaskID="_default" />
+    </Extensions>
     <ScreenResolutions>
       <ScreenResolution Name="ID_RESOLUTION_HD720P" />
       <ScreenResolution Name="ID_RESOLUTION_WXGA" />
