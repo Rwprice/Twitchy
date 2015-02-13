@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Deployment xmlns="http://schemas.microsoft.com/windowsphone/2012/deployment" AppPlatformVersion="8.0">
   <DefaultLanguage xmlns="" code="en-US" />
-  <App xmlns="" ProductID="{30b779bd-58c5-4929-bc9f-890f4460e09c}" Title="Twitchy" RuntimeType="Silverlight" Version="3.0.0.0" Genre="apps.normal" Author="Ryan Price" Description="Watch live video game streams from TwitchTV" Publisher="Earthquake Unicorn Productions" PublisherID="{3f927707-aac9-49f1-acba-8dade4d1b4fc}">
+  <App xmlns="" ProductID="{30b779bd-58c5-4929-bc9f-890f4460e09c}" Title="Twitchy" RuntimeType="Silverlight" Version="3.1.0.0" Genre="apps.normal" Author="Ryan Price" Description="Watch live video game streams from TwitchTV" Publisher="Earthquake Unicorn Productions" PublisherID="{3f927707-aac9-49f1-acba-8dade4d1b4fc}">
     <IconPath IsRelative="true" IsResource="false">Assets\logo.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />
@@ -17,6 +17,8 @@
       <DefaultTask Name="_default" NavigationPage="/Screens/MainPage.xaml" />
       <ExtendedTask Name="UpdateLiveTileTask">
         <BackgroundServiceAgent Specifier="ScheduledTaskAgent" Name="UpdateLiveTileTask" Source="LiveTileTaskAgent" Type="LiveTileTaskAgent.ScheduledAgent" />
+        <!--<BackgroundServiceAgent Specifier="AudioPlayerAgent" Name="AudioPlayer" Source="Twitchy" Type="SM.Media.BackgroundAudioStreamingAgent.AudioPlayer" />
+        <BackgroundServiceAgent Specifier="AudioStreamingAgent" Name="AudioTrackStreamer" Source="Twitchy" Type="SM.Media.BackgroundAudioStreamingAgent.AudioTrackStreamer" />-->
       </ExtendedTask>
     </Tasks>
     <Tokens>
