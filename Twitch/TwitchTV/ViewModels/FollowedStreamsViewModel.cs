@@ -30,7 +30,6 @@ namespace TwitchTV.ViewModels
             {
                 _isLoading = value;
                 NotifyPropertyChanged("IsLoading");
-
             }
         }
 

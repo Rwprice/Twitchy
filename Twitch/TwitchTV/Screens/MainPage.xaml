@@ -135,6 +135,7 @@
                 <ScrollViewer>
                     <StackPanel>
                         <TextBlock Text="Login" x:Name="Account" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
+                        <TextBlock Text="Notifications" x:Name="Notifications" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
                         <TextBlock Text="Settings" x:Name="Settings" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
                         <TextBlock Text="About" x:Name="About" Margin="50,10,0,10" Tap="SettingTapped" FontSize="40"/>
                     </StackPanel>
