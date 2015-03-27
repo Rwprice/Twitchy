@@ -170,4 +170,28 @@ namespace TwitchAPIHandler.Objects
         public string name { get; set; }
         public string logoUri { get; set; }
     }
+
+    public class Notification
+    {
+        public string display_name { get; set; }
+        public string name { get; set; }
+        public bool notify { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as Notification;
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            return this.name.Equals(item.name);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.name.GetHashCode();
+        }
+    }
 }

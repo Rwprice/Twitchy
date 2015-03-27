@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -69,6 +70,62 @@ namespace TwitchTV.ViewModels
             }
 
             catch { }
+        }
+
+        public async void SaveNotificationsList(List<Notification> notifications)
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            StorageFile textFile = await localFolder.CreateFileAsync("notifications", CreationCollisionOption.ReplaceExisting);
+
+            using (IRandomAccessStream textStream = await textFile.OpenAsync(FileAccessMode.ReadWrite))
+            {
+                using (DataWriter textWriter = new DataWriter(textStream))
+                {
+                    foreach (var notif in notifications.Distinct())
+                    {
+                        textWriter.WriteString(string.Format("{0}:{1}{2}", notif.display_name, notif.name, "\n"));
+                    }
+                    await textWriter.StoreAsync();
+                }
+            }
+        }
+
+        public async Task<List<Notification>> LoadNotificationsList()
+        {
+            try
+            {
+                string contents;
+
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                StorageFile textFile = await localFolder.GetFileAsync("notifications");
+
+                using (IRandomAccessStream textStream = await textFile.OpenReadAsync())
+                {
+                    using (DataReader textReader = new DataReader(textStream))
+                    {
+                        uint textLength = (uint)textStream.Size;
+                        await textReader.LoadAsync(textLength);
+                        contents = textReader.ReadString(textLength);
+                    }
+                }
+
+                List<Notification> channelsToNotify = new List<Notification>();
+                foreach (var channel in contents.Split('\n'))
+                {
+                    if (channel != "")
+                    {
+                        var split = channel.Split(':');
+                        channelsToNotify.Add(new Notification() { name = split[1], display_name = split[0], notify = true });
+                    }
+                }
+
+                return channelsToNotify.Distinct().ToList();
+            }
+
+            catch 
+            {
+                return null;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -160,7 +160,7 @@
     <value>/Assets/noBoxArt.jpg</value>
   </data>
   <data name="GET_ALL_FOLLOWED_STREAMS" xml:space="preserve">
-    <value>https://api.twitch.tv/kraken/streams/followed?oauth_token={0}</value>
+    <value>https://api.twitch.tv/kraken/users/{0}/follows/channels?&amp;offset={1}&amp;limit=16&amp;sortby=last_broadcast</value>
   </data>
   <data name="GET_STREAM" xml:space="preserve">
     <value>https://api.twitch.tv/kraken/streams/{0}</value>

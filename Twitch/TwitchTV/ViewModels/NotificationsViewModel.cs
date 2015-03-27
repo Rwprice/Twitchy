@@ -47,29 +47,28 @@ namespace TwitchTV.ViewModels
 
         public NotificationsViewModel()
         {
-            this.NotificationsList = new ObservableCollection<TwitchAPIHandler.Objects.Channel>();
+            this.NotificationsList = new ObservableCollection<TwitchAPIHandler.Objects.Notification>();
             this.IsLoading = false;
 
         }
 
-        public ObservableCollection<TwitchAPIHandler.Objects.Channel> NotificationsList
+        public ObservableCollection<TwitchAPIHandler.Objects.Notification> NotificationsList
         {
             get;
             private set;
         }
 
-        public void LoadPage(string oauth, int pageNumber)
+        public void LoadPage(string userName, int pageNumber)
         {
             if (pageNumber == 0)
             {
-                this.NotificationsList.Clear();
                 IsNotificationsLoaded = false;
             }
 
             if (!IsNotificationsLoaded)
             {
                 IsLoading = true;
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.GET_FOLLOWED_STREAMS, oauth, 8 * pageNumber)));
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.GET_ALL_FOLLOWED_STREAMS, userName, 8 * pageNumber)));
                 request.BeginGetResponse(new AsyncCallback(ReadCallback), request);
             }
         }
@@ -83,7 +82,7 @@ namespace TwitchTV.ViewModels
                 using (StreamReader reader = new StreamReader(response.GetResponseStream()))
                 {
                     JToken o = JObject.Parse(reader.ReadLine());
-                    JArray featured = JArray.Parse(o.SelectToken("streams").ToString());
+                    JArray featured = JArray.Parse(o.SelectToken("follows").ToString());
 
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
@@ -96,9 +95,10 @@ namespace TwitchTV.ViewModels
                                 var display_name = arrayValue.SelectToken("channel").SelectToken("display_name").ToString();
                                 var name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
 
-                                var channel = new TwitchAPIHandler.Objects.Channel() { display_name = display_name, name = name };
+                                var channel = new TwitchAPIHandler.Objects.Notification() { display_name = display_name, name = name, notify = false };
 
-                                this.NotificationsList.Add(channel);
+                                if(!NotificationsList.Contains(channel))
+                                    this.NotificationsList.Add(channel);
                             }
                         }
                         IsLoading = false;

@@ -17,7 +17,9 @@ namespace TwitchTV
     {
         private int _pageNumber = 0;
         private int _offsetKnob = 1;
-        NotificationsViewModel _viewModel;  
+        NotificationsViewModel _viewModel;
+
+        List<TwitchAPIHandler.Objects.Notification> channelsToSave = new List<TwitchAPIHandler.Objects.Notification>();
 
         public NotificationsPage()
         {
@@ -27,7 +29,7 @@ namespace TwitchTV
             this.Loaded += new RoutedEventHandler(NotificationPage_Loaded);
         }
 
-        private void NotificationPage_Loaded(object sender, RoutedEventArgs e)
+        private async void NotificationPage_Loaded(object sender, RoutedEventArgs e)
         {
             NotificationsList.ItemsSource = _viewModel.NotificationsList;
             var progressIndicator = SystemTray.ProgressIndicator;
@@ -52,10 +54,24 @@ namespace TwitchTV
 
             _pageNumber = 0;
 
+            //Load shit
+            channelsToSave = await App.ViewModel.LoadNotificationsList() ?? new List<TwitchAPIHandler.Objects.Notification>();
+            foreach (var notif in channelsToSave)
+            {
+                _viewModel.NotificationsList.Add(notif);
+            }
+
             if (App.ViewModel.user != null)
             {
-                _viewModel.LoadPage(App.ViewModel.user.Oauth, _pageNumber++);
+                _viewModel.LoadPage(App.ViewModel.user.Name, _pageNumber++);
             }
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            _viewModel.ClearList();
+            App.ViewModel.SaveNotificationsList(channelsToSave);
+            base.OnNavigatedFrom(e);
         }
 
         private void notificationsList_ItemRealized(object sender, ItemRealizationEventArgs e)
@@ -66,10 +82,10 @@ namespace TwitchTV
                 {
                     if (e.ItemKind == LongListSelectorItemKind.Item)
                     {
-                        if ((e.Container.Content as TwitchAPIHandler.Objects.Channel).Equals(NotificationsList.ItemsSource[NotificationsList.ItemsSource.Count - _offsetKnob]))
+                        if ((e.Container.Content as TwitchAPIHandler.Objects.Notification).Equals(NotificationsList.ItemsSource[NotificationsList.ItemsSource.Count - _offsetKnob]))
                         {
-                            Debug.WriteLine("Searching for Followed Page {0}", _pageNumber);
-                            _viewModel.LoadPage(App.ViewModel.user.Oauth, _pageNumber++);
+                            Debug.WriteLine("Searching for Notification Page {0}", _pageNumber);
+                            _viewModel.LoadPage(App.ViewModel.user.Name, _pageNumber++);
                         }
                     }
                 }
@@ -78,12 +94,18 @@ namespace TwitchTV
 
         private void ToggleSwitch_Checked(object sender, RoutedEventArgs e)
         {
-            TwitchAPIHandler.Objects.Channel channel = (TwitchAPIHandler.Objects.Channel)(sender as ToggleSwitch).DataContext;
+            var channel = (TwitchAPIHandler.Objects.Notification)(sender as ToggleSwitch).DataContext;
+
+            if(!channelsToSave.Contains(channel))
+                channelsToSave.Add(channel);
         }
 
         private void ToggleSwitch_Unchecked(object sender, RoutedEventArgs e)
         {
-            TwitchAPIHandler.Objects.Channel channel = (TwitchAPIHandler.Objects.Channel)(sender as ToggleSwitch).DataContext;
+            var channel = (TwitchAPIHandler.Objects.Notification)(sender as ToggleSwitch).DataContext;
+
+            if (channelsToSave.Contains(channel))
+                channelsToSave.Remove(channel);
         }
     }
 }
