@@ -173,9 +173,17 @@ namespace TwitchTV
         {
             try
             {
-                var task = PlayCurrentTrackAsync();
+                if (quality != "Offline")
+                {
+                    var task = PlayCurrentTrackAsync();
 
-                TaskCollector.Default.Add(task, "PlayerPage playVideo");
+                    TaskCollector.Default.Add(task, "PlayerPage playVideo");
+                }
+
+                else
+                {
+                    Debug.WriteLine("Stream should be offline");
+                }
             }
 
             catch (Exception ex)
@@ -219,6 +227,11 @@ namespace TwitchTV
             catch (Exception ex)
             {
                 Debug.WriteLine("PlayerPage.PlayCurrentTrackAsync() Unable to create media stream source: " + ex.Message);
+                
+                if (ex.Message.Contains("404 (Not Found)"))
+                {
+                    GetQualities();
+                }
                 return;
             }
 
@@ -261,7 +274,6 @@ namespace TwitchTV
 
         private void mediaElement1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
-            MessageBox.Show("The media failed to load", "Well, this is embarrassing...", MessageBoxButton.OK);
             CleanupMedia();
         }
 
@@ -361,8 +373,10 @@ namespace TwitchTV
                 playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
                 if(playlist == null)
                 {
-                    MessageBox.Show("This Stream appears to be offline!");
-                    Application.Current.Terminate();
+                    //Stream is offline
+                    playlist = new M3U8Playlist() { streams = new Dictionary<string, Uri>() };
+                    playlist.streams.Add("Offline", null);
+                    QualitySelection.IsEnabled = false;
                 }
 
                 this.QualitySelection.ItemsSource = playlist.streams.Keys;
