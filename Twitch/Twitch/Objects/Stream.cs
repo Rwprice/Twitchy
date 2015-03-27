@@ -71,6 +71,7 @@ namespace TwitchAPIHandler.Objects
         public static string TOP_STREAMS_PATH = PathStrings.TOP_STREAMS_PATH;
         public static string GET_FOLLOWED_STREAMS = PathStrings.GET_FOLLOWED_STREAMS;
         public static string GET_ALL_FOLLOWED_STREAMS = PathStrings.GET_ALL_FOLLOWED_STREAMS;
+        public static string GET_ALL_LIVE_FOLLOWED_STREAMS = PathStrings.GET_ALL_LIVE_FOLLOWED_STREAMS;
         public static string FRONT_PAGE_STREAMS_PATH = PathStrings.FRONT_PAGE_STREAMS_PATH;
 
         public static async Task<Stream> GetStream(string streamName)
@@ -176,6 +177,7 @@ namespace TwitchAPIHandler.Objects
         public string display_name { get; set; }
         public string name { get; set; }
         public bool notify { get; set; }
+        public bool live { get; set; }
 
         public override bool Equals(object obj)
         {
@@ -186,7 +188,7 @@ namespace TwitchAPIHandler.Objects
                 return false;
             }
 
-            return this.name.Equals(item.name);
+            return this.name.Equals(item.name) && this.display_name.Equals(item.display_name);
         }
 
         public override int GetHashCode()

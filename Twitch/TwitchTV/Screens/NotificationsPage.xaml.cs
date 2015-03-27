@@ -19,8 +19,6 @@ namespace TwitchTV
         private int _offsetKnob = 1;
         NotificationsViewModel _viewModel;
 
-        List<TwitchAPIHandler.Objects.Notification> channelsToSave = new List<TwitchAPIHandler.Objects.Notification>();
-
         public NotificationsPage()
         {
             InitializeComponent();
@@ -54,9 +52,7 @@ namespace TwitchTV
 
             _pageNumber = 0;
 
-            //Load shit
-            channelsToSave = await App.ViewModel.LoadNotificationsList() ?? new List<TwitchAPIHandler.Objects.Notification>();
-            foreach (var notif in channelsToSave)
+            foreach (var notif in await App.ViewModel.LoadNotificationsList() ?? new List<TwitchAPIHandler.Objects.Notification>())
             {
                 _viewModel.NotificationsList.Add(notif);
             }
@@ -69,6 +65,10 @@ namespace TwitchTV
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
+            var channelsToSave = (from notification in _viewModel.NotificationsList
+                                 where notification.notify
+                                 select notification).ToList();
+
             _viewModel.ClearList();
             App.ViewModel.SaveNotificationsList(channelsToSave);
             base.OnNavigatedFrom(e);
@@ -78,11 +78,18 @@ namespace TwitchTV
         {
             if (App.ViewModel.user != null)
             {
+                var channel = (e.Container.Content as TwitchAPIHandler.Objects.Notification);
+                if (channel.notify)
+                {
+                    channel.notify = false;
+                    NotificationsList.SelectedItems.Add(channel);
+                }
+
                 if (!_viewModel.IsLoading && NotificationsList.ItemsSource != null && NotificationsList.ItemsSource.Count >= _offsetKnob)
                 {
                     if (e.ItemKind == LongListSelectorItemKind.Item)
                     {
-                        if ((e.Container.Content as TwitchAPIHandler.Objects.Notification).Equals(NotificationsList.ItemsSource[NotificationsList.ItemsSource.Count - _offsetKnob]))
+                        if (channel.Equals(NotificationsList.ItemsSource[NotificationsList.ItemsSource.Count - _offsetKnob]))
                         {
                             Debug.WriteLine("Searching for Notification Page {0}", _pageNumber);
                             _viewModel.LoadPage(App.ViewModel.user.Name, _pageNumber++);
@@ -92,20 +99,15 @@ namespace TwitchTV
             }
         }
 
-        private void ToggleSwitch_Checked(object sender, RoutedEventArgs e)
+        private void NotificationsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var channel = (TwitchAPIHandler.Objects.Notification)(sender as ToggleSwitch).DataContext;
+            foreach(TwitchAPIHandler.Objects.Notification notification in e.AddedItems)
+                if (!notification.notify)
+                    notification.notify = true;
 
-            if(!channelsToSave.Contains(channel))
-                channelsToSave.Add(channel);
-        }
-
-        private void ToggleSwitch_Unchecked(object sender, RoutedEventArgs e)
-        {
-            var channel = (TwitchAPIHandler.Objects.Notification)(sender as ToggleSwitch).DataContext;
-
-            if (channelsToSave.Contains(channel))
-                channelsToSave.Remove(channel);
+            foreach (TwitchAPIHandler.Objects.Notification notification in e.RemovedItems)
+                if (notification.notify)
+                    notification.notify = false;
         }
     }
 }

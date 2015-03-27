@@ -83,7 +83,7 @@ namespace TwitchTV.ViewModels
                 {
                     foreach (var notif in notifications.Distinct())
                     {
-                        textWriter.WriteString(string.Format("{0}:{1}{2}", notif.display_name, notif.name, "\n"));
+                        textWriter.WriteString(string.Format("{0}:{1}:{2}{3}", notif.display_name, notif.name, notif.live,"\n"));
                     }
                     await textWriter.StoreAsync();
                 }
@@ -115,7 +115,11 @@ namespace TwitchTV.ViewModels
                     if (channel != "")
                     {
                         var split = channel.Split(':');
-                        channelsToNotify.Add(new Notification() { name = split[1], display_name = split[0], notify = true });
+                        if (split.Length == 3)
+                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], notify = true, live = bool.Parse(split[2])});
+
+                        else
+                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], notify = true, live = false });
                     }
                 }
 

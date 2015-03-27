@@ -49,12 +49,17 @@ namespace LiveTileTaskAgent
                     {
                         await LiveTileHelper.UpdateLiveTile(task.Description);
                         await LiveTileHelper.UpdateSecondaryTiles();
+                        await LiveTileHelper.SendNotifications();
                     }
 
                     else
                         LiveTileHelper.ResetLiveTile();
                 }
             }
+
+#if DEBUG
+            ScheduledActionService.LaunchForTest(liveTileTaskName, TimeSpan.FromSeconds(15));
+#endif
 
             NotifyComplete();
         }

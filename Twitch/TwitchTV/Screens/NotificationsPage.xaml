@@ -24,14 +24,12 @@
         <Grid.Resources>
 
             <DataTemplate x:Name="NotificationTemplate">
-                <StackPanel>
-                    <toolkit:ToggleSwitch Margin="10,0,0,0" IsChecked="{Binding notify}" Checked="ToggleSwitch_Checked" Unchecked="ToggleSwitch_Unchecked">
-                        <StackPanel>
-                            <TextBlock Text="{Binding display_name}"/>
-                            <TextBlock Text="{Binding name}" FontSize="18"/>
-                        </StackPanel>
-                    </toolkit:ToggleSwitch>
-                </StackPanel>
+                <Grid Margin="0,-12,0,32">
+                    <StackPanel>
+                        <TextBlock Text="{Binding display_name}" FontSize="36" HorizontalAlignment="Right" Margin="0,0,100,0"/>
+                        <TextBlock Text="{Binding name}" FontSize="20" HorizontalAlignment="Right" Margin="0,0,100,0"/>
+                    </StackPanel>
+                </Grid>
             </DataTemplate>
 
         </Grid.Resources>
@@ -42,9 +40,11 @@
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <phone:LongListSelector x:Name="NotificationsList"
-				ItemTemplate="{StaticResource NotificationTemplate}"/>
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,0,0">
+            <toolkit:LongListMultiSelector x:Name="NotificationsList"
+				ItemTemplate="{StaticResource NotificationTemplate}"
+                EnforceIsSelectionEnabled="True"
+                SelectionChanged="NotificationsList_SelectionChanged"/>
         </Grid>
     </Grid>
 
