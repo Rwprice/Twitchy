@@ -79,11 +79,20 @@ namespace TwitchAPIHandler {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/followed?oauth_token={0}.
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/users/{0}/follows/channels?&amp;offset={1}&amp;limit=16&amp;sortby=last_broadcast.
         /// </summary>
         internal static string GET_ALL_FOLLOWED_STREAMS {
             get {
                 return ResourceManager.GetString("GET_ALL_FOLLOWED_STREAMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.twitch.tv/kraken/streams/followed?oauth_token={0}&amp;limit=100.
+        /// </summary>
+        internal static string GET_ALL_LIVE_FOLLOWED_STREAMS {
+            get {
+                return ResourceManager.GetString("GET_ALL_LIVE_FOLLOWED_STREAMS", resourceCulture);
             }
         }
         

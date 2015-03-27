@@ -78,6 +78,10 @@ namespace TwitchTV
                     PeriodicTask periodicTask = new PeriodicTask(liveTileTaskName);
                     periodicTask.Description = App.ViewModel.user.Oauth;
                     ScheduledActionService.Add(periodicTask);
+
+#if DEBUG
+                    ScheduledActionService.LaunchForTest(liveTileTaskName, TimeSpan.FromSeconds(15));
+#endif
                 }
                 catch (Exception exception)
                 {

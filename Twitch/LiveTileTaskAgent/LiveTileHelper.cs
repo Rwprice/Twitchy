@@ -29,7 +29,7 @@ namespace LiveTileTaskAgent
 
             try
             {
-                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.GET_ALL_FOLLOWED_STREAMS, oAuth)));
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(new Uri(String.Format(TwitchAPIHandler.Objects.Stream.GET_ALL_LIVE_FOLLOWED_STREAMS, oAuth)));
                 using (var response = (HttpWebResponse)(await Task<WebResponse>.Factory.FromAsync(request.BeginGetResponse, request.EndGetResponse, null)))
                 {
                     using (var responseStream = response.GetResponseStream())
@@ -115,6 +115,89 @@ namespace LiveTileTaskAgent
                 });
             }
             return true;
+        }
+
+        public async static Task<bool> SendNotifications()
+        {
+            try
+            {
+                string contents;
+
+                StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+                StorageFile textFile = await localFolder.GetFileAsync("notifications");
+
+                using (IRandomAccessStream textStream = await textFile.OpenReadAsync())
+                {
+                    using (DataReader textReader = new DataReader(textStream))
+                    {
+                        uint textLength = (uint)textStream.Size;
+                        await textReader.LoadAsync(textLength);
+                        contents = textReader.ReadString(textLength);
+                    }
+                }
+
+                List<TwitchAPIHandler.Objects.Notification> channelsToNotify = new List<TwitchAPIHandler.Objects.Notification>();
+                foreach (var channel in contents.Split('\n'))
+                {
+                    if (channel != "")
+                    {
+                        var split = channel.Split(':');
+                        if(split.Length == 3)
+                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], live = bool.Parse(split[2])});
+
+                        else
+                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], live = false});
+                    }
+                }
+
+
+                foreach (var channel in channelsToNotify)
+                {
+                    //Lookup live or not
+                    var stream = await TwitchAPIHandler.Objects.Stream.GetStream(channel.name);
+                    bool streamLive = stream.channel != null ? true : false;
+
+                    if (streamLive)
+                    {
+                        if (!channel.live)
+                        {
+                            ShellToast toast = new ShellToast();
+                            toast.Title = string.Format("{0} is now live!", stream.channel.display_name);
+                            toast.Content = stream.channel.status ?? string.Format("Tap here to watch {0}", stream.channel.display_name);
+                            toast.NavigationUri = new Uri(string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name), UriKind.RelativeOrAbsolute);
+                            toast.Show();
+                            channel.live = true;
+                        }
+                    }
+
+
+                    else
+                    {
+                        channel.live = false;
+                    }
+                }
+
+                textFile = await localFolder.CreateFileAsync("notifications", CreationCollisionOption.ReplaceExisting);
+
+                using (IRandomAccessStream textStream = await textFile.OpenAsync(FileAccessMode.ReadWrite))
+                {
+                    using (DataWriter textWriter = new DataWriter(textStream))
+                    {
+                        foreach (var notif in channelsToNotify)
+                        {
+                            textWriter.WriteString(string.Format("{0}:{1}:{2}{3}", notif.display_name, notif.name, notif.live, "\n"));
+                        }
+                        await textWriter.StoreAsync();
+                    }
+                }
+
+                return true;
+            }
+
+            catch
+            {
+                return false;
+            }
         }
 
         public static void ResetLiveTile()
