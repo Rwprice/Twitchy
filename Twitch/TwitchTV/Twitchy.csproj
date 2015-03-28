@@ -93,6 +93,10 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="AudioMetadataHandler.cs" />
+    <Compile Include="AudioPlayer.cs" />
+    <Compile Include="AudioTrackExtensions.cs" />
+    <Compile Include="AudioTrackStreamer.cs" />
     <Compile Include="ChatClient.cs" />
     <Compile Include="Screens\NotificationsPage.xaml.cs">
       <DependentUpon>NotificationsPage.xaml</DependentUpon>
@@ -119,6 +123,7 @@
     <Compile Include="Screens\TopGamePage.xaml.cs">
       <DependentUpon>TopGamePage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TrackManager.cs" />
     <Compile Include="ViewModels\FeaturedStreamsViewModel.cs" />
     <Compile Include="ViewModels\FollowedStreamsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

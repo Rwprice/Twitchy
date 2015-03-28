@@ -1,4 +1,5 @@
-﻿using Microsoft.Phone.Controls;
+﻿using Microsoft.Phone.BackgroundAudio;
+using Microsoft.Phone.Controls;
 using SM.Media;
 using SM.Media.Playlists;
 using SM.Media.Segments;
@@ -267,11 +268,6 @@ namespace TwitchTV
             mediaStreamFacade.DisposeBackground("PlayerPage CleanupMedia");
         }
 
-        void UpdateState(MediaElementState state)
-        {
-            Debug.WriteLine("MediaElement State: " + state);
-        }
-
         private void mediaElement1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
         {
             CleanupMedia();
@@ -295,23 +291,6 @@ namespace TwitchTV
             ToggleUI();
         }
 
-        void mediaElement1_CurrentStateChanged(object sender, RoutedEventArgs e)
-        {
-            var state = null == mediaElement1 ? MediaElementState.Closed : mediaElement1.CurrentState;
-
-            if (null != _mediaStreamFacade)
-            {
-                var managerState = _mediaStreamFacade.State;
-
-                if (MediaElementState.Closed == state)
-                {
-                    if (TsMediaManager.MediaState.OpenMedia == managerState || TsMediaManager.MediaState.Opening == managerState || TsMediaManager.MediaState.Playing == managerState)
-                        state = MediaElementState.Opening;
-                }
-            }
-
-            UpdateState(state);
-        }
         #endregion
 
         #region API
