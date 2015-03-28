@@ -190,7 +190,7 @@ namespace TwitchAPIHandler.Objects
 
         public override bool Equals(object obj)
         {
-            var item = obj as Notification;
+            var item = obj as Channel;
 
             if (item == null)
             {
