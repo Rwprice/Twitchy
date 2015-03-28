@@ -11,12 +11,24 @@ using Microsoft.Phone.Shell;
 using TwitchTV.Resources;
 using TwitchTV.ViewModels;
 using System.Windows.Media;
+using Wintellect.Sterling;
+using Wintellect.Sterling.IsolatedStorage;
 
 namespace TwitchTV
 {
     public partial class App : Application
     {
         private static MainViewModel viewModel = null;
+        private SterlingEngine _engine;
+        private ISterlingDatabaseInstance _database;
+        private static SterlingDefaultLogger _logger;
+        public ISterlingDatabaseInstance Database
+        {
+            get { return _database; }
+            set { _database = value; }
+        }
+
+        public int LastSterlingIndex { get; set; }
 
         /// <summary>
         /// A static ViewModel used by the views to bind against.
@@ -80,10 +92,26 @@ namespace TwitchTV
 
         }
 
+        private void SetupTheDatabase()
+        {
+            // create the sterling engine
+            _engine = new SterlingEngine();
+
+            // create a logger for the sterling db
+            _logger = new SterlingDefaultLogger(SterlingLogLevel.Verbose);
+
+            // activate the sterling engine
+            _engine.Activate();
+
+            // Register your database with the sterling engine and specify its persistence in isolated storage
+            Database = _engine.SterlingDatabase.RegisterDatabase<PlaylistDatabaseInstance>(new IsolatedStorageDriver());
+        }
+
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            SetupTheDatabase();
         }
 
         // Code to execute when the application is activated (brought to foreground)
@@ -104,6 +132,11 @@ namespace TwitchTV
         // This code will not execute when the application is deactivated
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
+            Database.Flush();
+            _logger.Detach();
+            _engine.Dispose();
+            Database = null;
+            _engine = null;
         }
 
         // Code to execute if a navigation fails
