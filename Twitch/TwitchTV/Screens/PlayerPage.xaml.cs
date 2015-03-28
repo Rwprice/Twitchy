@@ -73,13 +73,75 @@ namespace TwitchTV
             backgroundWorker.DoWork += backgroundWorker_DoWork;
             backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
             backgroundWorker.WorkerReportsProgress = true;
+
+            PhoneApplicationFrame phoneAppRootFrame = App.RootFrame;
+            phoneAppRootFrame.Obscured += OnObscured;
+            phoneAppRootFrame.Unobscured += Unobscured;
+        }
+
+        private void Unobscured(object sender, EventArgs e)
+        {
+            HandleReturn(new Uri("app://phonecall/"));
+        }
+
+        private void OnObscured(object sender, ObscuredEventArgs e)
+        {
+            HandleLeave(new Uri("app://phonecall/"));
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.Uri.OriginalString.Contains('?'))
+            HandleReturn(e.Uri);
+            base.OnNavigatedTo(e);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            HandleLeave(e.Uri);
+
+            base.OnNavigatedFrom(e);
+        }
+
+        //Method to Update UI when navigating directly
+        //to the player plage from the home screen
+        private async void LoadSettingsAndStream(string streamName)
+        {
+            App.ViewModel.LoadSettings();
+
+            if (App.ViewModel.stream == null)
             {
-                var streamName = e.Uri.OriginalString.Substring(e.Uri.OriginalString.IndexOf('?') + 1);
+                App.ViewModel.stream = new Stream() { channel = new Channel() { name = streamName } };
+
+                //Load stream
+                App.ViewModel.stream = await Stream.GetStream(streamName);
+
+                if (App.ViewModel.stream.channel == null)
+                {
+                    MessageBox.Show("This Stream appears to be offline!");
+                    Application.Current.Terminate();
+                }
+
+                this.Status.Text = App.ViewModel.stream.channel.status;
+            }
+
+            if (App.ViewModel.user == null)
+            {
+                var user = await User.TryLoadUser();
+                if (user != null)
+                {
+                    App.ViewModel.user = user;
+                    isLoggedIn = true;
+                }
+            }
+
+            IsFollowed(App.ViewModel.stream.channel.name);
+        }
+
+        private void HandleReturn(Uri uri)
+        {
+            if (uri.OriginalString.Contains('?'))
+            {
+                var streamName = uri.OriginalString.Substring(uri.OriginalString.IndexOf('?') + 1);
                 LoadSettingsAndStream(streamName);
             }
 
@@ -120,53 +182,29 @@ namespace TwitchTV
 
             else
                 playVideo();
-            base.OnNavigatedTo(e);
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        private void HandleLeave(Uri uri)
         {
-            if (chatJoined)
-                rejoinChat = true;
-
             CleanupMedia();
             client = null;
 
-            base.OnNavigatedFrom(e);
-        }
-
-        //Method to Update UI when navigating directly
-        //to the player plage from the home screen
-        private async void LoadSettingsAndStream(string streamName)
-        {
-            App.ViewModel.LoadSettings();
-
-            if (App.ViewModel.stream == null)
+            //Leaving App
+            if (uri.OriginalString == @"app://external/")
             {
-                App.ViewModel.stream = new Stream() { channel = new Channel() { name = streamName } };
+                if (chatJoined)
+                    rejoinChat = true;
 
-                //Load stream
-                App.ViewModel.stream = await Stream.GetStream(streamName);
+                //var mediaTrack = new Playlist()
+                //{
+                //    Address = "http://video10.iad02.hls.ttvnw.net/hls132/starladder_cs_en_13758889632_223696550/mobile/py-index-live.m3u8?token=id=7719667929993536106,bid=13758889632,exp=1427649363,node=video10-1.iad02.hls.justin.tv,nname=video10.iad02,fmt=mobile&sig=e31ede099a8dce344e0a2b8b0933e7568fe4f4ea",
+                //    Name = App.ViewModel.stream.channel.display_name
+                //};
 
-                if (App.ViewModel.stream.channel == null)
-                {
-                    MessageBox.Show("This Stream appears to be offline!");
-                    Application.Current.Terminate();
-                }
+                //mediaTrack.Save();
 
-                this.Status.Text = App.ViewModel.stream.channel.status;
+                //BackgroundAudioPlayer.Instance.Play();
             }
-
-            if (App.ViewModel.user == null)
-            {
-                var user = await User.TryLoadUser();
-                if (user != null)
-                {
-                    App.ViewModel.user = user;
-                    isLoggedIn = true;
-                }
-            }
-
-            IsFollowed(App.ViewModel.stream.channel.name);
         }
 
         #region Video Methods
@@ -228,7 +266,7 @@ namespace TwitchTV
             catch (Exception ex)
             {
                 Debug.WriteLine("PlayerPage.PlayCurrentTrackAsync() Unable to create media stream source: " + ex.Message);
-                
+
                 if (ex.Message.Contains("404 (Not Found)"))
                 {
                     GetQualities();
@@ -250,7 +288,10 @@ namespace TwitchTV
         void StopMedia()
         {
             if (null != mediaElement1)
+            {
+                mediaElement1.Stop();
                 mediaElement1.Source = null;
+            }
         }
 
         void CleanupMedia()
