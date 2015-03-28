@@ -7,5 +7,5 @@ Twitch/TwitchTV/PerfLogs/*
 720p/*
 WVGA/*
 WXGA/*
-*/packages
+Twitch/packages/*
 *.csproj.user
