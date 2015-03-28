@@ -156,6 +156,23 @@ namespace TwitchAPIHandler.Objects
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as Stream;
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            return this.channel.Equals(item.channel);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.channel.GetHashCode();
+        }
     }
 
     public class Preview
@@ -170,6 +187,23 @@ namespace TwitchAPIHandler.Objects
         public string display_name { get; set; }
         public string name { get; set; }
         public string logoUri { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as Notification;
+
+            if (item == null)
+            {
+                return false;
+            }
+
+            return this.name.Equals(item.name) && this.display_name.Equals(item.display_name);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.name.GetHashCode();
+        }
     }
 
     public class Notification

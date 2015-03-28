@@ -111,7 +111,7 @@ namespace TwitchTV.ViewModels
                                     Debug.WriteLine(ex);
                                 }
 
-                                GamesList.Add(new TopGame()
+                                var topGame = new TopGame()
                                 {
                                     channels = channels,
                                     game = new Game()
@@ -122,7 +122,10 @@ namespace TwitchTV.ViewModels
                                             medium = medium
                                         }
                                     }
-                                });
+                                };
+
+                                if (!GamesList.Contains(topGame))
+                                    GamesList.Add(topGame);
                             }
                         }
                         IsLoading = false;

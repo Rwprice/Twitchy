@@ -148,12 +148,15 @@ namespace TwitchTV.ViewModels
                                     logoUri = logo
                                 };
 
-                                this.StreamList.Add(new TwitchAPIHandler.Objects.Stream()
+                                var stream = new TwitchAPIHandler.Objects.Stream()
                                 {
                                     channel = channel,
                                     preview = preview,
                                     viewers = viewers
-                                });
+                                };
+
+                                if (!this.StreamList.Contains(stream))
+                                    this.StreamList.Add(stream);
                             }
                         }
                         IsLoading = false;

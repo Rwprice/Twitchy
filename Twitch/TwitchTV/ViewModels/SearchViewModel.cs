@@ -103,14 +103,17 @@ namespace Twitchy.ViewModels
                                 Debug.WriteLine(ex);
                             }
 
-                            this.GameList.Add(new Game()
+                            var game = new Game()
                             {
                                 name = name,
                                 box = new Box
                                 {
                                     medium = medium
                                 }
-                            });
+                            };
+
+                            if (!this.GameList.Contains(game))
+                                this.GameList.Add(game);
                         }
                         IsLoading = false;
                     });
@@ -202,7 +205,7 @@ namespace Twitchy.ViewModels
                                     Debug.WriteLine(ex);
                                 }
 
-                                StreamList.Add(new TwitchAPIHandler.Objects.Stream()
+                                var stream = new TwitchAPIHandler.Objects.Stream()
                                 {
                                     channel = new Channel()
                                     {
@@ -217,7 +220,10 @@ namespace Twitchy.ViewModels
                                         small = small
                                     },
                                     viewers = viewers
-                                });
+                                };
+
+                                if (!StreamList.Contains(stream))
+                                    StreamList.Add(stream);
                             }
                         }
                         IsLoading = false;
