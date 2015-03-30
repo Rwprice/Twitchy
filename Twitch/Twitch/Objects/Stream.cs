@@ -90,6 +90,7 @@ namespace TwitchAPIHandler.Objects
                 var viewers = int.Parse(stream.SelectToken("viewers").ToString());
                 var display_name = stream.SelectToken("channel").SelectToken("display_name").ToString();
                 var name = stream.SelectToken("channel").SelectToken("name").ToString();
+                var game = stream.SelectToken("channel").SelectToken("game").ToString();
                 var status = "";
                 var logo = stream.SelectToken("channel").SelectToken("logo").ToString();
 
@@ -111,7 +112,8 @@ namespace TwitchAPIHandler.Objects
                     display_name = display_name,
                     name = name,
                     status = status,
-                    logoUri = logo
+                    logoUri = logo,
+                    game = game
                 };
 
                 var streamToReturn = new Stream()
@@ -187,6 +189,7 @@ namespace TwitchAPIHandler.Objects
         public string display_name { get; set; }
         public string name { get; set; }
         public string logoUri { get; set; }
+        public string game { get; set; }
 
         public override bool Equals(object obj)
         {

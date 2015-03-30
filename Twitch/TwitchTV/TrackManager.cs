@@ -14,7 +14,7 @@ namespace SM.Media.BackgroundAudioStreamingAgent
     {
         private static ISterlingDatabaseInstance Database;
 
-        static MediaTrack[] GetPlaylist()
+        static TwitchTVMediaTrack[] GetPlaylist()
         {
             if (Database == null)
             {
@@ -25,19 +25,20 @@ namespace SM.Media.BackgroundAudioStreamingAgent
 
             var playlist = Database.Query<Playlist, int>().FirstOrDefault().LazyValue.Value;
 
-            return new MediaTrack[]
+            return new TwitchTVMediaTrack[]
             {
-                new MediaTrack
+                new TwitchTVMediaTrack
                 {
                     Title = playlist.Name,
-                    Url = new Uri(playlist.Address)
+                    Url = new Uri(playlist.Address),
+                    Status = playlist.Status,
                 }
             };
         }
 
-        private static IList<MediaTrack> _tracks = null;
+        private static IList<TwitchTVMediaTrack> _tracks = null;
 
-        public static IList<MediaTrack> Tracks
+        public static IList<TwitchTVMediaTrack> Tracks
         {
             get
             {
@@ -49,5 +50,10 @@ namespace SM.Media.BackgroundAudioStreamingAgent
                 return _tracks;
             }
         }
+    }
+
+    class TwitchTVMediaTrack : MediaTrack
+    {
+        public string Status { get; set; }
     }
 }

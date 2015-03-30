@@ -408,6 +408,7 @@ namespace TwitchTV
                     {
                         Address = playlist.streams[playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1)].OriginalString,
                         Name = App.ViewModel.stream.channel.display_name,
+                        Status = App.ViewModel.stream.channel.status,
                         Key = 0
                     };
 

@@ -12,9 +12,7 @@ namespace SM.Media.BackgroundAudioStreamingAgent
     {
         static readonly AudioTrack[] AudioTracks = TrackManager.Tracks
             .Where(t => null != t)
-            .Select(t => t.UseNativePlayer
-                ? new AudioTrack(t.Url, t.Title, null, null, null, null, EnabledPlayerControls.All)
-                : new AudioTrack(null, t.Title, null, null, null, t.Url.ToString(), EnabledPlayerControls.All))
+            .Select(t => new AudioTrack(null, t.Title, t.Status, null, null, t.Url.ToString(), EnabledPlayerControls.Pause))
             .ToArray();
 
         static volatile bool _classInitialized;

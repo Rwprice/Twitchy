@@ -63,34 +63,6 @@ namespace SM.Media.BackgroundAudioStreamingAgent
             _metadataHandler = new AudioMetadataHandler(_cancellationTokenSource.Token);
         }
 
-#if DEBUG
-        readonly Timer _memoryPoll = new Timer(_ => DumpMemory());
-
-        static void DumpMemory()
-        {
-            Debug.WriteLine("<{0:F}MiB/{1:F}MiB>",
-                DeviceStatus.ApplicationCurrentMemoryUsage.BytesToMiB(),
-                DeviceStatus.ApplicationPeakMemoryUsage.BytesToMiB());
-        }
-#endif
-
-        [Conditional("DEBUG")]
-        void StartPoll()
-        {
-#if DEBUG
-            Debug.WriteLine("<Limit {0:F}MiB>", DeviceStatus.ApplicationMemoryUsageLimit.BytesToMiB());
-            _memoryPoll.Change(TimeSpan.Zero, TimeSpan.FromSeconds(15));
-#endif
-        }
-
-        [Conditional("DEBUG")]
-        void StopPoll()
-        {
-#if DEBUG
-            _memoryPoll.Change(Timeout.Infinite, Timeout.Infinite);
-#endif
-        }
-
         protected override async void OnBeginStreaming(AudioTrack track, AudioStreamer streamer)
         {
             Debug.WriteLine("AudioTrackStreamer.OnBeginStreaming() track.Source {0} track.Tag {1}",
@@ -99,10 +71,6 @@ namespace SM.Media.BackgroundAudioStreamingAgent
 
             try
             {
-                Debug.Assert(null == _mediaStreamFacade, "_mediaStreamFacade is in use");
-
-                StartPoll();
-
                 if (_cancellationTokenSource.IsCancellationRequested)
                     _cancellationTokenSource = new CancellationTokenSource();
 
@@ -116,8 +84,6 @@ namespace SM.Media.BackgroundAudioStreamingAgent
             }
             finally
             {
-                StopPoll();
-
                 Debug.WriteLine("AudioTrackStreamer.OnBeginStreaming() play done NotifyComplete");
                 NotifyComplete();
             }
@@ -344,12 +310,6 @@ namespace SM.Media.BackgroundAudioStreamingAgent
             // for a while and we have just released a large
             // number of objects.
             GC.Collect();
-#if DEBUG
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-
-            DumpMemory();
-#endif
         }
 
         /// <summary>
@@ -439,9 +399,6 @@ namespace SM.Media.BackgroundAudioStreamingAgent
             TryCancel();
 
             CleanupMediaStreamFacadeAsync().Wait();
-#if DEBUG
-            _memoryPoll.Dispose();
-#endif
 
             _cancellationTokenSource.Dispose();
         }
