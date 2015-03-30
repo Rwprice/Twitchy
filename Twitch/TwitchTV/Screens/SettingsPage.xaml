@@ -23,7 +23,7 @@
 
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="Twitchy Version 3.0" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock Text="Twitchy Version 3.1" Style="{StaticResource PhoneTextNormalStyle}"/>
             <TextBlock Text="Settings" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
@@ -38,6 +38,10 @@
                 </toolkit:ToggleSwitch>
                 <toolkit:ToggleSwitch Margin="10,0,0,0" Name="LiveTilesButton" Checked="LiveTilesButton_Checked"  Unchecked="LiveTilesButton_Unchecked">
                     <TextBlock Text="Live Tiles"/>
+                </toolkit:ToggleSwitch>
+                <toolkit:ToggleSwitch Margin="10,0,0,0" Name="BackgroundAudioButton" Checked="BackgroundAudioButton_Checked"  
+                                      Unchecked="BackgroundAudioButton_Unchecked">
+                    <TextBlock Text="Background Audio"/>
                 </toolkit:ToggleSwitch>
             </StackPanel>
         </Grid>

@@ -105,7 +105,6 @@ namespace TwitchTV.ViewModels
                                 var name = arrayValue.SelectToken("channel").SelectToken("name").ToString();
                                 var status = "";
                                 var logo = arrayValue.SelectToken("channel").SelectToken("logo").ToString();
-                                var game = arrayValue.SelectToken("channel").SelectToken("game").ToString();
 
                                 try
                                 {
@@ -147,7 +146,6 @@ namespace TwitchTV.ViewModels
                                     name = name,
                                     status = status,
                                     logoUri = logo,
-                                    game = game
                                 };
 
                                 var stream = new TwitchAPIHandler.Objects.Stream()

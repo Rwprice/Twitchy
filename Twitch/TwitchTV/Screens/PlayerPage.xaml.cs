@@ -39,7 +39,6 @@ namespace TwitchTV
 
         #region Video
         IMediaStreamFacade _mediaStreamFacade;
-        Uri track;
         #endregion
 
         #region UI
@@ -76,18 +75,12 @@ namespace TwitchTV
             backgroundWorker.WorkerReportsProgress = true;
 
             PhoneApplicationFrame phoneAppRootFrame = App.RootFrame;
-            phoneAppRootFrame.Obscured += OnObscured;
             phoneAppRootFrame.Unobscured += Unobscured;
         }
 
         private void Unobscured(object sender, EventArgs e)
         {
             HandleReturn(new Uri("app://phonecall/"));
-        }
-
-        private void OnObscured(object sender, ObscuredEventArgs e)
-        {
-            HandleLeave(new Uri("app://phonecall/"));
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -188,19 +181,19 @@ namespace TwitchTV
 
         private void HandleLeave(Uri uri)
         {
-            //Leaving App
-            if (uri.OriginalString == @"app://external/" || uri.OriginalString == @"app://phonecall/")
+            if (chatJoined)
+                rejoinChat = true;
+
+            if (uri.OriginalString == @"app://external/")
             {
-                StopMedia();
-
-                if (chatJoined)
-                    rejoinChat = true;
-
-                if (uri.OriginalString == @"app://external/")
+                if (App.ViewModel.BackgroundAudioEnabled)
                 {
-                    BackgroundAudioPlayer.Instance.Close();
+                    StopMedia();
                     BackgroundAudioPlayer.Instance.Play();
                 }
+
+                else
+                    PauseMedia();
             }
 
             else
@@ -213,36 +206,40 @@ namespace TwitchTV
         #region Video Methods
         void playVideo()
         {
-            try
+            if(mediaElement1.CurrentState == MediaElementState.Paused)
             {
-                track = null;
-                track = playlist.streams[quality];
-                if (quality != "Offline")
-                {
-                    var task = PlayCurrentTrackAsync();
-
-                    TaskCollector.Default.Add(task, "PlayerPage playVideo");
-                }
-
-                else
-                {
-                    Debug.WriteLine("Stream should be offline");
-                }
+                mediaElement1.Play();
             }
 
-            catch (Exception ex)
+            else if (mediaElement1.CurrentState != MediaElementState.Playing)
             {
-                CleanupMedia();
-                MessageBox.Show("Can't play this particular stream. Try another or try again later", "Well, this is embarrassing...", MessageBoxButton.OK);
-                Debug.WriteLine(ex.Message);
+                try
+                {
+                    if (quality != "Offline")
+                    {
+                        var task = PlayCurrentTrackAsync();
+
+                        TaskCollector.Default.Add(task, "PlayerPage playVideo");
+                    }
+
+                    else
+                    {
+                        Debug.WriteLine("Stream should be offline");
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    CleanupMedia();
+                    MessageBox.Show("Can't play this particular stream. Try another or try again later", "Well, this is embarrassing...", MessageBoxButton.OK);
+                    Debug.WriteLine(ex.Message);
+                }
             }
         }
 
         async Task PlayCurrentTrackAsync()
         {
-            if (BackgroundAudioPlayer.Instance.PlayerState == PlayState.Playing)
-                BackgroundAudioPlayer.Instance.Close();
-
+            var track = playlist.streams[quality];
             if (null == track)
             {
                 await _mediaStreamFacade.StopAsync(CancellationToken.None);
@@ -296,6 +293,14 @@ namespace TwitchTV
                 mediaElement1.Stop();
                 mediaElement1.Source = null;
             }
+
+            BackgroundAudioPlayer.Instance.Close();
+        }
+
+        void PauseMedia()
+        {
+            if (null != mediaElement1)
+                mediaElement1.Pause();
         }
 
         void CleanupMedia()

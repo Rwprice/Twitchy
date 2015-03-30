@@ -22,6 +22,7 @@ namespace TwitchTV.ViewModels
         public bool AutoJoinChat = false;
         public bool LockLandscape = false;
         public bool LiveTilesEnabled = false;
+        public bool BackgroundAudioEnabled = false;
 
         public MainViewModel()
         {
@@ -37,7 +38,10 @@ namespace TwitchTV.ViewModels
             {
                 using (DataWriter textWriter = new DataWriter(textStream))
                 {
-                    textWriter.WriteString(AutoJoinChat.ToString() + "\n" + LockLandscape.ToString() + "\n" + LiveTilesEnabled.ToString());
+                    textWriter.WriteString(AutoJoinChat.ToString() + "\n" 
+                        + LockLandscape.ToString() + "\n"
+                        + LiveTilesEnabled.ToString() + "\n"
+                        + BackgroundAudioEnabled.ToString());
                     await textWriter.StoreAsync();
                 }
             }
@@ -67,6 +71,8 @@ namespace TwitchTV.ViewModels
                 bool.TryParse(lines[0], out AutoJoinChat);
                 bool.TryParse(lines[1], out LockLandscape);
                 bool.TryParse(lines[2], out LiveTilesEnabled);
+                if(lines.Length == 4)
+                    bool.TryParse(lines[3], out BackgroundAudioEnabled);
             }
 
             catch { }

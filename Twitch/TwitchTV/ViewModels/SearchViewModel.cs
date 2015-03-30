@@ -176,7 +176,6 @@ namespace Twitchy.ViewModels
                                 var medium = new BitmapImage();
                                 var status = "";
                                 var logo = arrayValue.SelectToken("channel").SelectToken("logo").ToString();
-                                var game = arrayValue.SelectToken("channel").SelectToken("game").ToString();
 
                                 try
                                 {
@@ -214,7 +213,6 @@ namespace Twitchy.ViewModels
                                         name = name,
                                         status = status,
                                         logoUri = logo,
-                                        game = game
                                     },
                                     preview = new Preview()
                                     {
