@@ -188,16 +188,25 @@ namespace TwitchTV
 
         private void HandleLeave(Uri uri)
         {
-            CleanupMedia();
-            client = null;
-
-            App.Database.PurgeAsync().Wait();
-
             //Leaving App
-            if (uri.OriginalString == @"app://external/")
+            if (uri.OriginalString == @"app://external/" || uri.OriginalString == @"app://phonecall/")
             {
+                StopMedia();
+
                 if (chatJoined)
                     rejoinChat = true;
+
+                if (uri.OriginalString == @"app://external/")
+                {
+                    BackgroundAudioPlayer.Instance.Close();
+                    BackgroundAudioPlayer.Instance.Play();
+                }
+            }
+
+            else
+            {
+                CleanupMedia();
+                client = null;
             }
         }
 
@@ -231,6 +240,9 @@ namespace TwitchTV
 
         async Task PlayCurrentTrackAsync()
         {
+            if (BackgroundAudioPlayer.Instance.PlayerState == PlayState.Playing)
+                BackgroundAudioPlayer.Instance.Close();
+
             if (null == track)
             {
                 await _mediaStreamFacade.StopAsync(CancellationToken.None);
@@ -267,8 +279,6 @@ namespace TwitchTV
                 }
                 return;
             }
-
-            mediaElement1.Play();
         }
 
         void InitializeMediaStream()
@@ -315,26 +325,7 @@ namespace TwitchTV
                 var obj = (string)((ListPicker)(sender)).SelectedItem;
                 if (!string.IsNullOrEmpty(obj))
                 {
-                    quality = obj;
-
-                    if (quality == "Audio")
-                    {
-                        track = playlist.streams[quality];
-                        var list = new Playlist()
-                        {
-                            Address = track.OriginalString,
-                            Name = App.ViewModel.stream.channel.display_name,
-                            Key = 0
-                        };
-
-                        App.Database.SaveAsync<Playlist>(list).Wait();
-                        App.Database.FlushAsync().Wait();
-
-                        BackgroundAudioPlayer.Instance.Play();
-                    }
-
-                    else
-                        playVideo();
+                    playVideo();
                 }
             }
         }
@@ -413,13 +404,21 @@ namespace TwitchTV
 
                 else
                 {
-                    playlist.streams.Add("Audio", playlist.streams[playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1)]);
+                    var list = new Playlist()
+                    {
+                        Address = playlist.streams[playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1)].OriginalString,
+                        Name = App.ViewModel.stream.channel.display_name,
+                        Key = 0
+                    };
+
+                    App.Database.SaveAsync<Playlist>(list).Wait();
+                    App.Database.FlushAsync().Wait();
                 }
 
                 this.QualitySelection.ItemsSource = playlist.streams.Keys;
 
                 if (string.IsNullOrEmpty(quality))
-                    quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 2);
+                    quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
                 
                 this.QualitySelection.SelectedItem = quality;
             }
