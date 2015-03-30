@@ -39,6 +39,7 @@ namespace TwitchTV
 
         #region Video
         IMediaStreamFacade _mediaStreamFacade;
+        Uri track;
         #endregion
 
         #region UI
@@ -92,6 +93,7 @@ namespace TwitchTV
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             HandleReturn(e.Uri);
+
             base.OnNavigatedTo(e);
         }
 
@@ -189,21 +191,13 @@ namespace TwitchTV
             CleanupMedia();
             client = null;
 
+            App.Database.PurgeAsync().Wait();
+
             //Leaving App
             if (uri.OriginalString == @"app://external/")
             {
                 if (chatJoined)
                     rejoinChat = true;
-
-                //var mediaTrack = new Playlist()
-                //{
-                //    Address = "http://video10.iad02.hls.ttvnw.net/hls132/starladder_cs_en_13758889632_223696550/mobile/py-index-live.m3u8?token=id=7719667929993536106,bid=13758889632,exp=1427649363,node=video10-1.iad02.hls.justin.tv,nname=video10.iad02,fmt=mobile&sig=e31ede099a8dce344e0a2b8b0933e7568fe4f4ea",
-                //    Name = App.ViewModel.stream.channel.display_name
-                //};
-
-                //mediaTrack.Save();
-
-                //BackgroundAudioPlayer.Instance.Play();
             }
         }
 
@@ -212,6 +206,8 @@ namespace TwitchTV
         {
             try
             {
+                track = null;
+                track = playlist.streams[quality];
                 if (quality != "Offline")
                 {
                     var task = PlayCurrentTrackAsync();
@@ -235,8 +231,6 @@ namespace TwitchTV
 
         async Task PlayCurrentTrackAsync()
         {
-            var track = playlist.streams[quality];
-
             if (null == track)
             {
                 await _mediaStreamFacade.StopAsync(CancellationToken.None);
@@ -322,7 +316,25 @@ namespace TwitchTV
                 if (!string.IsNullOrEmpty(obj))
                 {
                     quality = obj;
-                    playVideo();
+
+                    if (quality == "Audio")
+                    {
+                        track = playlist.streams[quality];
+                        var list = new Playlist()
+                        {
+                            Address = track.OriginalString,
+                            Name = App.ViewModel.stream.channel.display_name,
+                            Key = 0
+                        };
+
+                        App.Database.SaveAsync<Playlist>(list).Wait();
+                        App.Database.FlushAsync().Wait();
+
+                        BackgroundAudioPlayer.Instance.Play();
+                    }
+
+                    else
+                        playVideo();
                 }
             }
         }
@@ -391,7 +403,7 @@ namespace TwitchTV
             {
                 token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
                 playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
-                if(playlist == null)
+                if (playlist == null)
                 {
                     //Stream is offline
                     playlist = new M3U8Playlist() { streams = new Dictionary<string, Uri>() };
@@ -399,10 +411,15 @@ namespace TwitchTV
                     QualitySelection.IsEnabled = false;
                 }
 
+                else
+                {
+                    playlist.streams.Add("Audio", playlist.streams[playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1)]);
+                }
+
                 this.QualitySelection.ItemsSource = playlist.streams.Keys;
 
                 if (string.IsNullOrEmpty(quality))
-                    quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
+                    quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 2);
                 
                 this.QualitySelection.SelectedItem = quality;
             }

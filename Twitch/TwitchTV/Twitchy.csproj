@@ -98,7 +98,7 @@
     <Compile Include="AudioTrackExtensions.cs" />
     <Compile Include="AudioTrackStreamer.cs" />
     <Compile Include="ChatClient.cs" />
-    <Compile Include="ItemsDatabaseInstance.cs" />
+    <Compile Include="PlaylistDatabaseInstance.cs" />
     <Compile Include="Screens\NotificationsPage.xaml.cs">
       <DependentUpon>NotificationsPage.xaml</DependentUpon>
     </Compile>
@@ -305,11 +305,11 @@
       <HintPath>..\..\References\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Interactivity, Version=3.9.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="Wintellect.Sterling.WindowsPhone">
-      <HintPath>..\packages\SterlingPhone.1.6.2\lib\sl3-wp\Wintellect.Sterling.WindowsPhone.dll</HintPath>
+    <Reference Include="Wintellect.Sterling.Core">
+      <HintPath>..\..\References\Wintellect.Sterling.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Wintellect.Sterling.WindowsPhone.IsolatedStorage">
-      <HintPath>..\packages\SterlingPhone.1.6.2\lib\sl3-wp\Wintellect.Sterling.WindowsPhone.IsolatedStorage.dll</HintPath>
+    <Reference Include="Wintellect.Sterling.WP8">
+      <HintPath>..\..\References\Wintellect.Sterling.WP8.dll</HintPath>
     </Reference>
     <Reference Include="WriteableBitmapExWinPhone">
       <HintPath>..\packages\WriteableBitmapEx.1.0.14.0\lib\WindowsPhone8\WriteableBitmapExWinPhone.dll</HintPath>

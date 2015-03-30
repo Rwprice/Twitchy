@@ -1,23 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Wintellect.Sterling.Database;
+using Wintellect.Sterling.Core.Database;
 
 namespace TwitchTV
 {
     public class PlaylistDatabaseInstance : BaseDatabaseInstance
     {
-        public override string Name
-        {
-            get
-            {
-                return "PlaylistDatabase";
-            }
-        }
-
         protected override List<ITableDefinition> RegisterTables()
         {
             return new List<ITableDefinition>
@@ -49,21 +42,5 @@ namespace TwitchTV
         public string Name { get; set; }
 
         public string Address { get; set; }
-    }
-
-    public static class Extensions
-    {
-        public static void Save(this Playlist playlist)
-        {
-            int currentIndex = (Application.Current as App).Database.Query<Playlist, int>().Count();
-            if (playlist.Key == -1)
-            {
-                playlist.Key = currentIndex;
-            }
-
-            (Application.Current as App).Database.Save(playlist);
-            (App.Current as App).Database.Flush();
-
-        }
     }
 }
