@@ -291,7 +291,7 @@ namespace TwitchTV
             if (null != mediaElement1)
             {
                 mediaElement1.Stop();
-                mediaElement1.Source = null;
+                //mediaElement1.Source = null;
             }
 
             BackgroundAudioPlayer.Instance.Close();
@@ -330,6 +330,7 @@ namespace TwitchTV
                 var obj = (string)((ListPicker)(sender)).SelectedItem;
                 if (!string.IsNullOrEmpty(obj))
                 {
+                    quality = obj;
                     playVideo();
                 }
             }
