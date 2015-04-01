@@ -24,7 +24,6 @@ namespace TwitchTV
 {
     public partial class PlayerPage : PhoneApplicationPage
     {
-
         #region Variables
         public AccessToken token { get; set; }
         public M3U8Playlist playlist { get; set; }
@@ -35,6 +34,7 @@ namespace TwitchTV
         public bool chatJoined = false;
         public bool isLoggedIn = false;
         public bool rejoinChat = false;
+        public bool handledReturn = false;
         
 
         #region Video
@@ -134,6 +134,11 @@ namespace TwitchTV
 
         private void HandleReturn(Uri uri)
         {
+            if (handledReturn)
+                return;
+
+            handledReturn = true;
+
             if (uri.OriginalString.Contains('?'))
             {
                 var streamName = uri.OriginalString.Substring(uri.OriginalString.IndexOf('?') + 1);
@@ -181,6 +186,8 @@ namespace TwitchTV
 
         private void HandleLeave(Uri uri)
         {
+            handledReturn = false;
+
             if (chatJoined)
                 rejoinChat = true;
 
@@ -188,8 +195,11 @@ namespace TwitchTV
             {
                 if (App.ViewModel.BackgroundAudioEnabled)
                 {
-                    StopMedia();
-                    BackgroundAudioPlayer.Instance.Play();
+                    if (BackgroundAudioPlayer.Instance.PlayerState != PlayState.Playing)
+                    {
+                        StopMedia();
+                        BackgroundAudioPlayer.Instance.Play();
+                    }
                 }
 
                 else
@@ -206,34 +216,31 @@ namespace TwitchTV
         #region Video Methods
         void playVideo()
         {
-            if(mediaElement1.CurrentState == MediaElementState.Paused)
+            if (mediaElement1.CurrentState == MediaElementState.Paused)
             {
                 mediaElement1.Play();
             }
 
-            else if (mediaElement1.CurrentState != MediaElementState.Playing)
+            try
             {
-                try
+                if (quality != "Offline")
                 {
-                    if (quality != "Offline")
-                    {
-                        var task = PlayCurrentTrackAsync();
+                    var task = PlayCurrentTrackAsync();
 
-                        TaskCollector.Default.Add(task, "PlayerPage playVideo");
-                    }
-
-                    else
-                    {
-                        Debug.WriteLine("Stream should be offline");
-                    }
+                    TaskCollector.Default.Add(task, "PlayerPage playVideo");
                 }
 
-                catch (Exception ex)
+                else
                 {
-                    CleanupMedia();
-                    MessageBox.Show("Can't play this particular stream. Try another or try again later", "Well, this is embarrassing...", MessageBoxButton.OK);
-                    Debug.WriteLine(ex.Message);
+                    Debug.WriteLine("Stream should be offline");
                 }
+            }
+
+            catch (Exception ex)
+            {
+                CleanupMedia();
+                MessageBox.Show("Can't play this particular stream. Try another or try again later", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
             }
         }
 
@@ -291,7 +298,7 @@ namespace TwitchTV
             if (null != mediaElement1)
             {
                 mediaElement1.Stop();
-                //mediaElement1.Source = null;
+                mediaElement1.Source = null;
             }
 
             BackgroundAudioPlayer.Instance.Close();
@@ -325,10 +332,10 @@ namespace TwitchTV
 
         private void QualitySelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (quality != null) // Lowest hasn't been set yet
+            var obj = (string)((ListPicker)(sender)).SelectedItem;
+            if (!string.IsNullOrEmpty(obj))
             {
-                var obj = (string)((ListPicker)(sender)).SelectedItem;
-                if (!string.IsNullOrEmpty(obj))
+                if (quality != obj)
                 {
                     quality = obj;
                     playVideo();
@@ -424,10 +431,8 @@ namespace TwitchTV
 
                 this.QualitySelection.ItemsSource = playlist.streams.Keys;
 
-                if (string.IsNullOrEmpty(quality))
-                    quality = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
-                
-                this.QualitySelection.SelectedItem = quality;
+                QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
+                this.QualitySelection.SelectedItem = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
             }
 
             catch (Exception ex)

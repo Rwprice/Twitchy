@@ -35,7 +35,6 @@
                 HorizontalAlignment="Right"
                 Width="150"
                 BorderBrush="DarkGray"
-                SelectionChanged="QualitySelection_SelectionChanged"
                 GotFocus="QualitySelection_GotFocus"/>
             <Button BorderThickness="0" Canvas.ZIndex="4" Margin="10,75,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.5" Name="FavoriteButton" Tap="FavoriteButton_Tap">
                 <TextBlock Name="FavoriteLabel" Opacity=".5"/>
