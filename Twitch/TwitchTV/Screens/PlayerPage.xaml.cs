@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 using TwitchAPIHandler.Objects;
@@ -51,7 +52,7 @@ namespace TwitchTV
         #endregion
         #endregion
 
-        public PlayerPage()
+        public PlayerPage() : base()
         {
             token = new AccessToken();
             playlist = new M3U8Playlist();
@@ -422,23 +423,25 @@ namespace TwitchTV
 
         protected override void OnOrientationChanged(OrientationChangedEventArgs e)
         {
-            if ((e.Orientation == PageOrientation.Landscape || e.Orientation == PageOrientation.LandscapeLeft || e.Orientation == PageOrientation.LandscapeRight) || App.ViewModel.LockLandscape)
+            var CurrentStream = (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream;
+
+            if ((e.Orientation == PageOrientation.Landscape || e.Orientation == PageOrientation.LandscapeLeft || e.Orientation == PageOrientation.LandscapeRight))
             {
-                if ((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream != null)
+                if (CurrentStream != null)
                 {
-                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.Margin = new Thickness(0);
-                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
-                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                    CurrentStream.Margin = new Thickness(0);
+                    CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
+                    CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
                 }
             }
 
             else
             {
-                if ((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream != null)
+                if (CurrentStream != null)
                 {
-                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.Margin = new Thickness(0, 70, 0, 0);
-                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                    CurrentStream.Margin = new Thickness(0, 70, 0, 0);
+                    CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                    CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
                 }
             }
 

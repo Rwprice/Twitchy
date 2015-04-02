@@ -7,7 +7,7 @@
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!--Application Resources-->
-    <Application.Resources>
+    <Application.Resources>       
         <sys:Double x:Key="PanoramaItemHeaderFontSize">66</sys:Double>
 
         <Style x:Key="PanoramaItemHeaderTextStyle" TargetType="TextBlock">

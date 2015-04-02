@@ -117,6 +117,7 @@ namespace TwitchTV
         private void Application_Closing(object sender, ClosingEventArgs e)
         {
             Database.PurgeAsync().Wait();
+            BackgroundAudioPlayer.Instance.Close();
         }
 
         // Code to execute if a navigation fails
