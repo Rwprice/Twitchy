@@ -15,7 +15,20 @@
             <Setter Property="FontSize" Value="{StaticResource PanoramaItemHeaderFontSize}"/>
             <Setter Property="CharacterSpacing" Value="-35"/>
         </Style>
-        
+
+        <Style  x:Key="RootFrameStyle" TargetType="phone:PhoneApplicationFrame">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="phone:PhoneApplicationFrame">
+                        <Grid>
+                            <MediaElement Loaded="CurrentStream_Loaded"/>
+                            <ContentPresenter />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <local:LocalizedStrings xmlns:local="clr-namespace:TwitchTV" x:Key="LocalizedStrings"/>
     </Application.Resources>
 

@@ -125,6 +125,7 @@
       <DependentUpon>TopGamePage.xaml</DependentUpon>
     </Compile>
     <Compile Include="TrackManager.cs" />
+    <Compile Include="TwitchPhoneApplicationFrame.cs" />
     <Compile Include="ViewModels\FeaturedStreamsViewModel.cs" />
     <Compile Include="ViewModels\FollowedStreamsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />

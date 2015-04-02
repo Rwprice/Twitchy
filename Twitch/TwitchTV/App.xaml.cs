@@ -14,6 +14,12 @@ using System.Windows.Media;
 using Wintellect.Sterling.Core;
 using Wintellect.Sterling.WP8.IsolatedStorage;
 using Wintellect.Sterling.WP8;
+using System.Threading.Tasks;
+using System.Threading;
+using SM.Media;
+using Microsoft.Phone.BackgroundAudio;
+using SM.Media.Utility;
+using System.Windows.Controls;
 
 namespace TwitchTV
 {
@@ -22,7 +28,6 @@ namespace TwitchTV
         private static MainViewModel viewModel = null;
         public static ISterlingDatabaseInstance Database { get; private set; }
         private static SterlingEngine _engine;
-        private static SterlingDefaultLogger _logger;
 
         public int LastSterlingIndex { get; set; }
 
@@ -85,7 +90,6 @@ namespace TwitchTV
                 // and consume battery power when the user is not using the phone.
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
-
         }
 
         // Code to execute when the application is launching (eg, from Start)
@@ -139,10 +143,8 @@ namespace TwitchTV
 
         #region Phone application initialization
 
-        // Avoid double-initialization
         private bool phoneApplicationInitialized = false;
 
-        // Do not add any additional code to this method
         private void InitializePhoneApplication()
         {
             if (phoneApplicationInitialized)
@@ -150,7 +152,8 @@ namespace TwitchTV
 
             // Create the frame but don't set it as RootVisual yet; this allows the splash
             // screen to remain active until the application is ready to render.
-            RootFrame = new PhoneApplicationFrame();
+            RootFrame = new TwitchPhoneApplicationFrame();
+            RootFrame.Style = Resources["RootFrameStyle"] as Style;
             RootFrame.Navigated += CompleteInitializePhoneApplication;
 
             // Handle navigation failures
@@ -261,6 +264,11 @@ namespace TwitchTV
             _engine = new SterlingEngine(new PlatformAdapter());
             _engine.Activate();
             Database = _engine.SterlingDatabase.RegisterDatabase<PlaylistDatabaseInstance>("PlaylistDatabase", new IsolatedStorageDriver());
+        }
+
+        private void CurrentStream_Loaded(object sender, RoutedEventArgs e)
+        {
+            (RootFrame as TwitchPhoneApplicationFrame).SetMediaElement(sender as MediaElement);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Windows.Navigation;
 using TwitchAPIHandler.Objects;
 using TwitchTV.ViewModels;
@@ -105,7 +106,27 @@ namespace TwitchTV
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             TryRefresh();
+
+            //Handle video
+            if ((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream != null)
+            {
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.Margin = new Thickness(0, 70, 0, 0);
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
+                Canvas.SetZIndex((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream, 2);
+            }
+
             base.OnNavigatedTo(e);
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            if ((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream != null && (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.CurrentState == MediaElementState.Playing)
+            {
+                (App.RootFrame as TwitchPhoneApplicationFrame).StopMedia();
+            }
+
+            base.OnNavigatedFrom(e);
         }
 
         private void followedStreamsList_ItemRealized(object sender, ItemRealizationEventArgs e)

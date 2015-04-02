@@ -35,11 +35,6 @@ namespace TwitchTV
         public bool isLoggedIn = false;
         public bool rejoinChat = false;
         public bool handledReturn = false;
-        
-
-        #region Video
-        IMediaStreamFacade _mediaStreamFacade;
-        #endregion
 
         #region UI
         DispatcherTimer uiTimeout;
@@ -165,23 +160,25 @@ namespace TwitchTV
 
             if (this.Orientation == PageOrientation.Landscape || this.Orientation == PageOrientation.LandscapeLeft || this.Orientation == PageOrientation.LandscapeRight)
             {
-                mediaElement1.Margin = new Thickness(0);
-                mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
-                mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.Margin = new Thickness(0);
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                Canvas.SetZIndex((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream, 0);
             }
 
             else
             {
-                mediaElement1.Margin = new Thickness(0, 70, 0, 0);
-                mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.Margin = new Thickness(0, 70, 0, 0);
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                Canvas.SetZIndex((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream, 0);
             }
 
             if (quality == null)
                 GetQualities();
 
             else
-                playVideo();
+                (App.RootFrame as TwitchPhoneApplicationFrame).PlayVideo(quality, playlist.streams[quality]);
         }
 
         private void HandleLeave(Uri uri)
@@ -197,138 +194,22 @@ namespace TwitchTV
                 {
                     if (BackgroundAudioPlayer.Instance.PlayerState != PlayState.Playing)
                     {
-                        StopMedia();
+                        (App.RootFrame as TwitchPhoneApplicationFrame).StopMedia();
                         BackgroundAudioPlayer.Instance.Play();
                     }
                 }
 
                 else
-                    PauseMedia();
+                    (App.RootFrame as TwitchPhoneApplicationFrame).PauseMedia();
             }
 
             else
             {
-                CleanupMedia();
                 client = null;
             }
         }
 
         #region Video Methods
-        void playVideo()
-        {
-            if (mediaElement1.CurrentState == MediaElementState.Paused)
-            {
-                mediaElement1.Play();
-            }
-
-            try
-            {
-                if (quality != "Offline")
-                {
-                    var task = PlayCurrentTrackAsync();
-
-                    TaskCollector.Default.Add(task, "PlayerPage playVideo");
-                }
-
-                else
-                {
-                    Debug.WriteLine("Stream should be offline");
-                }
-            }
-
-            catch (Exception ex)
-            {
-                CleanupMedia();
-                MessageBox.Show("Can't play this particular stream. Try another or try again later", "Well, this is embarrassing...", MessageBoxButton.OK);
-                Debug.WriteLine(ex.Message);
-            }
-        }
-
-        async Task PlayCurrentTrackAsync()
-        {
-            var track = playlist.streams[quality];
-            if (null == track)
-            {
-                await _mediaStreamFacade.StopAsync(CancellationToken.None);
-
-                mediaElement1.Stop();
-                mediaElement1.Source = null;
-
-                return;
-            }
-
-            mediaElement1.Source = null;
-
-            try
-            {
-                InitializeMediaStream();
-
-                var mss = await _mediaStreamFacade.CreateMediaStreamSourceAsync(track, CancellationToken.None);
-
-                if (null == mss)
-                {
-                    Debug.WriteLine("PlayerPage.PlayCurrentTrackAsync() Unable to create media stream source");
-                    return;
-                }
-
-                mediaElement1.SetSource(mss);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("PlayerPage.PlayCurrentTrackAsync() Unable to create media stream source: " + ex.Message);
-
-                if (ex.Message.Contains("404 (Not Found)"))
-                {
-                    GetQualities();
-                }
-                return;
-            }
-        }
-
-        void InitializeMediaStream()
-        {
-            if (null != _mediaStreamFacade)
-                return;
-
-            _mediaStreamFacade = MediaStreamFacadeSettings.Parameters.Create();
-        }
-
-        void StopMedia()
-        {
-            if (null != mediaElement1)
-            {
-                mediaElement1.Stop();
-                mediaElement1.Source = null;
-            }
-
-            BackgroundAudioPlayer.Instance.Close();
-        }
-
-        void PauseMedia()
-        {
-            if (null != mediaElement1)
-                mediaElement1.Pause();
-        }
-
-        void CleanupMedia()
-        {
-            StopMedia();
-
-            if (null == _mediaStreamFacade)
-                return;
-
-            var mediaStreamFacade = _mediaStreamFacade;
-
-            _mediaStreamFacade = null;
-
-            //Don't block the dispose
-            mediaStreamFacade.DisposeBackground("PlayerPage CleanupMedia");
-        }
-
-        private void mediaElement1_MediaFailed(object sender, ExceptionRoutedEventArgs e)
-        {
-            CleanupMedia();
-        }
 
         private void QualitySelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -338,12 +219,12 @@ namespace TwitchTV
                 if (quality != obj)
                 {
                     quality = obj;
-                    playVideo();
+                    (App.RootFrame as TwitchPhoneApplicationFrame).PlayVideo(quality, playlist.streams[quality]);
                 }
             }
         }
 
-        private void mediaElement1_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private void CurrentStream_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             ToggleUI();
         }
@@ -543,27 +424,25 @@ namespace TwitchTV
         {
             if ((e.Orientation == PageOrientation.Landscape || e.Orientation == PageOrientation.LandscapeLeft || e.Orientation == PageOrientation.LandscapeRight) || App.ViewModel.LockLandscape)
             {
-                if (this.mediaElement1 != null)
+                if ((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream != null)
                 {
-                    this.mediaElement1.Margin = new Thickness(0);
-                    this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
-                    this.mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.Margin = new Thickness(0);
+                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Stretch;
+                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
                 }
             }
 
             else
             {
-                if (this.mediaElement1 != null)
+                if ((App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream != null)
                 {
-                    this.mediaElement1.Margin = new Thickness(0, 70, 0, 0);
-                    this.mediaElement1.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-                    this.mediaElement1.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
+                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.Margin = new Thickness(0, 70, 0, 0);
+                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.VerticalAlignment = System.Windows.VerticalAlignment.Top;
+                    (App.RootFrame as TwitchPhoneApplicationFrame).CurrentStream.HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch;
                 }
             }
 
             ToggleUI();
-
-            base.OnOrientationChanged(e);
         }
         #endregion
 
