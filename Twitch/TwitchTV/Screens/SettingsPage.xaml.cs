@@ -25,7 +25,6 @@ namespace TwitchTV
             this.AutoJoinChatButton.IsChecked = App.ViewModel.AutoJoinChat;
             this.LockLandscapeButton.IsChecked = App.ViewModel.LockLandscape;
             this.LiveTilesButton.IsChecked = App.ViewModel.LiveTilesEnabled;
-            this.BackgroundAudioButton.IsChecked = App.ViewModel.BackgroundAudioEnabled;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -113,15 +112,5 @@ namespace TwitchTV
                 Console.WriteLine(exception);
             }
         }
-
-        private void BackgroundAudioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            App.ViewModel.BackgroundAudioEnabled = true;
-        }
-
-        private void BackgroundAudioButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-            App.ViewModel.BackgroundAudioEnabled = false;
-        }        
     }
 }

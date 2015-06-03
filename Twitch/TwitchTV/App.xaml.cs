@@ -14,6 +14,7 @@ using System.Windows.Media;
 using Wintellect.Sterling.Core;
 using Wintellect.Sterling.WP8.IsolatedStorage;
 using Wintellect.Sterling.WP8;
+using Microsoft.Phone.Tasks;
 
 namespace TwitchTV
 {
@@ -39,6 +40,11 @@ namespace TwitchTV
                     viewModel = new MainViewModel();
 
                 return viewModel;
+            }
+
+            set
+            {
+                viewModel = value;
             }
         }
 
@@ -134,6 +140,9 @@ namespace TwitchTV
                 Debugger.Break();
             }
 
+#if DEBUG
+            MessageBox.Show(e.ExceptionObject.ToString());
+#endif
             MessageBox.Show("The application has run into an error and must close", "Well, this is embarrasing...", MessageBoxButton.OK);
         }
 

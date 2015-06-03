@@ -9,12 +9,14 @@ using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 using System.Windows.Media.Imaging;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace TwitchAPIHandler.Objects
 {
     public class TopGame
     {
         private int _channels;
+        [DataMember]
         public int channels
         {
             get
@@ -31,6 +33,7 @@ namespace TwitchAPIHandler.Objects
         }
 
         private Game _game;
+        [DataMember]
         public Game game
         {
             get
@@ -69,7 +72,9 @@ namespace TwitchAPIHandler.Objects
 
     public class Game
     {
+        [DataMember]
         public string name { get; set; }
+        [DataMember]
         public Box box { get; set; }
 
         public override bool Equals(object obj)
@@ -92,6 +97,7 @@ namespace TwitchAPIHandler.Objects
 
     public class Box
     {
+        [DataMember]
         public BitmapImage medium { get; set; }
     }
 }

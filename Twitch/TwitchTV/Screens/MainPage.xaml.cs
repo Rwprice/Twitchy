@@ -1,5 +1,4 @@
 ﻿using LiveTileTaskAgent;
-using Microsoft.Phone.BackgroundAudio;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Net.NetworkInformation;
 using Microsoft.Phone.Scheduler;

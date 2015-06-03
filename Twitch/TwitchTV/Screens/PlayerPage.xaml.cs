@@ -35,7 +35,6 @@ namespace TwitchTV
         public bool isLoggedIn = false;
         public bool rejoinChat = false;
         public bool handledReturn = false;
-        
 
         #region Video
         IMediaStreamFacade _mediaStreamFacade;
@@ -139,10 +138,32 @@ namespace TwitchTV
 
             handledReturn = true;
 
-            if (uri.OriginalString.Contains('?'))
+            if (uri != null && uri.OriginalString != null && uri.OriginalString.Contains('?'))
             {
                 var streamName = uri.OriginalString.Substring(uri.OriginalString.IndexOf('?') + 1);
                 LoadSettingsAndStream(streamName);
+            }
+
+#if DEBUG
+            if (App.ViewModel == null)
+                MessageBox.Show("App.ViewModel is null");
+            else if (App.ViewModel.stream == null)
+                MessageBox.Show("App.ViewModel.stream is null");
+            if(mediaElement1 == null)
+                MessageBox.Show("mediaElement1 is null");
+#endif
+
+            if (App.ViewModel.stream == null)
+            {
+                App.ViewModel.stream = new Stream();
+                App.ViewModel.stream.channel = (Channel)State["stream.channel"];
+            }
+
+            if (App.ViewModel.user == null)
+            {
+                object _user;
+                if (State.TryGetValue("user", out _user))
+                    App.ViewModel.user = (User)_user;
             }
 
             isLoggedIn = App.ViewModel.user != null;
@@ -193,23 +214,21 @@ namespace TwitchTV
 
             if (uri.OriginalString == @"app://external/")
             {
-                if (App.ViewModel.BackgroundAudioEnabled)
+                if (BackgroundAudioPlayer.Instance.PlayerState != PlayState.Playing)
                 {
-                    if (BackgroundAudioPlayer.Instance.PlayerState != PlayState.Playing)
-                    {
-                        StopMedia();
-                        BackgroundAudioPlayer.Instance.Play();
-                    }
+                    PauseMedia();
                 }
 
-                else
-                    PauseMedia();
+                State["stream.channel"] = App.ViewModel.stream.channel;
+                if(App.ViewModel.user != null)
+                    State["user"] = App.ViewModel.user;
             }
 
             else
             {
                 CleanupMedia();
                 client = null;
+                State.Clear();
             }
         }
 
@@ -338,7 +357,17 @@ namespace TwitchTV
                 if (quality != obj)
                 {
                     quality = obj;
-                    playVideo();
+
+                    if (quality == "Audio")
+                    {
+                        StopMedia();
+                        BackgroundAudioPlayer.Instance.Play();
+                    }
+
+                    else
+                    {
+                        playVideo();
+                    }
                 }
             }
         }
@@ -417,7 +446,7 @@ namespace TwitchTV
 
                 else
                 {
-                    var list = new Playlist()
+                    var audioTrack = new Playlist()
                     {
                         Address = playlist.streams[playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1)].OriginalString,
                         Name = App.ViewModel.stream.channel.display_name,
@@ -425,18 +454,23 @@ namespace TwitchTV
                         Key = 0
                     };
 
-                    App.Database.SaveAsync<Playlist>(list).Wait();
+                    App.Database.SaveAsync<Playlist>(audioTrack).Wait();
                     App.Database.FlushAsync().Wait();
+
+                    playlist.streams.Add("Audio", null);
+
+                    this.QualitySelection.ItemsSource = playlist.streams.Keys;
+
+                    QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
+                    this.QualitySelection.SelectedItem = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 2);
                 }
-
-                this.QualitySelection.ItemsSource = playlist.streams.Keys;
-
-                QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
-                this.QualitySelection.SelectedItem = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1);
             }
 
             catch (Exception ex)
             {
+#if DEBUG
+                MessageBox.Show(ex.ToString());
+#endif
                 MessageBox.Show("Can't load the qualities list of this stream", "Well, this is embarrassing...", MessageBoxButton.OK);
                 Debug.WriteLine(ex.Message);
             }

@@ -141,12 +141,12 @@ namespace LiveTileTaskAgent
                 {
                     if (channel != "")
                     {
-                        var split = channel.Split(':');
+                        var split = channel.Split('!');
                         if(split.Length == 3)
-                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], live = bool.Parse(split[2])});
+                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], createdAt = split[2] });
 
                         else
-                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], live = false});
+                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], createdAt = null });
                     }
                 }
 
@@ -155,25 +155,14 @@ namespace LiveTileTaskAgent
                 {
                     //Lookup live or not
                     var stream = await TwitchAPIHandler.Objects.Stream.GetStream(channel.name);
-                    bool streamLive = stream.channel != null ? true : false;
-
-                    if (streamLive)
+                    if (stream.createdAt != null && channel.createdAt != stream.createdAt)
                     {
-                        if (!channel.live)
-                        {
-                            ShellToast toast = new ShellToast();
-                            toast.Title = string.Format("{0} is now live!", stream.channel.display_name);
-                            toast.Content = stream.channel.status ?? string.Format("Tap here to watch {0}", stream.channel.display_name);
-                            toast.NavigationUri = new Uri(string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name), UriKind.RelativeOrAbsolute);
-                            toast.Show();
-                            channel.live = true;
-                        }
-                    }
-
-
-                    else
-                    {
-                        channel.live = false;
+                        ShellToast toast = new ShellToast();
+                        toast.Title = string.Format("{0} is now live!", stream.channel.display_name);
+                        toast.Content = stream.channel.status ?? string.Format("Tap here to watch {0}", stream.channel.display_name);
+                        toast.NavigationUri = new Uri(string.Concat("/Screens/PlayerPage.xaml?", stream.channel.name), UriKind.RelativeOrAbsolute);
+                        toast.Show();
+                        channel.createdAt = stream.createdAt;
                     }
                 }
 
@@ -185,7 +174,7 @@ namespace LiveTileTaskAgent
                     {
                         foreach (var notif in channelsToNotify)
                         {
-                            textWriter.WriteString(string.Format("{0}:{1}:{2}{3}", notif.display_name, notif.name, notif.live, "\n"));
+                            textWriter.WriteString(string.Format("{0}!{1}!{2}{3}", notif.display_name, notif.name, notif.createdAt, "\n"));
                         }
                         await textWriter.StoreAsync();
                     }

@@ -47,9 +47,13 @@ namespace LiveTileTaskAgent
                 {
                     if (task.Description != "No OAuth to use")
                     {
-                        await LiveTileHelper.UpdateLiveTile(task.Description);
-                        await LiveTileHelper.UpdateSecondaryTiles();
-                        await LiveTileHelper.SendNotifications();
+                        try
+                        {
+                            await LiveTileHelper.UpdateLiveTile(task.Description);
+                            await LiveTileHelper.UpdateSecondaryTiles();
+                            await LiveTileHelper.SendNotifications();
+                        }
+                        catch { }
                     }
 
                     else

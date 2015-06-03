@@ -39,10 +39,6 @@
                 <toolkit:ToggleSwitch Margin="10,0,0,0" Name="LiveTilesButton" Checked="LiveTilesButton_Checked"  Unchecked="LiveTilesButton_Unchecked">
                     <TextBlock Text="Live Tiles"/>
                 </toolkit:ToggleSwitch>
-                <toolkit:ToggleSwitch Margin="10,0,0,0" Name="BackgroundAudioButton" Checked="BackgroundAudioButton_Checked"  
-                                      Unchecked="BackgroundAudioButton_Unchecked">
-                    <TextBlock Text="Background Audio"/>
-                </toolkit:ToggleSwitch>
             </StackPanel>
         </Grid>
     </Grid>

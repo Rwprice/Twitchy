@@ -6,15 +6,18 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
 namespace TwitchAPIHandler.Objects
 {
+    [DataContract]
     public class Stream : INotifyPropertyChanged
     {
         private int _viewers;
+        [DataMember]
         public int viewers
         {
             get
@@ -32,6 +35,7 @@ namespace TwitchAPIHandler.Objects
         }
 
         private Preview _preview;
+        [DataMember]
         public Preview preview
         {
             get
@@ -49,6 +53,7 @@ namespace TwitchAPIHandler.Objects
         }
 
         private Channel _channel;
+        [DataMember]
         public Channel channel
         {
             get
@@ -61,6 +66,24 @@ namespace TwitchAPIHandler.Objects
                 {
                     _channel = value;
                     NotifyPropertyChanged("channel");
+                }
+            }
+        }
+
+        private string _createdAt;
+        [DataMember]
+        public string createdAt
+        {
+            get
+            {
+                return _createdAt;
+            }
+            set
+            {
+                if (value != _createdAt)
+                {
+                    _createdAt = value;
+                    NotifyPropertyChanged("createdAt");
                 }
             }
         }
@@ -88,6 +111,7 @@ namespace TwitchAPIHandler.Objects
                 var channel = new Channel();
 
                 var viewers = int.Parse(stream.SelectToken("viewers").ToString());
+                var created_at = stream.SelectToken("created_at").ToString();
                 var display_name = stream.SelectToken("channel").SelectToken("display_name").ToString();
                 var name = stream.SelectToken("channel").SelectToken("name").ToString();
                 var game = stream.SelectToken("channel").SelectToken("game").ToString();
@@ -119,7 +143,8 @@ namespace TwitchAPIHandler.Objects
                 var streamToReturn = new Stream()
                 {
                     channel = channel,
-                    viewers = viewers
+                    viewers = viewers,
+                    createdAt = created_at
                 };
 
                 return streamToReturn;
@@ -177,18 +202,27 @@ namespace TwitchAPIHandler.Objects
         }
     }
 
+    [DataContractAttribute]
     public class Preview
     {
+        [DataMemberAttribute]
         public BitmapImage medium { get; set; }
+        [DataMemberAttribute]
         public BitmapImage small { get; set; }
     }
 
+    [DataContract]
     public class Channel
     {
+        [DataMember]
         public string status { get; set; }
+        [DataMember]
         public string display_name { get; set; }
+        [DataMember]
         public string name { get; set; }
+        [DataMember]
         public string logoUri { get; set; }
+        [DataMember]
         public string game { get; set; }
 
         public override bool Equals(object obj)
@@ -214,7 +248,7 @@ namespace TwitchAPIHandler.Objects
         public string display_name { get; set; }
         public string name { get; set; }
         public bool notify { get; set; }
-        public bool live { get; set; }
+        public string createdAt { get; set; }
 
         public override bool Equals(object obj)
         {

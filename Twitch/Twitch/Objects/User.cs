@@ -9,15 +9,20 @@ using Newtonsoft.Json.Linq;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Microsoft.Phone.Scheduler;
+using System.Runtime.Serialization;
 
 namespace TwitchAPIHandler.Objects
 {
+    [DataContract]
     public class User
     {
         private static string liveTileTaskName = "UpdateLiveTileTask";
 
+        [DataMember]
         public string Name { get; set; }
+        [DataMember]
         public string DisplayName { get; set; }
+        [DataMember]
         public string Oauth { get; set; }
 
         public static async Task<User> GetUserFromOauth(string oauth)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -13,16 +14,22 @@ using Windows.Storage.Streams;
 
 namespace TwitchTV.ViewModels
 {
+    [DataContract]
     public class MainViewModel : INotifyPropertyChanged
     {
+        [DataMember]
         public Stream stream { get; set; }
+        [DataMember]
         public TopGame curTopGame { get; set; }
+        [DataMember]
         public User user { get; set; }
 
+        [DataMember]
         public bool AutoJoinChat = false;
+        [DataMember]
         public bool LockLandscape = false;
+        [DataMember]
         public bool LiveTilesEnabled = false;
-        public bool BackgroundAudioEnabled = false;
 
         public MainViewModel()
         {
@@ -40,8 +47,7 @@ namespace TwitchTV.ViewModels
                 {
                     textWriter.WriteString(AutoJoinChat.ToString() + "\n" 
                         + LockLandscape.ToString() + "\n"
-                        + LiveTilesEnabled.ToString() + "\n"
-                        + BackgroundAudioEnabled.ToString());
+                        + LiveTilesEnabled.ToString());
                     await textWriter.StoreAsync();
                 }
             }
@@ -71,8 +77,6 @@ namespace TwitchTV.ViewModels
                 bool.TryParse(lines[0], out AutoJoinChat);
                 bool.TryParse(lines[1], out LockLandscape);
                 bool.TryParse(lines[2], out LiveTilesEnabled);
-                if(lines.Length == 4)
-                    bool.TryParse(lines[3], out BackgroundAudioEnabled);
             }
 
             catch { }
@@ -89,7 +93,7 @@ namespace TwitchTV.ViewModels
                 {
                     foreach (var notif in notifications.Distinct())
                     {
-                        textWriter.WriteString(string.Format("{0}:{1}:{2}{3}", notif.display_name, notif.name, notif.live,"\n"));
+                        textWriter.WriteString(string.Format("{0}!{1}!{2}{3}", notif.display_name, notif.name, notif.createdAt,"\n"));
                     }
                     await textWriter.StoreAsync();
                 }
@@ -120,12 +124,12 @@ namespace TwitchTV.ViewModels
                 {
                     if (channel != "")
                     {
-                        var split = channel.Split(':');
+                        var split = channel.Split('!');
                         if (split.Length == 3)
-                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], notify = true, live = bool.Parse(split[2])});
+                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], notify = true, createdAt = split[2]});
 
                         else
-                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], notify = true, live = false });
+                            channelsToNotify.Add(new TwitchAPIHandler.Objects.Notification() { name = split[1], display_name = split[0], notify = true, createdAt = null });
                     }
                 }
 
