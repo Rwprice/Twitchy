@@ -161,7 +161,7 @@ namespace SM.Media.BackgroundAudioStreamingAgent
                         break;
                     case UserAction.Pause:
                         if (PlayState.Playing == player.PlayerState)
-                            player.Pause();
+                            player.Close();
 
                         break;
                     case UserAction.FastForward:

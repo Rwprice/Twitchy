@@ -98,21 +98,22 @@ namespace TwitchTV
 
         //Method to Update UI when navigating directly
         //to the player plage from the home screen
-        private async void LoadSettingsAndStream(string streamName)
+        private async Task LoadSettingsAndStream(string streamName)
         {
             App.ViewModel.LoadSettings();
 
             if (App.ViewModel.stream == null)
             {
-                App.ViewModel.stream = new Stream() { channel = new Channel() { name = streamName } };
-
                 //Load stream
                 App.ViewModel.stream = await Stream.GetStream(streamName);
 
-                if (App.ViewModel.stream.channel == null)
+                if (App.ViewModel.stream.channel.display_name == null)
                 {
-                    MessageBox.Show("This Stream appears to be offline!");
-                    Application.Current.Terminate();
+                    //Stream is offline
+                    playlist = new M3U8Playlist() { streams = new Dictionary<string, Uri>() };
+                    playlist.streams.Add("Offline", null);
+                    this.QualitySelection.ItemsSource = playlist.streams.Keys;
+                    QualitySelection.IsEnabled = false;
                 }
 
                 this.Status.Text = App.ViewModel.stream.channel.status;
@@ -131,7 +132,7 @@ namespace TwitchTV
             IsFollowed(App.ViewModel.stream.channel.name);
         }
 
-        private void HandleReturn(Uri uri)
+        private async void HandleReturn(Uri uri)
         {
             if (handledReturn)
                 return;
@@ -141,17 +142,10 @@ namespace TwitchTV
             if (uri != null && uri.OriginalString != null && uri.OriginalString.Contains('?'))
             {
                 var streamName = uri.OriginalString.Substring(uri.OriginalString.IndexOf('?') + 1);
-                LoadSettingsAndStream(streamName);
+                await LoadSettingsAndStream(streamName);
+                if (App.ViewModel.stream.channel.display_name == null)
+                    return;
             }
-
-#if DEBUG
-            if (App.ViewModel == null)
-                MessageBox.Show("App.ViewModel is null");
-            else if (App.ViewModel.stream == null)
-                MessageBox.Show("App.ViewModel.stream is null");
-            if(mediaElement1 == null)
-                MessageBox.Show("mediaElement1 is null");
-#endif
 
             if (App.ViewModel.stream == null)
             {
@@ -214,9 +208,20 @@ namespace TwitchTV
 
             if (uri.OriginalString == @"app://external/")
             {
-                if (BackgroundAudioPlayer.Instance.PlayerState != PlayState.Playing)
+                try
                 {
-                    PauseMedia();
+                    if (BackgroundAudioPlayer.Instance.PlayerState != PlayState.Playing)
+                    {
+                        PauseMedia();
+                    }
+                }
+
+                catch(Exception ex)
+                {
+#if DEBUG
+                    MessageBox.Show("Trying to check the bg audio player shat the bed...");
+                    MessageBox.Show(ex.ToString());
+#endif
                 }
 
                 State["stream.channel"] = App.ViewModel.stream.channel;
@@ -430,50 +435,58 @@ namespace TwitchTV
 
         private async void GetQualities()
         {
+            #region Get Playlist
             IsFollowed(App.ViewModel.stream.channel.name);
 
             try
             {
                 token = await AccessToken.GetToken(App.ViewModel.stream.channel.name);
-                playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
-                if (playlist == null)
-                {
-                    //Stream is offline
-                    playlist = new M3U8Playlist() { streams = new Dictionary<string, Uri>() };
-                    playlist.streams.Add("Offline", null);
-                    QualitySelection.IsEnabled = false;
-                }
-
-                else
-                {
-                    var audioTrack = new Playlist()
-                    {
-                        Address = playlist.streams[playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1)].OriginalString,
-                        Name = App.ViewModel.stream.channel.display_name,
-                        Status = App.ViewModel.stream.channel.status,
-                        Key = 0
-                    };
-
-                    App.Database.SaveAsync<Playlist>(audioTrack).Wait();
-                    App.Database.FlushAsync().Wait();
-
-                    playlist.streams.Add("Audio", null);
-
-                    this.QualitySelection.ItemsSource = playlist.streams.Keys;
-
-                    QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
-                    this.QualitySelection.SelectedItem = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 2);
-                }
             }
-
             catch (Exception ex)
             {
 #if DEBUG
+                MessageBox.Show("Error in GetToken with channel: '" + App.ViewModel.stream.channel.name + "'");
                 MessageBox.Show(ex.ToString());
 #endif
                 MessageBox.Show("Can't load the qualities list of this stream", "Well, this is embarrassing...", MessageBoxButton.OK);
                 Debug.WriteLine(ex.Message);
+                return;
             }
+            try
+            {
+                playlist = await M3U8Playlist.GetStreamPlaylist(App.ViewModel.stream.channel.name, token);
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                MessageBox.Show("Error in GetStreamPlaylist with channel: '" + App.ViewModel.stream.channel.name + "'");
+                MessageBox.Show(ex.ToString());
+#endif
+                MessageBox.Show("Can't load the qualities list of this stream", "Well, this is embarrassing...", MessageBoxButton.OK);
+                Debug.WriteLine(ex.Message);
+                return;
+            }
+            #endregion
+
+            #region Create Background Audio Track
+            var audioTrack = new Playlist()
+            {
+                Address = playlist.streams[playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 1)].OriginalString,
+                Name = App.ViewModel.stream.channel.display_name,
+                Status = App.ViewModel.stream.channel.status,
+                Key = 0
+            };
+
+            App.Database.SaveAsync<Playlist>(audioTrack).Wait();
+            App.Database.FlushAsync().Wait();
+            playlist.streams.Add("Audio", null);
+            #endregion
+
+            this.QualitySelection.ItemsSource = playlist.streams.Keys;
+
+            QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
+            this.QualitySelection.SelectedItem = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 2);
+
         }
         #endregion
 

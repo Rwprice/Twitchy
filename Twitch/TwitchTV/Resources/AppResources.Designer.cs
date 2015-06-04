@@ -67,9 +67,7 @@ namespace TwitchTV.Resources {
         ///
         ///Be careful when using this app on your mobile data connection as it requires vast amounts of data for streams. 
         ///
-        ///With the Version 3.0 update, stability has improved substantially! Ability to use live tiles and pin streams to the start menu has been added!
-        ///
-        ///Twitchy is a product of Earthquake Unicorn Productions. For mor [rest of string was truncated]&quot;;.
+        ///With the Version 3.1 update, stability has improved yet again, finally being able to track down a bug when returning from tombstoned state. Notifications now work for streams you follow and background audio is [rest of string was truncated]&quot;;.
         /// </summary>
         public static string ABOUT_TEXT {
             get {

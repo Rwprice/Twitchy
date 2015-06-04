@@ -108,6 +108,19 @@ namespace TwitchAPIHandler.Objects
                 JToken o = JObject.Parse(response);
                 JToken stream = o.SelectToken("stream");
 
+                if (stream.Next == null)
+                {
+                    return new Stream()
+                    {
+                        channel = new Channel()
+                        {
+                            name = streamName,
+                            status = string.Format("{0} is offline!", streamName),
+                            display_name = null
+                        }
+                    };
+                }
+
                 var channel = new Channel();
 
                 var viewers = int.Parse(stream.SelectToken("viewers").ToString());
@@ -152,7 +165,7 @@ namespace TwitchAPIHandler.Objects
 
             catch
             {
-                return new Stream();
+                return null;
             }
         }
 
