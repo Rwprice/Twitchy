@@ -247,6 +247,14 @@ namespace TwitchTV
 
             try
             {
+                if (quality == "Audio")
+                {
+                    if (BackgroundAudioPlayer.Instance.PlayerState != PlayState.Playing)
+                    {
+                        BackgroundAudioPlayer.Instance.Play();
+                    }
+                }
+
                 if (quality != "Offline")
                 {
                     var task = PlayCurrentTrackAsync();
@@ -611,6 +619,11 @@ namespace TwitchTV
             ToggleUI();
 
             base.OnOrientationChanged(e);
+        }
+
+        private void Background_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            ToggleUI();
         }
         #endregion
 

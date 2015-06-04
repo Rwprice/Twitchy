@@ -15,7 +15,7 @@
     shell:SystemTray.IsVisible="False">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">        
+    <Grid x:Name="LayoutRoot" Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -23,12 +23,20 @@
 
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="0,0,0,0">
-            <MediaElement Name="mediaElement1" AutoPlay="True" Canvas.ZIndex="0" Tap="mediaElement1_Tap"/>
-            <Border Name="TaskBar" Opacity="1" Canvas.ZIndex="1" Background="Gray" BorderBrush="DarkGray" BorderThickness="5" HorizontalAlignment="Stretch"  Height="68" VerticalAlignment="Top"/>
-            <TextBlock Margin="10,20,165,0" Height="40" Canvas.ZIndex="2" Name="Status" Opacity="1" VerticalAlignment="Top" HorizontalAlignment="Stretch" TextTrimming="WordEllipsis"/>
+            <Rectangle Canvas.ZIndex="0" Tap="Background_Tap" Margin="0,0,0,0" 
+                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="Black"/>
+            
+            <MediaElement Name="mediaElement1" AutoPlay="True" Canvas.ZIndex="1" Tap="mediaElement1_Tap"/>
+            
+            <Border Name="TaskBar" Opacity="1" Canvas.ZIndex="2" Background="Gray" BorderBrush="DarkGray" 
+                    BorderThickness="5" HorizontalAlignment="Stretch"  Height="68" VerticalAlignment="Top"/>
+            
+            <TextBlock Margin="10,20,165,0" Height="40" Canvas.ZIndex="3" Name="Status" Opacity="1" 
+                       VerticalAlignment="Top" HorizontalAlignment="Stretch" TextTrimming="WordEllipsis"/>
+            
             <toolkit:ListPicker 
                 x:Name="QualitySelection"
-                Canvas.ZIndex="3"
+                Canvas.ZIndex="4"
                 Opacity="1"
                 Margin="0,0,15,0" 
                 VerticalAlignment="Top"
@@ -36,9 +44,12 @@
                 Width="150"
                 BorderBrush="DarkGray"
                 GotFocus="QualitySelection_GotFocus"/>
-            <Button BorderThickness="0" Canvas.ZIndex="4" Margin="10,75,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.5" Name="FavoriteButton" Tap="FavoriteButton_Tap">
+            
+            <Button BorderThickness="0" Canvas.ZIndex="5" Margin="10,75,0,0" HorizontalAlignment="Left" 
+                    VerticalAlignment="Top" Opacity="0.5" Name="FavoriteButton" Tap="FavoriteButton_Tap">
                 <TextBlock Name="FavoriteLabel" Opacity=".5"/>
             </Button>
+            
             <ListBox Name="ChatBox" Background="White" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Height="385" Margin="0,0,0,70">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -49,13 +60,20 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button Name="ConnectToChat" Tap="ConnectToChat_Tap" Margin="0,200,0,0" Background="Black" Canvas.ZIndex="10" BorderBrush="Gray" HorizontalAlignment="Center" VerticalAlignment="Center">
+            
+            <Button Name="ConnectToChat" Tap="ConnectToChat_Tap" Margin="0,200,0,0" Background="Black" 
+                    Canvas.ZIndex="10" BorderBrush="Gray" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Name="ConnectToChatText" Text="Connect to Chat" Foreground="White"/>
             </Button>
-            <TextBox KeyUp="SendMessageBox_KeyUp" GotFocus="SendMessageBox_GotFocus" Margin="0,0,70,0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="70" Name="SendMessageBox" BorderThickness="0" Text="Type to chat..."/>
+            
+            <TextBox KeyUp="SendMessageBox_KeyUp" GotFocus="SendMessageBox_GotFocus" Margin="0,0,70,0" 
+                     HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="70" Name="SendMessageBox" 
+                     BorderThickness="0" Text="Type to chat..."/>
+            
             <Button Name="SendButton" Tap="SendButton_Tap" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="70" Width="90">
                 <TextBlock FontSize="18" Text="Send"/>
             </Button>
+            
         </Grid>
     </Grid>
 

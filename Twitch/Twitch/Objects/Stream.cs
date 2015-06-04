@@ -108,7 +108,7 @@ namespace TwitchAPIHandler.Objects
                 JToken o = JObject.Parse(response);
                 JToken stream = o.SelectToken("stream");
 
-                if (stream.Next == null)
+                if (!stream.HasValues)
                 {
                     return new Stream()
                     {
