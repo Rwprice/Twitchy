@@ -227,6 +227,7 @@ namespace TwitchTV
                 State["stream.channel"] = App.ViewModel.stream.channel;
                 if(App.ViewModel.user != null)
                     State["user"] = App.ViewModel.user;
+                State["quality"] = quality;
             }
 
             else
@@ -493,7 +494,18 @@ namespace TwitchTV
             this.QualitySelection.ItemsSource = playlist.streams.Keys;
 
             QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
-            this.QualitySelection.SelectedItem = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 2);
+
+            object outQual;
+            if (State.TryGetValue("quality", out outQual))
+            {
+                quality = (string)outQual;
+                this.QualitySelection.SelectedItem = quality;
+            }
+
+            else
+            {
+                this.QualitySelection.SelectedItem = playlist.streams.Keys.ElementAt(playlist.streams.Keys.Count - 2);
+            }
 
         }
         #endregion
