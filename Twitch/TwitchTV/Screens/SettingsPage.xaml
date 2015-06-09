@@ -37,7 +37,7 @@
                     <TextBlock Text="Landscape Lock"/>
                 </toolkit:ToggleSwitch>
                 <toolkit:ToggleSwitch Margin="10,0,0,0" Name="LiveTilesButton" Checked="LiveTilesButton_Checked"  Unchecked="LiveTilesButton_Unchecked">
-                    <TextBlock Text="Live Tiles"/>
+                    <TextBlock Text="Live Tiles+Notifications"/>
                 </toolkit:ToggleSwitch>
             </StackPanel>
         </Grid>

@@ -61,6 +61,11 @@ namespace TwitchTV
             {
                 _viewModel.LoadPage(App.ViewModel.user.Name, _pageNumber++);
             }
+
+            else
+            {
+                MessageBox.Show("Must be logged in to use notifications!");
+            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

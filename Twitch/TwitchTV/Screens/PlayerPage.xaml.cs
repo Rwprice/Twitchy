@@ -491,9 +491,17 @@ namespace TwitchTV
             playlist.streams.Add("Audio", null);
             #endregion
 
-            this.QualitySelection.ItemsSource = playlist.streams.Keys;
+            if (playlist.streams.Keys.Count == 2)
+            {
+                this.QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
+                this.QualitySelection.ItemsSource = playlist.streams.Keys;
+            }
 
-            QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
+            else
+            {
+                this.QualitySelection.ItemsSource = playlist.streams.Keys;
+                this.QualitySelection.SelectionChanged += QualitySelection_SelectionChanged;
+            }
 
             object outQual;
             if (State.TryGetValue("quality", out outQual))
