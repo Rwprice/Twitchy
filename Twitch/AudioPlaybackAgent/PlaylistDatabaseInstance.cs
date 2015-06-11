@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Wintellect.Sterling.Core.Database;
 
-namespace TwitchTV
+namespace AudioPlaybackAgent
 {
     public class PlaylistDatabaseInstance : BaseDatabaseInstance
     {

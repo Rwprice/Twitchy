@@ -1,10 +1,8 @@
-﻿using Microsoft.Phone.BackgroundAudio;
+﻿using AudioPlaybackAgent;
+using Microsoft.Phone.BackgroundAudio;
 using Microsoft.Phone.Controls;
 using SM.Media;
-using SM.Media.Playlists;
-using SM.Media.Segments;
 using SM.Media.Utility;
-using SM.Media.Web;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

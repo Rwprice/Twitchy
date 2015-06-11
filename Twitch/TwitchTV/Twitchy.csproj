@@ -93,12 +93,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="AudioMetadataHandler.cs" />
-    <Compile Include="AudioPlayer.cs" />
-    <Compile Include="AudioTrackExtensions.cs" />
-    <Compile Include="AudioTrackStreamer.cs" />
     <Compile Include="ChatClient.cs" />
-    <Compile Include="PlaylistDatabaseInstance.cs" />
     <Compile Include="Screens\NotificationsPage.xaml.cs">
       <DependentUpon>NotificationsPage.xaml</DependentUpon>
     </Compile>
@@ -124,7 +119,6 @@
     <Compile Include="Screens\TopGamePage.xaml.cs">
       <DependentUpon>TopGamePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TrackManager.cs" />
     <Compile Include="ViewModels\FeaturedStreamsViewModel.cs" />
     <Compile Include="ViewModels\FollowedStreamsViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
@@ -235,6 +229,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AudioPlaybackAgent\AudioPlaybackAgent.csproj">
+      <Project>{5E351C3B-B986-4B2D-884E-2A15B9E230F8}</Project>
+      <Name>AudioPlaybackAgent</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LiveTileTaskAgent\LiveTileTaskAgent.csproj">
       <Project>{C6492BAF-AC31-4AE6-A907-4BC488B79446}</Project>
       <Name>LiveTileTaskAgent</Name>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Phone.BackgroundAudio;
 
-namespace SM.Media.BackgroundAudioStreamingAgent
+namespace AudioPlaybackAgent
 {
     public static class AudioTrackExtensions
     {

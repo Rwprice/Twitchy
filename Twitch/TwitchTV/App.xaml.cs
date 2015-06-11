@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using AudioPlaybackAgent;
+using Microsoft.Phone.Controls;
+using Microsoft.Phone.Shell;
+using System;
 using System.Diagnostics;
-using System.Resources;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
 using TwitchTV.Resources;
 using TwitchTV.ViewModels;
-using System.Windows.Media;
 using Wintellect.Sterling.Core;
-using Wintellect.Sterling.WP8.IsolatedStorage;
 using Wintellect.Sterling.WP8;
-using Microsoft.Phone.Tasks;
+using Wintellect.Sterling.WP8.IsolatedStorage;
 
 namespace TwitchTV
 {
@@ -23,7 +19,6 @@ namespace TwitchTV
         private static MainViewModel viewModel = null;
         public static ISterlingDatabaseInstance Database { get; private set; }
         private static SterlingEngine _engine;
-        private static SterlingDefaultLogger _logger;
 
         public int LastSterlingIndex { get; set; }
 

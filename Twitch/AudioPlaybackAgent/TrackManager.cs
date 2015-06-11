@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using SM.Media.Playlists;
-using TwitchTV;
 using System.Collections.ObjectModel;
 using Wintellect.Sterling.Core;
 using Wintellect.Sterling.WP8;
 using Wintellect.Sterling.WP8.IsolatedStorage;
 
-namespace SM.Media.BackgroundAudioStreamingAgent
+namespace AudioPlaybackAgent
 {
     static class TrackManager
     {

@@ -2,17 +2,14 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Resources;
 using Windows.Storage;
 using Windows.Storage.Streams;
 
@@ -22,7 +19,7 @@ namespace LiveTileTaskAgent
     {
         static string imageFolder = "shared\\shellcontent\\";
 
-        public async static Task<bool> UpdateLiveTile(string oAuth)
+        public async static Task UpdateLiveTile(string oAuth)
         {
             var StreamsList = new List<TwitchAPIHandler.Objects.Stream>();
             string received = "";
@@ -87,11 +84,9 @@ namespace LiveTileTaskAgent
             }
 
             catch { }
-
-            return true;
         }
 
-        public async static Task<bool> UpdateSecondaryTiles()
+        public async static Task UpdateSecondaryTiles()
         {
             //Get Secondary Tiles
             var tiles = ShellTile.ActiveTiles.Where(x => x.NavigationUri.OriginalString.Contains("PlayerPage")).ToList();
@@ -114,10 +109,9 @@ namespace LiveTileTaskAgent
                     }
                 });
             }
-            return true;
         }
 
-        public async static Task<bool> SendNotifications()
+        public async static Task SendNotifications()
         {
             try
             {
@@ -180,12 +174,14 @@ namespace LiveTileTaskAgent
                     }
                 }
 
-                return true;
             }
 
             catch
             {
-                return false;
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
             }
         }
 

@@ -6,7 +6,7 @@ using Microsoft.Phone.BackgroundAudio;
 using SM.Media.Metadata;
 using SM.Media.Utility;
 
-namespace SM.Media.BackgroundAudioStreamingAgent
+namespace AudioPlaybackAgent
 {
     sealed class AudioMetadataHandler : IDisposable
     {

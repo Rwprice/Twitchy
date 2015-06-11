@@ -6,7 +6,7 @@ using System.Windows;
 using Microsoft.Phone.BackgroundAudio;
 using SM.Media.Utility;
 
-namespace SM.Media.BackgroundAudioStreamingAgent
+namespace AudioPlaybackAgent
 {
     public class AudioPlayer : AudioPlayerAgent
     {

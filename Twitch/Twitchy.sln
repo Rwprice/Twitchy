@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twitchy", "TwitchTV\Twitchy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiveTileTaskAgent", "LiveTileTaskAgent\LiveTileTaskAgent.csproj", "{C6492BAF-AC31-4AE6-A907-4BC488B79446}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioPlaybackAgent", "AudioPlaybackAgent\AudioPlaybackAgent.csproj", "{5E351C3B-B986-4B2D-884E-2A15B9E230F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,22 @@ Global
 		{C6492BAF-AC31-4AE6-A907-4BC488B79446}.Release|Mixed Platforms.Build.0 = Release|x86
 		{C6492BAF-AC31-4AE6-A907-4BC488B79446}.Release|x86.ActiveCfg = Release|x86
 		{C6492BAF-AC31-4AE6-A907-4BC488B79446}.Release|x86.Build.0 = Release|x86
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Debug|ARM.ActiveCfg = Debug|ARM
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Debug|ARM.Build.0 = Debug|ARM
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Debug|x86.ActiveCfg = Debug|x86
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Debug|x86.Build.0 = Debug|x86
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Release|ARM.ActiveCfg = Release|ARM
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Release|ARM.Build.0 = Release|ARM
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Release|Mixed Platforms.Build.0 = Release|x86
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Release|x86.ActiveCfg = Release|x86
+		{5E351C3B-B986-4B2D-884E-2A15B9E230F8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

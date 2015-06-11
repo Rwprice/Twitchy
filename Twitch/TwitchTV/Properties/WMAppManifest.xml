@@ -17,8 +17,8 @@
       <DefaultTask Name="_default" NavigationPage="/Screens/MainPage.xaml" />
       <ExtendedTask Name="UpdateLiveTileTask">
         <BackgroundServiceAgent Specifier="ScheduledTaskAgent" Name="UpdateLiveTileTask" Source="LiveTileTaskAgent" Type="LiveTileTaskAgent.ScheduledAgent" />
-        <BackgroundServiceAgent Specifier="AudioPlayerAgent" Name="AudioPlayerAgent" Source="Twitchy" Type="SM.Media.BackgroundAudioStreamingAgent.AudioPlayer" />
-        <BackgroundServiceAgent Specifier="AudioStreamingAgent" Name="AudioStreamingAgent" Source="Twitchy" Type="SM.Media.BackgroundAudioStreamingAgent.AudioTrackStreamer" />
+        <BackgroundServiceAgent Specifier="AudioPlayerAgent" Name="AudioPlayer" Source="AudioPlaybackAgent" Type="AudioPlaybackAgent.AudioPlayer" />
+        <BackgroundServiceAgent Specifier="AudioStreamingAgent" Name="AudioStreamer" Source="AudioPlaybackAgent" Type="AudioPlaybackAgent.AudioTrackStreamer" />
       </ExtendedTask>
     </Tasks>
     <Tokens>

@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Phone.BackgroundAudio;
-using Microsoft.Phone.Info;
+﻿using Microsoft.Phone.BackgroundAudio;
+using SM.Media;
 using SM.Media.Buffering;
 using SM.Media.MediaManager;
 using SM.Media.Metadata;
 using SM.Media.Utility;
 using SM.Media.Web;
 using SM.TsParser;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace SM.Media.BackgroundAudioStreamingAgent
+namespace AudioPlaybackAgent
 {
     /// <summary>
     ///     A background agent that performs per-track streaming for playback
